@@ -5,7 +5,7 @@ public class Company {
 	String nom;
 	int id;
 	
-	public Company(String name, int id) {
+	public Company(int id, String name) {
 		this.nom = name;
 		this.id = id;
 	}
