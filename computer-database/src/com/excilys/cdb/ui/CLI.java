@@ -19,6 +19,9 @@ public class CLI {
 	public final static Scanner sc = new Scanner(System.in);
 	public final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
+	/**
+	 * Affiche la liste des ordinateurs sous forme de tableau
+	 */
 	public static void showComputerList()
 	{
 		List<Computer> compList = ComputerDAO.getComputerList();
@@ -46,6 +49,9 @@ public class CLI {
 		System.out.println(outString);
 	}
 	
+	/**
+	 * Affiche la liste des entreprises sous la forme d'un tableau
+	 */
 	public static void showCompaniesList()
 	{
 		List<Company> compList = CompanyDAO.getCompaniesList();
@@ -61,7 +67,13 @@ public class CLI {
 		System.out.println(outString);
 	}
 	
-	public static Optional<String> optionalActionYesNo(String question, String actionIfYes)
+	/**
+	 * Pose une question à l'utilisateur et lui demande une entrée si oui
+	 * @param question La question à poser à l'utilisateur
+	 * @param actionIfYes Demande l'entrée
+	 * @return Un Optional contenant l'entrée de l'utilisateur s'il y en a une
+	 */
+	private static Optional<String> optionalActionYesNo(String question, String actionIfYes)
 	{
 		boolean ok= false;
 		Optional<String> res = Optional.empty();
@@ -93,7 +105,12 @@ public class CLI {
 		}
 		return res;
 	}
-	
+	/**
+	 * Demande si l'utilisateur veut entrer une date puis demande une date à l'utilisateur sous la forme DD/MM/YYYY
+	 * @param debut Indique si c'est la date de début ou de fin. Ca change seulement l'affichage
+	 * @param minDate La date entrée doit être supérieure à cette date
+	 * @return Un objet LocalDateTime correspondant à ce que l'utiliateur a entré
+	 */
 	private static Optional<LocalDateTime> askDate(boolean debut, LocalDateTime minDate)
 	{
 		String askString1 = debut ? "Voulez-vous mettre une date d'introduction ?" : "Voulez-vous mettre une date de fin ?";
@@ -125,6 +142,10 @@ public class CLI {
 		}
 	}
 	
+	/**
+	 * Demande si l'utilisateur veut entrer le nom d'une entreprise puis demande le nom d'un fabricant et renvoie l'objet Company associé
+	 * @return Un optional contenant un objet Company si présent
+	 */
 	private static Optional<Company> askCompany()
 	{
 		while(true)
@@ -149,6 +170,10 @@ public class CLI {
 		}
 	}
 	
+	/**
+	 * Demande un identifiant à l'utilisateur et renvoie l'ordianteur associé
+	 * @return L'ordinateur avec l'identifiant rentré
+	 */
 	private static Computer askComputer()
 	{
 		while(true)
@@ -172,6 +197,9 @@ public class CLI {
 		}
 	}
 	
+	/**
+	 * Demande des informations à l'utilisateur et crée un nouvel ordinateur puis l'ajoute dans la base de données
+	 */
 	public static void createNewComputer()
 	{
 		System.out.println("Création d'un nouvel ordinateur\n");
@@ -197,7 +225,10 @@ public class CLI {
 		System.out.println("Ordinateur ajouté");
 		
 	}
-	
+
+	/**
+	 * Demande des informations à l'utilisateur pour mettre à jour un ordinateur déjà existant
+	 */
 	public static void updateComputer()
 	{
 		System.out.println("Modification d'un ordinateur\n");
@@ -224,6 +255,9 @@ public class CLI {
 		System.out.println("Ordinateur mis à jour");		
 	}
 	
+	/**
+	 * Supprime un ordinateur de la base de données
+	 */
 	public static void deleteComputer()
 	{
 		System.out.println("Suppression d'un ordinateur\n");
@@ -233,6 +267,12 @@ public class CLI {
 		
 	}
 	
+	/**
+	 * Demande un entier à l'utilisateur entre min et max
+	 * @param min Le minimum acceptable
+	 * @param max le maximum acceptable
+	 * @return Un entier entre min et max
+	 */
 	public static int getIntBetween(int min, int max)
 	{
 		while(true)
@@ -255,6 +295,9 @@ public class CLI {
 		}
 	}
 	
+	/**
+	 * Affiche le menu principal
+	 */
 	public static void printMenu()
 	{
 		System.out.println("\n\n\nComputer Database");
@@ -266,6 +309,9 @@ public class CLI {
 		System.out.println("6 - Quitter\n");
 	}
 	
+	/**
+	 * Affiche le menu principal, récupère l'entrée de l'utilisateur et fait l'action correspondante
+	 */
 	public static void menu()
 	{
 		while(true)

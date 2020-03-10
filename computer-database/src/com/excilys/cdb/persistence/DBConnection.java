@@ -13,6 +13,9 @@ public class DBConnection implements AutoCloseable {
 	private Connection conn;
 	private Statement stmt;
 	
+	/**
+	 * Se connecte à la base de données et stocke la connexion
+	 */
 	private DBConnection() {
 		String url = "jdbc:mysql://localhost:3306/";
 		String db = "computer-database-db";
@@ -45,7 +48,7 @@ public class DBConnection implements AutoCloseable {
 	
 	/**
 	 * 
-	 * @param query La requête SQLà exécuter
+	 * @param query La requête SQL à exécuter
 	 * @return Le resultat de la requête sous la forme d'un ResultSet
 	 * @throws SQLException
 	 */
@@ -67,15 +70,15 @@ public class DBConnection implements AutoCloseable {
 		return stmt.executeUpdate(insertQuery);
 	}
 	
+	/**
+	 * Crée une PreparedStement sur l'objet conn et le renvoie
+	 * @param query la requête à executer
+	 * @return Une preparedStatement de l'objet conn
+	 * @throws SQLException
+	 */
 	public PreparedStatement prepareStement(String query) throws SQLException
 	{
 		return conn.prepareStatement(query);
-	}
-	
-	
-	public static void main(String[] args) {
-		System.err.println("Erreur 1");
-		System.err.println("Erreur 2");
 	}
 
 	/**
