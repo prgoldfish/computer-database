@@ -8,7 +8,7 @@ public class Computer {
 	private String nom;
 	private LocalDateTime dateIntroduction;
 	private LocalDateTime dateDiscontinuation;
-	private Integer idEntreprise;
+	private Company entreprise;
 	
 	
 	private Computer(ComputerBuilder builder) {
@@ -16,7 +16,7 @@ public class Computer {
 		this.nom = builder.nom;
 		this.dateIntroduction = builder.dateIntroduction;
 		this.dateDiscontinuation = builder.dateDiscontinuation;
-		this.idEntreprise = builder.idEntreprise;
+		this.entreprise = builder.entreprise;
 	}
 	
 	/**
@@ -82,16 +82,16 @@ public class Computer {
 	/**
 	 * @return Renvoie l'identifiant de l'entreprise associée à l'ordinateur
 	 */
-	public Integer getIdEntreprise() {
-		return idEntreprise;
+	public Company getEntreprise() {
+		return entreprise;
 	}
 	
 	/**
 	 * 
 	 * @param idEntreprise Identifiant de l'entreprise associée à l'ordinateur
 	 */
-	public void setIdEntreprise(Integer idEntreprise) {
-		this.idEntreprise = idEntreprise;
+	public void setEntreprise(Company entreprise) {
+		this.entreprise = entreprise;
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class Computer {
 		res.append(", nom=").append(nom == null ? "Indefini" : nom);
 		res.append(", dateIntroduction=").append(dateIntroduction == null ? "Indefini" : dateIntroduction);
 		res.append(", dateDiscontinuation=").append(dateDiscontinuation == null ? "Indefini" : dateDiscontinuation);
-		res.append(", idEntreprise=").append(idEntreprise).append("]");
+		res.append(", idEntreprise=").append(entreprise).append("]");
 		return res.toString();
 	}
 	
@@ -113,7 +113,7 @@ public class Computer {
 		//Optionnels
 		private LocalDateTime dateIntroduction;
 		private LocalDateTime dateDiscontinuation;
-		private Integer idEntreprise;
+		private Company entreprise;
 		
 		
 		public ComputerBuilder(int id, String nom) {
@@ -134,8 +134,8 @@ public class Computer {
 		}
 
 
-		public ComputerBuilder setIdEntreprise(Integer idEntreprise) {
-			this.idEntreprise = idEntreprise;
+		public ComputerBuilder setEntreprise(Company entreprise) {
+			this.entreprise = entreprise;
 			return this;
 		}
 		

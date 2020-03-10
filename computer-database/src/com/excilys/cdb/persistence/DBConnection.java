@@ -90,5 +90,10 @@ public class DBConnection implements AutoCloseable {
 		}
 		
 	}
+	
+	@Override
+	protected void finalize() throws SQLException {
+		conn.close();
+	}
 
 }
