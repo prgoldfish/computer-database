@@ -153,7 +153,7 @@ public class CLI {
 	{
 		while(true)
 		{
-			System.out.println("Entrez l'identifiant de l'ordinateur à modifier : ");
+			System.out.println("Entrez l'identifiant de l'ordinateur : ");
 			try
 			{
 				int cId = Integer.parseInt(sc.nextLine());
@@ -174,6 +174,7 @@ public class CLI {
 	
 	public static void createNewComputer()
 	{
+		System.out.println("Création d'un nouvel ordinateur\n");
 		System.out.println("Entrez le nom du nouvel ordinateur : ");
 		String computerName = sc.nextLine();
 		ComputerBuilder builder = new Computer.ComputerBuilder(ComputerDAO.getMaxId() + 1, computerName);
@@ -199,6 +200,7 @@ public class CLI {
 	
 	public static void updateComputer()
 	{
+		System.out.println("Modification d'un ordinateur\n");
 		Computer toUpdate = askComputer();
 		Optional<LocalDateTime> dateDebut = askDate(true, null);
 		if(dateDebut.isPresent())
@@ -207,7 +209,7 @@ public class CLI {
 		}
 		if(toUpdate.getDateIntroduction() != null)
 		{
-			Optional<LocalDateTime> dateFin = askDate(false, toUpdate.getDateDiscontinuation());
+			Optional<LocalDateTime> dateFin = askDate(false, toUpdate.getDateIntroduction());
 			if(dateFin.isPresent())
 			{
 				toUpdate.setDateDiscontinuation(dateFin.get());
@@ -219,20 +221,98 @@ public class CLI {
 			toUpdate.setEntreprise(entreprise.get());
 		}
 		ComputerDAO.updateComputer(toUpdate);
-		System.out.println("Ordinateur mis à jour");
+		System.out.println("Ordinateur mis à jour");		
+	}
+	
+	public static void deleteComputer()
+	{
+		System.out.println("Suppression d'un ordinateur\n");
+		Computer toDelete = askComputer();
+		ComputerDAO.deleteComputer(toDelete.getId());
+		System.out.println("Ordinateur supprimé");
 		
+	}
+	
+	public static int getIntBetween(int min, int max)
+	{
+		while(true)
+		{
+			System.out.println("Veuillez entrer un nombre entre " + min + " et " + max );
+			try
+			{
+				int in = Integer.parseInt(sc.nextLine());
+				if(in >= min && in <= max)
+				{
+					return in;
+				}
+				else
+				{
+					System.out.println("L'entrée doit être comprise entre " + min + " et " + max);
+				}
+			} catch (NumberFormatException e) {
+				System.out.println("Entrée invalide.");
+			}
+		}
+	}
+	
+	public static void printMenu()
+	{
+		System.out.println("\n\n\nComputer Database");
+		System.out.println("1 - Afficher la liste des ordinateurs");
+		System.out.println("2 - Afficher la liste des entreprises");
+		System.out.println("3 - Créer un nouvel ordinateur");
+		System.out.println("4 - Modifier un ordinateur");
+		System.out.println("5 - Supprimer un ordinateur");
+		System.out.println("6 - Quitter\n");
+	}
+	
+	public static void menu()
+	{
+		while(true)
+		{
+			printMenu();
+			switch (getIntBetween(1,  6)) {
+			case 1:
+				showComputerList();
+				break;
+
+			case 2:
+				showCompaniesList();
+				break;
+				
+			case 3:
+				createNewComputer();
+				break;
+
+			case 4:
+				updateComputer();
+				break;
+
+			case 5:
+				deleteComputer();
+				break;
+
+			case 6:
+				System.exit(0);
+
+			default:
+				System.err.println("Endroit inatteignable");
+				break;
+			}
+		}
 	}
 	
 	
 	
-	
 	public static void main(String[] args) {
-		showComputerList();
+		//showComputerList();
 		//System.out.println(LocalDate.parse("23/09/1996", dateFormatter).atStartOfDay());
 		//showCompaniesList();
 		//System.out.println(optionalActionYesNo("Voulez-vous écrire quelque chose ?", "Ecrivez quelque chose"));
 		//createNewComputer();
-		updateComputer();
+		//updateComputer();
+		//deleteComputer();
+		menu();
 	}
 
 }

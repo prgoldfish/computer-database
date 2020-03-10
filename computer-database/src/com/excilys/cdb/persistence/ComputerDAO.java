@@ -48,7 +48,7 @@ public class ComputerDAO {
 				}
 				if(discont != null)
 				{
-					c.setDateIntroduction(discont.toLocalDateTime());
+					c.setDateDiscontinuation(discont.toLocalDateTime());
 				}
 				if (idEntreprise != 0)
 				{
