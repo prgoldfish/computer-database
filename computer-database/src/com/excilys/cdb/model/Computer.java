@@ -96,11 +96,12 @@ public class Computer {
 
 	@Override
 	public String toString() {
+		String indefini = "Indefini";
 		StringBuilder res = new StringBuilder("Identifiant : ");
 		res.append(id);
-		res.append("\nNom de l'ordinateur : ").append(nom == null ? "Indefini" : nom);
-		res.append("\nDate d'introduction : ").append(dateIntroduction == null ? "Indefini" : dateIntroduction);
-		res.append("\nDate de fin : ").append(dateDiscontinuation == null ? "Indefini" : dateDiscontinuation);
+		res.append("\nNom de l'ordinateur : ").append(nom == null ? indefini : nom);
+		res.append("\nDate d'introduction : ").append(dateIntroduction == null ? indefini : dateIntroduction);
+		res.append("\nDate de fin : ").append(dateDiscontinuation == null ? indefini : dateDiscontinuation);
 		res.append("\nEntreprise : ").append(entreprise);
 		return res.toString();
 	}

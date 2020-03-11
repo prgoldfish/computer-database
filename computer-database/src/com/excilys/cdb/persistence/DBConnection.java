@@ -26,7 +26,7 @@ public class DBConnection implements AutoCloseable {
 		try
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			this.conn = (Connection) DriverManager.getConnection(url + db , user, pass);
+			this.conn = DriverManager.getConnection(url + db , user, pass);
 		}catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -92,11 +92,6 @@ public class DBConnection implements AutoCloseable {
 			stmt.close();
 		}
 		
-	}
-	
-	@Override
-	protected void finalize() throws SQLException {
-		conn.close();
 	}
 
 }

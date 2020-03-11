@@ -20,7 +20,7 @@ public class CompanyDAO {
 	 */
 	public static List<Company> getCompaniesList()
 	{
-		List<Company> compList = new ArrayList<Company>();
+		List<Company> compList = new ArrayList<>();
 		try (DBConnection conn = DBConnection.getConnection();) {
 			ResultSet res = conn.query(SELECT_COMPANY_LIST_QUERY);
 			while(res.next())

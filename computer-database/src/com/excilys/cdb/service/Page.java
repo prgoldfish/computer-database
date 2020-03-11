@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.persistence.ComputerDAO;
 
 public class Page {
 	
-	private List<Computer> computerList;
 	private int pageLength;
 	private int currentPage;
 	private int maxPage;
@@ -29,12 +29,11 @@ public class Page {
 		return head.toString();
 	}
 	
-	public Page(List<Computer> list, int pageLength)
+	public Page(int pageLength)
 	{
-		this.computerList = list;
 		this.pageLength = pageLength;
 		this.currentPage = 0;
-		this.maxPage = (computerList.size() - 1) / pageLength;
+		this.maxPage = (ComputerDAO.getMaxId() - 1) / pageLength;
 	}
 	
 	/**
@@ -42,26 +41,30 @@ public class Page {
 	 */
 	public void printPage()
 	{
-		int maxIndex = Math.min(computerList.size(), (currentPage + 1) * pageLength);
+		List<Computer> computerList = ComputerDAO.getComputerList(currentPage * pageLength, pageLength);
 		System.out.println(header);
-		for(Computer c : computerList.subList(currentPage * pageLength, maxIndex))
+		for(Computer c : computerList)
 		{
-			StringBuilder outString = new StringBuilder();
-			LocalDateTime intro = c.getDateIntroduction();
-			LocalDateTime discont = c.getDateDiscontinuation();
-			Company entreprise = c.getEntreprise();
-			String introString = intro == null ? "Indefini" : intro.toString();
-			String discontString = discont == null ? "Indéfini" : discont.toString();
-			String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getNom();
-			outString.append("| ").append(c.getId());
-			outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
-			outString.append("| ").append(String.format("%1$-20s", introString));
-			outString.append("| ").append(String.format("%1$-24s", discontString));
-			outString.append("| ").append(String.format("%1$-45s", nomEntreprise));
-			outString.append("|");
-			System.out.println(outString);
+			printComputer(c);
 		}
 		System.out.println("\nPage " + (currentPage + 1) + "/" + (maxPage + 1));
+	}
+
+	private void printComputer(Computer c) {
+		StringBuilder outString = new StringBuilder();
+		LocalDateTime intro = c.getDateIntroduction();
+		LocalDateTime discont = c.getDateDiscontinuation();
+		Company entreprise = c.getEntreprise();
+		String introString = intro == null ? "Indefini" : intro.toString();
+		String discontString = discont == null ? "Indéfini" : discont.toString();
+		String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getNom();
+		outString.append("| ").append(c.getId());
+		outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
+		outString.append("| ").append(String.format("%1$-20s", introString));
+		outString.append("| ").append(String.format("%1$-24s", discontString));
+		outString.append("| ").append(String.format("%1$-45s", nomEntreprise));
+		outString.append("|");
+		System.out.println(outString);
 	}
 	
 	/**

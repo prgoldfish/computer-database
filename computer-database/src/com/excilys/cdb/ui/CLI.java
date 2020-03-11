@@ -17,8 +17,8 @@ import com.excilys.cdb.service.Page;
 
 public class CLI {
 
-	private final static Scanner sc = new Scanner(System.in);
-	private final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	private static final Scanner sc = new Scanner(System.in);
+	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
 	/**
 	 * Demande un numéro de page à l'utilisateur
@@ -35,36 +35,40 @@ public class CLI {
 	 */
 	private static void showComputerList()
 	{
-		List<Computer> compList = ComputerDAO.getComputerList();
-		Page page = new Page(compList, 20);
+		Page page = new Page(20);
 		page.printPage();
 		boolean quit = false;
 		while(!quit)
 		{
 			System.out.println("Entrez \"prec\" pour voir la page précédente, \"suiv\" pour la page suivante, \"page\" pour aller à une page et \"menu\" pour retourner au menu principal.");
-			switch (sc.nextLine()) {
-			case "prec":
-				page.printPreviousPage();
-				break;
-				
-			case "suiv":
-				page.printNextPage();
-				break;
-				
-			case "page":
-				askPage(page);
-				page.printPage();
-				break;
-				
-			case "menu":
-				quit = true;
-				break;
-
-			default:
-				System.out.println("Entrée invalide");
-				break;
-			}
+			quit = pageCommandSwitch(page, quit);
 		}
+	}
+
+	private static boolean pageCommandSwitch(Page page, boolean quit) {
+		switch (sc.nextLine()) {
+		case "prec":
+			page.printPreviousPage();
+			break;
+			
+		case "suiv":
+			page.printNextPage();
+			break;
+			
+		case "page":
+			askPage(page);
+			page.printPage();
+			break;
+			
+		case "menu":
+			quit = true;
+			break;
+
+		default:
+			System.out.println("Entrée invalide");
+			break;
+		}
+		return quit;
 	}
 	
 	/**
@@ -231,6 +235,22 @@ public class CLI {
 		System.out.println("Entrez le nom du nouvel ordinateur : ");
 		String computerName = sc.nextLine();
 		ComputerBuilder builder = new Computer.ComputerBuilder(ComputerDAO.getMaxId() + 1, computerName);
+		setDateComputer(builder);
+		setCompanyComputer(builder);
+		ComputerDAO.addComputer(builder.build());
+		System.out.println("Ordinateur ajouté");
+		
+	}
+
+	private static void setCompanyComputer(ComputerBuilder builder) {
+		Optional<Company> entreprise = askCompany();
+		if(entreprise.isPresent())
+		{
+			builder.setEntreprise(entreprise.get());
+		}
+	}
+
+	private static void setDateComputer(ComputerBuilder builder) {
 		Optional<LocalDateTime> dateDebut = askDate(true, null);
 		if(dateDebut.isPresent())
 		{
@@ -241,14 +261,6 @@ public class CLI {
 				builder.setDateDiscontinuation(dateFin.get());
 			}
 		}
-		Optional<Company> entreprise = askCompany();
-		if(entreprise.isPresent())
-		{
-			builder.setEntreprise(entreprise.get());
-		}
-		ComputerDAO.addComputer(builder.build());
-		System.out.println("Ordinateur ajouté");
-		
 	}
 
 	/**
@@ -258,6 +270,21 @@ public class CLI {
 	{
 		System.out.println("Modification d'un ordinateur\n");
 		Computer toUpdate = askComputer();
+		updateComputerDates(toUpdate);
+		updateComputerCompany(toUpdate);
+		ComputerDAO.updateComputer(toUpdate);
+		System.out.println("Ordinateur mis à jour");		
+	}
+
+	private static void updateComputerCompany(Computer toUpdate) {
+		Optional<Company> entreprise = askCompany();
+		if(entreprise.isPresent())
+		{
+			toUpdate.setEntreprise(entreprise.get());
+		}
+	}
+
+	private static void updateComputerDates(Computer toUpdate) {
 		Optional<LocalDateTime> dateDebut = askDate(true, null);
 		if(dateDebut.isPresent())
 		{
@@ -271,13 +298,6 @@ public class CLI {
 				toUpdate.setDateDiscontinuation(dateFin.get());
 			}
 		}
-		Optional<Company> entreprise = askCompany();
-		if(entreprise.isPresent())
-		{
-			toUpdate.setEntreprise(entreprise.get());
-		}
-		ComputerDAO.updateComputer(toUpdate);
-		System.out.println("Ordinateur mis à jour");		
 	}
 	
 	/**
@@ -366,9 +386,10 @@ public class CLI {
 
 			case 6:
 				showComputerDetails();
+				break;
 
 			case 7:
-				System.exit(0);
+				return;
 
 			default:
 				System.err.println("Endroit inatteignable");
@@ -380,13 +401,7 @@ public class CLI {
 	
 	
 	public static void main(String[] args) {
-		//showComputerList();
-		//System.out.println(LocalDate.parse("23/09/1996", dateFormatter).atStartOfDay());
-		//showCompaniesList();
-		//System.out.println(optionalActionYesNo("Voulez-vous écrire quelque chose ?", "Ecrivez quelque chose"));
-		//createNewComputer();
-		//updateComputer();
-		//deleteComputer();
+
 		menu();
 	}
 
