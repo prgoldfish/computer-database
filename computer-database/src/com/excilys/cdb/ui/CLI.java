@@ -13,11 +13,18 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.persistence.CompanyDAO;
 import com.excilys.cdb.persistence.ComputerDAO;
+import com.excilys.cdb.service.Page;
 
 public class CLI {
 
 	private final static Scanner sc = new Scanner(System.in);
 	private final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	
+	private static void askPage(Page p) {
+		System.out.println("Entrez un numéro de page entre 1 et " + (p.getMaxPage() + 1));
+		int pageNum = getIntBetween(1, p.getMaxPage() + 1);
+		p.gotoPage(pageNum - 1);
+	}
 	
 	/**
 	 * Affiche la liste des ordinateurs sous forme de tableau
@@ -25,28 +32,35 @@ public class CLI {
 	private static void showComputerList()
 	{
 		List<Computer> compList = ComputerDAO.getComputerList();
-		StringBuilder outString = new StringBuilder("| Id\t| ");
-		outString.append(String.format("%1$-70s", "Nom"));
-		outString.append(String.format("%1$-22s", "| Date d'introduction"));
-		outString.append(String.format("%1$-26s", "| Date de discontinuation"));
-		outString.append(String.format("%1$-47s", "| Entreprise"));
-		outString.append("|\n");
-		for(Computer c : compList)
+		Page page = new Page(compList, 20);
+		page.printPage();
+		boolean quit = false;
+		while(!quit)
 		{
-			LocalDateTime intro = c.getDateIntroduction();
-			LocalDateTime discont = c.getDateDiscontinuation();
-			Company entreprise = c.getEntreprise();
-			String introString = intro == null ? "Indefini" : intro.toString();
-			String discontString = discont == null ? "Indéfini" : discont.toString();
-			String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getNom();
-			outString.append("| ").append(c.getId());
-			outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
-			outString.append("| ").append(String.format("%1$-20s", introString));
-			outString.append("| ").append(String.format("%1$-24s", discontString));
-			outString.append("| ").append(String.format("%1$-45s", nomEntreprise));
-			outString.append("|\n");
+			System.out.println("Entrez \"prec\" pour voir la page précédente, \"suiv\" pour la page suivante, \"page\" pour aller à une page et \"menu\" pour retourner au menu principal.");
+			switch (sc.nextLine()) {
+			case "prec":
+				page.printPreviousPage();
+				break;
+				
+			case "suiv":
+				page.printNextPage();
+				break;
+				
+			case "page":
+				askPage(page);
+				page.printPage();
+				break;
+				
+			case "menu":
+				quit = true;
+				break;
+
+			default:
+				System.out.println("Entrée invalide");
+				break;
+			}
 		}
-		System.out.println(outString);
 	}
 	
 	/**
