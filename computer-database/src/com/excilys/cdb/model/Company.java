@@ -26,7 +26,7 @@ public class Company {
 
 	@Override
 	public String toString() {
-		return "Company [nom=" + nom + ", id=" + id + "]";
+		return nom + "(" + id + ")";
 	}
 	
 	

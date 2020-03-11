@@ -96,12 +96,12 @@ public class Computer {
 
 	@Override
 	public String toString() {
-		StringBuilder res = new StringBuilder("Computer [id=");
+		StringBuilder res = new StringBuilder("Identifiant : ");
 		res.append(id);
-		res.append(", nom=").append(nom == null ? "Indefini" : nom);
-		res.append(", dateIntroduction=").append(dateIntroduction == null ? "Indefini" : dateIntroduction);
-		res.append(", dateDiscontinuation=").append(dateDiscontinuation == null ? "Indefini" : dateDiscontinuation);
-		res.append(", idEntreprise=").append(entreprise).append("]");
+		res.append("\nNom de l'ordinateur : ").append(nom == null ? "Indefini" : nom);
+		res.append("\nDate d'introduction : ").append(dateIntroduction == null ? "Indefini" : dateIntroduction);
+		res.append("\nDate de fin : ").append(dateDiscontinuation == null ? "Indefini" : dateDiscontinuation);
+		res.append("\nEntreprise : ").append(entreprise);
 		return res.toString();
 	}
 	

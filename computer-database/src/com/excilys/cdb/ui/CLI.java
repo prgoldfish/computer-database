@@ -16,13 +16,13 @@ import com.excilys.cdb.persistence.ComputerDAO;
 
 public class CLI {
 
-	public final static Scanner sc = new Scanner(System.in);
-	public final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	private final static Scanner sc = new Scanner(System.in);
+	private final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
 	/**
 	 * Affiche la liste des ordinateurs sous forme de tableau
 	 */
-	public static void showComputerList()
+	private static void showComputerList()
 	{
 		List<Computer> compList = ComputerDAO.getComputerList();
 		StringBuilder outString = new StringBuilder("| Id\t| ");
@@ -52,7 +52,7 @@ public class CLI {
 	/**
 	 * Affiche la liste des entreprises sous la forme d'un tableau
 	 */
-	public static void showCompaniesList()
+	private static void showCompaniesList()
 	{
 		List<Company> compList = CompanyDAO.getCompaniesList();
 		StringBuilder outString = new StringBuilder("| Id\t| ");
@@ -197,10 +197,17 @@ public class CLI {
 		}
 	}
 	
+	private static void showComputerDetails()
+	{
+		Computer c = askComputer();
+		System.out.println("Details de l'ordinateur : ");
+		System.out.println(c);
+	}
+	
 	/**
 	 * Demande des informations à l'utilisateur et crée un nouvel ordinateur puis l'ajoute dans la base de données
 	 */
-	public static void createNewComputer()
+	private static void createNewComputer()
 	{
 		System.out.println("Création d'un nouvel ordinateur\n");
 		System.out.println("Entrez le nom du nouvel ordinateur : ");
@@ -229,7 +236,7 @@ public class CLI {
 	/**
 	 * Demande des informations à l'utilisateur pour mettre à jour un ordinateur déjà existant
 	 */
-	public static void updateComputer()
+	private static void updateComputer()
 	{
 		System.out.println("Modification d'un ordinateur\n");
 		Computer toUpdate = askComputer();
@@ -258,7 +265,7 @@ public class CLI {
 	/**
 	 * Supprime un ordinateur de la base de données
 	 */
-	public static void deleteComputer()
+	private static void deleteComputer()
 	{
 		System.out.println("Suppression d'un ordinateur\n");
 		Computer toDelete = askComputer();
@@ -273,7 +280,7 @@ public class CLI {
 	 * @param max le maximum acceptable
 	 * @return Un entier entre min et max
 	 */
-	public static int getIntBetween(int min, int max)
+	private static int getIntBetween(int min, int max)
 	{
 		while(true)
 		{
@@ -298,7 +305,7 @@ public class CLI {
 	/**
 	 * Affiche le menu principal
 	 */
-	public static void printMenu()
+	private static void printMenu()
 	{
 		System.out.println("\n\n\nComputer Database");
 		System.out.println("1 - Afficher la liste des ordinateurs");
@@ -306,7 +313,8 @@ public class CLI {
 		System.out.println("3 - Créer un nouvel ordinateur");
 		System.out.println("4 - Modifier un ordinateur");
 		System.out.println("5 - Supprimer un ordinateur");
-		System.out.println("6 - Quitter\n");
+		System.out.println("6 - Afficher les détails d'un ordinateur");
+		System.out.println("7 - Quitter\n");
 	}
 	
 	/**
@@ -317,7 +325,7 @@ public class CLI {
 		while(true)
 		{
 			printMenu();
-			switch (getIntBetween(1,  6)) {
+			switch (getIntBetween(1,  7)) {
 			case 1:
 				showComputerList();
 				break;
@@ -339,6 +347,9 @@ public class CLI {
 				break;
 
 			case 6:
+				showComputerDetails();
+
+			case 7:
 				System.exit(0);
 
 			default:
