@@ -14,7 +14,10 @@ public class Page {
 	private int maxPage;
 	private static String header = setHeader();
 	
-	
+	/**
+	 * Crée le header en haut de chaque page
+	 * @return Une String repésentant le header
+	 */
 	private static String setHeader()
 	{
 		StringBuilder head = new StringBuilder("| Id\t| ");
@@ -34,6 +37,9 @@ public class Page {
 		this.maxPage = (computerList.size() - 1) / pageLength;
 	}
 	
+	/**
+	 * Affiche chaque élément de la page actuelle sous forme de tableau
+	 */
 	public void printPage()
 	{
 		int maxIndex = Math.min(computerList.size(), (currentPage + 1) * pageLength);
@@ -58,10 +64,17 @@ public class Page {
 		System.out.println("\nPage " + (currentPage + 1) + "/" + (maxPage + 1));
 	}
 	
+	/**
+	 * Renvoie le nombre maximum de pages
+	 * @return Le nombre max de pages (en partant de 0)
+	 */
 	public int getMaxPage() {
 		return maxPage;
 	}
-
+	
+	/**
+	 * Passe à la page suivante et l'affiche 
+	 */
 	public void printNextPage() {
 		if(currentPage + 1 > maxPage)
 		{
@@ -74,6 +87,9 @@ public class Page {
 		}
 	}
 	
+	/**
+	 * Passe à la page précédente et l'affiche
+	 */
 	public void printPreviousPage()
 	{
 		if(currentPage - 1 < 0)
@@ -87,6 +103,10 @@ public class Page {
 		}
 	}
 	
+	/** 
+	 * Va à la page indiquée en paramètre
+	 * @param pageNumber Le numéro de page voulu
+	 */
 	public void gotoPage(int pageNumber)
 	{
 		if(pageNumber >= 0 && pageNumber <= maxPage)

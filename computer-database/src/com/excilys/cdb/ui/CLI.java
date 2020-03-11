@@ -20,6 +20,10 @@ public class CLI {
 	private final static Scanner sc = new Scanner(System.in);
 	private final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
+	/**
+	 * Demande un numéro de page à l'utilisateur
+	 * @param p L'objet page contenant les informations de pagination
+	 */
 	private static void askPage(Page p) {
 		System.out.println("Entrez un numéro de page entre 1 et " + (p.getMaxPage() + 1));
 		int pageNum = getIntBetween(1, p.getMaxPage() + 1);
@@ -27,7 +31,7 @@ public class CLI {
 	}
 	
 	/**
-	 * Affiche la liste des ordinateurs sous forme de tableau
+	 * Affiche la liste des ordinateurs avec un système de pagination
 	 */
 	private static void showComputerList()
 	{
