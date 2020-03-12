@@ -3,6 +3,8 @@ package com.excilys.cdb.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.excilys.cdb.exception.ComputerServiceException;
+import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.ComputerDAO;
@@ -33,24 +35,25 @@ public class Page {
 	{
 		this.pageLength = pageLength;
 		this.currentPage = 0;
-		this.maxPage = (ComputerDAO.getMaxId() - 1) / pageLength;
+		this.maxPage = (int) ((ComputerDAO.getMaxId() - 1) / pageLength);
 	}
 	
 	/**
 	 * Affiche chaque élément de la page actuelle sous forme de tableau
+	 * @throws ComputerServiceException 
 	 */
-	public void printPage()
+	public String getPageContent() throws ComputerServiceException
 	{
-		List<Computer> computerList = ComputerDAO.getComputerList(currentPage * pageLength, pageLength);
-		System.out.println(header);
+		List<Computer> computerList = new ComputerService().getComputerList(currentPage * pageLength, pageLength);
+		String outString = header;
 		for(Computer c : computerList)
 		{
-			printComputer(c);
+			outString += computerDetailsString(c) + '\n';
 		}
-		System.out.println("\nPage " + (currentPage + 1) + "/" + (maxPage + 1));
+		return outString + "\nPage " + (currentPage + 1) + "/" + (maxPage + 1) + "\n";
 	}
 
-	private void printComputer(Computer c) {
+	private String computerDetailsString(Computer c) {
 		StringBuilder outString = new StringBuilder();
 		LocalDateTime intro = c.getDateIntroduction();
 		LocalDateTime discont = c.getDateDiscontinuation();
@@ -64,7 +67,7 @@ public class Page {
 		outString.append("| ").append(String.format("%1$-24s", discontString));
 		outString.append("| ").append(String.format("%1$-45s", nomEntreprise));
 		outString.append("|");
-		System.out.println(outString);
+		return outString.toString();
 	}
 	
 	/**
@@ -77,33 +80,33 @@ public class Page {
 	
 	/**
 	 * Passe à la page suivante et l'affiche 
+	 * @return 
+	 * @throws ComputerServiceException 
+	 * @throws PageException 
 	 */
-	public void printNextPage() {
+	public String getNextPageContents() throws ComputerServiceException, PageException {
 		if(currentPage + 1 > maxPage)
 		{
-			System.out.println("Il n'y a pas de page suivante");
+			throw new PageException("Il n'y a pas de page suivante");
 		}
-		else
-		{
-			currentPage++;
-			printPage();
-		}
+		currentPage++;
+		return getPageContent();
 	}
 	
 	/**
 	 * Passe à la page précédente et l'affiche
+	 * @return 
+	 * @throws ComputerServiceException 
+	 * @throws PageException 
 	 */
-	public void printPreviousPage()
+	public String getPreviousPageContents() throws ComputerServiceException, PageException
 	{
 		if(currentPage - 1 < 0)
 		{
-			System.out.println("Il n'y a pas de page précédente");
+			throw new PageException("Il n'y a pas de page précédente");
 		}
-		else
-		{
-			currentPage--;
-			printPage();
-		}
+		currentPage--;
+		return getPageContent();
 	}
 	
 	/** 

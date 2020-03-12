@@ -25,7 +25,7 @@ public class CompanyDAO {
 			ResultSet res = conn.query(SELECT_COMPANY_LIST_QUERY);
 			while(res.next())
 			{
-				Company c = new Company(res.getInt("id"), res.getString("name"));
+				Company c = new Company(res.getLong("id"), res.getString("name"));
 				compList.add(c);
 			}
 		} catch (SQLException e) {
@@ -42,7 +42,7 @@ public class CompanyDAO {
 			ResultSet res = stmt.executeQuery();
 			if(res.next())
 			{
-				return Optional.of(new Company(res.getInt("id"), res.getString("name")));
+				return Optional.of(new Company(res.getLong("id"), res.getString("name")));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

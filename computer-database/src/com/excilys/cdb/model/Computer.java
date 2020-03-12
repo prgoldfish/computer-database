@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Computer {
 	
-	private int id;
+	private long id;
 	private String nom;
 	private LocalDateTime dateIntroduction;
 	private LocalDateTime dateDiscontinuation;
@@ -22,7 +22,7 @@ public class Computer {
 	/**
 	 * @return Renvoie l'identifiant de l'ordinateur
 	 */
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 	
@@ -30,7 +30,7 @@ public class Computer {
 	 * 
 	 * @param id Identifiant de l'ordinateur
 	 */
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	
@@ -108,7 +108,7 @@ public class Computer {
 	
 	public static class ComputerBuilder {
 		//Obligatoires
-		private int id;
+		private long id;
 		private String nom;
 		
 		//Optionnels
@@ -117,7 +117,7 @@ public class Computer {
 		private Company entreprise;
 		
 		
-		public ComputerBuilder(int id, String nom) {
+		public ComputerBuilder(long id, String nom) {
 			this.id = id;
 			this.nom = nom;
 		}
@@ -138,6 +138,11 @@ public class Computer {
 		public ComputerBuilder setEntreprise(Company entreprise) {
 			this.entreprise = entreprise;
 			return this;
+		}
+		
+		public LocalDateTime getDateIntroduction()
+		{
+			return this.dateIntroduction;
 		}
 		
 		public Computer build()

@@ -3,9 +3,9 @@ package com.excilys.cdb.model;
 public class Company {
 
 	String nom;
-	int id;
+	long id;
 	
-	public Company(int id, String name) {
+	public Company(long id, String name) {
 		this.nom = name;
 		this.id = id;
 	}
@@ -20,7 +20,7 @@ public class Company {
 	/**
 	 * @return Renvoie l'identifiant de l'entreprise
 	 */
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

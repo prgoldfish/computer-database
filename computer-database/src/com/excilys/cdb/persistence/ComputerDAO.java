@@ -30,14 +30,14 @@ public class ComputerDAO {
 	 * Fais une requête sur la base de données pour récupérer la liste des ordinateurs
 	 * @return Les ordinateurs dans une List
 	 */
-	public static List<Computer> getComputerList(int startIndex, int limit)
+	public static List<Computer> getComputerList(long startIndex, long limit)
 	{
 		DBConnection conn = DBConnection.getConnection();
 		ResultSet res = null;
 		List<Computer> compList = new ArrayList<>();
 		try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_LIST_QUERY)) {
-			stmt.setInt(1, limit);
-			stmt.setInt(2, startIndex);
+			stmt.setLong(1, limit);
+			stmt.setLong(2, startIndex);
 			res = stmt.executeQuery();
 			while(res.next())
 			{
@@ -50,14 +50,14 @@ public class ComputerDAO {
 		return compList;
 	}
 	
-	public static int getMaxId()
+	public static long getMaxId()
 	{
 		try (DBConnection conn = DBConnection.getConnection();)
 		{
 			ResultSet res = conn.query(GET_MAX_ID_QUERY);
 			if(res.next())
 			{
-				return res.getInt("idMax");
+				return res.getLong("idMax");
 			}
 			return 0; //On présume que la table est vide
 			
@@ -67,11 +67,11 @@ public class ComputerDAO {
 		return 0;
 	}
 	
-	public static Optional<Computer> getComputerById(int id) 
+	public static Optional<Computer> getComputerById(long id) 
 	{
 		DBConnection conn = DBConnection.getConnection();
 		try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_BY_ID_QUERY);){
-			stmt.setInt(1, id);
+			stmt.setLong(1, id);
 			ResultSet res = stmt.executeQuery();
 			if(res.next())
 			{
@@ -133,10 +133,9 @@ public class ComputerDAO {
 		executeAddComputerQuery(c, conn, entreprise, introTimestamp, discontTimestamp);
 	}
 
-	private static void executeAddComputerQuery(Computer c, DBConnection conn, Company entreprise,
-			Timestamp introTimestamp, Timestamp discontTimestamp) {
+	private static void executeAddComputerQuery(Computer c, DBConnection conn, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
 		try (PreparedStatement stmt = conn.prepareStement(ADD_COMPUTER_QUERY);) {
-			stmt.setInt(1, c.getId());
+			stmt.setLong(1, c.getId());
 			stmt.setString(2, c.getNom());
 			stmt.setTimestamp(3, introTimestamp);
 			stmt.setTimestamp(4, discontTimestamp);
@@ -146,7 +145,7 @@ public class ComputerDAO {
 			}
 			else
 			{
-				stmt.setInt(5, entreprise.getId());
+				stmt.setLong(5, entreprise.getId());
 			}
 			stmt.executeUpdate();
 		} catch (SQLException e) {
@@ -176,20 +175,20 @@ public class ComputerDAO {
 			}
 			else
 			{
-				stmt.setInt(3, entreprise.getId());
+				stmt.setLong(3, entreprise.getId());
 			}			
-			stmt.setInt(4, c.getId());
+			stmt.setLong(4, c.getId());
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void deleteComputer(int id)
+	public static void deleteComputer(long id)
 	{
 		DBConnection conn = DBConnection.getConnection();
 		try (PreparedStatement stmt = conn.prepareStement(DELETE_COMPUTER_QUERY);) {
-			stmt.setInt(1, id);
+			stmt.setLong(1, id);
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
