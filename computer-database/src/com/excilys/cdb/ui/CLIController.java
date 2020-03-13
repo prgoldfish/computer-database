@@ -8,42 +8,92 @@ import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.CompanyDAO;
+import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.Page;
 
 public class CLIController {
 
 	/**
+	 * Demande un identifiant à l'utilisateur et renvoie l'ordianteur associé
+	 * @return L'ordinateur avec l'identifiant rentré
+	 */
+	protected static Computer askComputer()
+	{
+		ComputerService computerService = new ComputerService();
+		while(true)
+		{
+			CLI.printString("Entrez l'identifiant de l'ordinateur : ");
+			try
+			{
+				int cId = CLI.getInt();
+				Optional<Computer> c = computerService.getComputerById(cId);
+				if(c.isPresent())
+				{
+					return c.get();
+				}
+				else
+				{
+					CLI.printSingleError("L'identifiant n'existe pas");
+				}
+			} catch (NumberFormatException e) {
+				CLI.printSingleError("Entrée invalide");
+			}
+		}
+	}
+	
+	private static void showComputerDetails()
+	{
+		Computer c = askComputer();
+		CLI.printString("Details de l'ordinateur : ");
+		CLI.printString(c.toString());
+	}
+	
+	
+	/**
+	 * Supprime un ordinateur de la base de données
+	 */
+	private static void deleteComputer()
+	{
+		CLI.printString("Suppression d'un ordinateur\n");
+		Computer toDelete = askComputer();
+		ComputerService comService = new ComputerService();
+		try {
+			comService.deleteComputer(toDelete.getId());
+			CLI.printString("Ordinateur supprimé");
+		} catch (ComputerServiceException e) {
+			CLI.printSingleError(e.getMessage());
+		}
+		
+	}
+		
+	/**
 	 * Demande des informations à l'utilisateur pour mettre à jour un ordinateur déjà existant
 	 */
 	private static void updateComputer()
 	{
-		System.out.println("Modification d'un ordinateur\n");
-		Computer toUpdate = CLI.askComputer();
+		CLI.printString("Modification d'un ordinateur\n");
+		Computer toUpdate = askComputer();
 		ComputerService comService = new ComputerService();
 		try {
 			comService.buildComputerFromComputer(toUpdate);
 			setDateComputer(comService);
 			setCompanyComputer(comService);
 			comService.updateComputerToDB();
+			CLI.printString("Ordinateur mis à jour");	
 		} catch (ComputerServiceException e) {
 			CLI.printSingleError(e.getMessage());
-		}
-		System.out.println("Ordinateur mis à jour");		
+		}	
 	}
 	
 	private static void setDateComputer(ComputerService service) throws ComputerServiceException {
 		Optional<LocalDateTime> dateDebut = CLI.askDate(true, null);
-		if(dateDebut.isPresent())
-		{
+		if (dateDebut.isPresent()) {
 			service.addIntroDate(dateDebut.get());
 		}
-		if(service.canAddEndDate())
-		{
-			Optional<LocalDateTime> dateFin = CLI.askDate(false, dateDebut.get());
-			if(dateFin.isPresent())
-			{
+		if (service.getBeginDate().isPresent()) {
+			Optional<LocalDateTime> dateFin = CLI.askDate(false, service.getBeginDate().get());
+			if (dateFin.isPresent()) {
 				service.addEndDate(dateFin.get());
 			}
 		}
@@ -85,10 +135,10 @@ public class CLIController {
 			setDateComputer(comService);
 			setCompanyComputer(comService);
 			comService.addComputerToDB();
+			CLI.printString("Ordinateur ajouté");
 		} catch (ComputerServiceException e) {
 			CLI.printSingleError(e.getMessage());
 		}
-		CLI.printString("Ordinateur ajouté");
 		
 	}
 	
@@ -98,7 +148,8 @@ public class CLIController {
 	 */
 	private static void showCompaniesList()
 	{
-		List<Company> compList = CompanyDAO.getCompaniesList();
+		CompanyService comService = new CompanyService();
+		List<Company> compList = comService.getCompaniesList();
 		StringBuilder outString = new StringBuilder("| Id\t| ");
 		outString.append(String.format("%1$-70s", "Nom"));
 		outString.append("|\n");
@@ -151,11 +202,11 @@ public class CLIController {
 				break;
 
 			case 5:
-				//TODO deleteComputer();
+				deleteComputer();
 				break;
 
 			case 6:
-				//TODO showComputerDetails();
+				showComputerDetails();
 				break;
 
 			case 7:

@@ -26,6 +26,11 @@ public class ComputerService {
 		return builder != null && builder.isPresent() && builder.get().getDateIntroduction() != null;
 	}
 	
+	public Optional<LocalDateTime> getBeginDate()
+	{
+		return builder.map((build) -> build.getDateIntroduction());
+	}
+	
 	public void buildComputerFromScratch(String name) throws ComputerServiceException
 	{
 		if(name == null || name.equals(""))
@@ -59,7 +64,7 @@ public class ComputerService {
 	public void addEndDate(LocalDateTime time) throws ComputerServiceException
 	{
 		isBuildStarted();
-		if(builder.get().getDateIntroduction() != null)
+		if(builder.get().getDateIntroduction() == null)
 		{
 			throw new ComputerServiceException("Impossible de régler la date de fin si la date de début n'est pas réglée.");
 		}
@@ -67,7 +72,7 @@ public class ComputerService {
 		{
 			throw new ComputerServiceException("La date de fin est est avant la date de début.");
 		}
-		builder.get().setDateIntroduction(time);
+		builder.get().setDateDiscontinuation(time);
 	}
 	
 	public void addCompany(String companyName) throws ComputerServiceException

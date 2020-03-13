@@ -10,11 +10,6 @@ import java.util.Scanner;
 
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.PageException;
-import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.model.Computer.ComputerBuilder;
-import com.excilys.cdb.persistence.CompanyDAO;
-import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.service.Page;
 
 public class CLI {
@@ -164,54 +159,11 @@ public class CLI {
 			}
 		}
 	}
-	
-	
-	/**
-	 * Demande un identifiant à l'utilisateur et renvoie l'ordianteur associé
-	 * @return L'ordinateur avec l'identifiant rentré
-	 */
-	protected static Computer askComputer()
-	{
-		while(true)
-		{
-			System.out.println("Entrez l'identifiant de l'ordinateur : ");
-			try
-			{
-				int cId = Integer.parseInt(sc.nextLine());
-				Optional<Computer> c = ComputerDAO.getComputerById(cId);
-				if(c.isPresent())
-				{
-					return c.get();
-				}
-				else
-				{
-					System.out.println("L'identifiant n'existe pas");
-				}
-			} catch (NumberFormatException e) {
-				System.out.println("Entrée invalide");
-			}
-		}
+
+	public static int getInt() {
+		return Integer.parseInt(sc.nextLine());
 	}
 	
-	private static void showComputerDetails()
-	{
-		Computer c = askComputer();
-		System.out.println("Details de l'ordinateur : ");
-		System.out.println(c);
-	}
-	
-	
-	/**
-	 * Supprime un ordinateur de la base de données
-	 */
-	private static void deleteComputer()
-	{
-		System.out.println("Suppression d'un ordinateur\n");
-		Computer toDelete = askComputer();
-		ComputerDAO.deleteComputer(toDelete.getId());
-		System.out.println("Ordinateur supprimé");
-		
-	}
 	
 	/**
 	 * Demande un entier à l'utilisateur entre min et max
@@ -226,7 +178,7 @@ public class CLI {
 			System.out.println("Veuillez entrer un nombre entre " + min + " et " + max );
 			try
 			{
-				int in = Integer.parseInt(sc.nextLine());
+				int in = getInt();
 				if(in >= min && in <= max)
 				{
 					return in;

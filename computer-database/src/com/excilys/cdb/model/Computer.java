@@ -102,7 +102,7 @@ public class Computer {
 		res.append("\nNom de l'ordinateur : ").append(nom == null ? indefini : nom);
 		res.append("\nDate d'introduction : ").append(dateIntroduction == null ? indefini : dateIntroduction);
 		res.append("\nDate de fin : ").append(dateDiscontinuation == null ? indefini : dateDiscontinuation);
-		res.append("\nEntreprise : ").append(entreprise);
+		res.append("\nEntreprise : ").append(entreprise == null ? indefini : entreprise);
 		return res.toString();
 	}
 	
