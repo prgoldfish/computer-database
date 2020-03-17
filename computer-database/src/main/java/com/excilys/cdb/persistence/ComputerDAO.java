@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
@@ -24,6 +27,7 @@ public class ComputerDAO {
 	private static final String GET_MAX_ID_QUERY = "SELECT MAX(id) as idMax FROM computer";
 	private static final String UPDATE_COMPUTER_QUERY = "UPDATE computer SET introduced = ?, discontinued = ?, company_id = ? WHERE id = ?";
 	private static final String DELETE_COMPUTER_QUERY = "DELETE FROM computer WHERE id = ?";
+	private static final Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
 	
 	/**
@@ -35,6 +39,7 @@ public class ComputerDAO {
 		DBConnection conn = DBConnection.getConnection();
 		ResultSet res = null;
 		List<Computer> compList = new ArrayList<>();
+		logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_LIST_QUERY);
 		try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_LIST_QUERY)) {
 			stmt.setLong(1, limit);
 			stmt.setLong(2, startIndex);
@@ -44,8 +49,8 @@ public class ComputerDAO {
 				ComputerBuilder c = processGetComputerResults(res);
 				compList.add(c.build());
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return compList;
 	}
@@ -54,6 +59,7 @@ public class ComputerDAO {
 	{
 		try (DBConnection conn = DBConnection.getConnection();)
 		{
+			logger.info("Exécution de la requête \"{}\"", GET_MAX_ID_QUERY);
 			ResultSet res = conn.query(GET_MAX_ID_QUERY);
 			if(res.next())
 			{
@@ -61,8 +67,8 @@ public class ComputerDAO {
 			}
 			return 0; //On présume que la table est vide
 			
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return 0;
 	}
@@ -70,6 +76,7 @@ public class ComputerDAO {
 	public static Optional<Computer> getComputerById(long id) 
 	{
 		DBConnection conn = DBConnection.getConnection();
+		logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_ID_QUERY);
 		try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_BY_ID_QUERY);){
 			stmt.setLong(1, id);
 			ResultSet res = stmt.executeQuery();
@@ -78,8 +85,8 @@ public class ComputerDAO {
 				ComputerBuilder c = processGetComputerResults(res);
 				return Optional.of(c.build());
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return Optional.empty();
 	}
@@ -87,6 +94,7 @@ public class ComputerDAO {
 	public static Optional<Computer> getComputerByName(String name) 
 	{
 		DBConnection conn = DBConnection.getConnection();
+		logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_NAME_QUERY);
 		try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_BY_NAME_QUERY);) {
 			stmt.setString(1, name);
 			ResultSet res = stmt.executeQuery();
@@ -95,8 +103,8 @@ public class ComputerDAO {
 				ComputerBuilder c = processGetComputerResults(res);
 				return Optional.of(c.build());
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return Optional.empty();
 	}
@@ -134,6 +142,7 @@ public class ComputerDAO {
 	}
 
 	private static void executeAddComputerQuery(Computer c, DBConnection conn, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
+		logger.info("Exécution de la requête \"{}\"", ADD_COMPUTER_QUERY);
 		try (PreparedStatement stmt = conn.prepareStement(ADD_COMPUTER_QUERY);) {
 			stmt.setLong(1, c.getId());
 			stmt.setString(2, c.getNom());
@@ -148,8 +157,8 @@ public class ComputerDAO {
 				stmt.setLong(5, entreprise.getId());
 			}
 			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 	}
 	
@@ -164,8 +173,8 @@ public class ComputerDAO {
 		executeUpdateComputerQuery(c, conn, entreprise, introTimestamp, discontTimestamp);
 	}
 
-	private static void executeUpdateComputerQuery(Computer c, DBConnection conn, Company entreprise,
-			Timestamp introTimestamp, Timestamp discontTimestamp) {
+	private static void executeUpdateComputerQuery(Computer c, DBConnection conn, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
+		logger.info("Exécution de la requête \"{}\"", UPDATE_COMPUTER_QUERY);
 		try (PreparedStatement stmt = conn.prepareStement(UPDATE_COMPUTER_QUERY);) {
 			stmt.setTimestamp(1, introTimestamp);
 			stmt.setTimestamp(2, discontTimestamp);
@@ -179,19 +188,20 @@ public class ComputerDAO {
 			}			
 			stmt.setLong(4, c.getId());
 			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 	}
 	
 	public static void deleteComputer(long id)
 	{
 		DBConnection conn = DBConnection.getConnection();
+		logger.info("Exécution de la requête \"{}\"", DELETE_COMPUTER_QUERY);
 		try (PreparedStatement stmt = conn.prepareStement(DELETE_COMPUTER_QUERY);) {
 			stmt.setLong(1, id);
 			stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 	}
 

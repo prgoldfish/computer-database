@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.exception.ComputerServiceException;
-import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
@@ -36,7 +38,7 @@ public class CLIController {
 				{
 					CLI.printSingleError("L'identifiant n'existe pas");
 				}
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException nfe) {
 				CLI.printSingleError("Entrée invalide");
 			}
 		}
@@ -61,8 +63,8 @@ public class CLIController {
 		try {
 			comService.deleteComputer(toDelete.getId());
 			CLI.printString("Ordinateur supprimé");
-		} catch (ComputerServiceException e) {
-			CLI.printSingleError(e.getMessage());
+		} catch (ComputerServiceException cse) {
+			CLI.printSingleError(cse.getMessage());
 		}
 		
 	}
@@ -81,8 +83,8 @@ public class CLIController {
 			setCompanyComputer(comService);
 			comService.updateComputerToDB();
 			CLI.printString("Ordinateur mis à jour");	
-		} catch (ComputerServiceException e) {
-			CLI.printSingleError(e.getMessage());
+		} catch (ComputerServiceException cse) {
+			CLI.printSingleError(cse.getMessage());
 		}	
 	}
 	
@@ -109,8 +111,8 @@ public class CLIController {
 				try {
 					service.addCompany(entreprise.get());
 					loop = false;
-				} catch (ComputerServiceException e) {
-					CLI.printSingleError(e.getMessage());
+				} catch (ComputerServiceException cse) {
+					CLI.printSingleError(cse.getMessage());
 				}
 			}
 			else
@@ -136,8 +138,8 @@ public class CLIController {
 			setCompanyComputer(comService);
 			comService.addComputerToDB();
 			CLI.printString("Ordinateur ajouté");
-		} catch (ComputerServiceException e) {
-			CLI.printSingleError(e.getMessage());
+		} catch (ComputerServiceException cse) {
+			CLI.printSingleError(cse.getMessage());
 		}
 		
 	}
@@ -171,8 +173,8 @@ public class CLIController {
 		try {
 			CLI.printString(page.getPageContent());
 			CLI.pageCommand(page);
-		} catch (ComputerServiceException | PageException e) {
-			CLI.printSingleError(e.getMessage());
+		} catch (ComputerServiceException cse) {
+			CLI.printSingleError(cse.getMessage());
 		}
 	}
 	
@@ -213,13 +215,16 @@ public class CLIController {
 				return;
 
 			default:
-				System.err.println("Endroit inatteignable");
+				CLI.printSingleError("Endroit inatteignable");
 				break;
 			}
 		}
 	}
 	
 	public static void main(String[] args) {
+		Logger logger = LoggerFactory.getLogger(CLIController.class);
+		logger.info("Hello World");
+		logger.info("HELLO HELLO");
 		menu();
 
 	}

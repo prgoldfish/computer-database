@@ -7,11 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class DBConnection implements AutoCloseable {
 	
 	private static DBConnection instance;
 	private Connection conn;
 	private Statement stmt;
+	private static final Logger logger = LoggerFactory.getLogger(DBConnection.class);
+
 	
 	/**
 	 * Se connecte à la base de données et stocke la connexion
@@ -27,8 +33,8 @@ public class DBConnection implements AutoCloseable {
 		{
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			this.conn = DriverManager.getConnection(url + db , user, pass);
-		}catch (Exception e) {
-			e.printStackTrace();
+		}catch (Exception exc) {
+			logger.error("Erreur de connexion à la base de données", exc);
 			System.exit(-1);
 		}
 	}

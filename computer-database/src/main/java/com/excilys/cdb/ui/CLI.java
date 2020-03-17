@@ -16,6 +16,7 @@ public class CLI {
 
 	private static final Scanner sc = new Scanner(System.in);
 	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	//private static final Logger logger = LoggerFactory.getLogger(CLI.class);
 	
 	/**
 	 * Demande un numéro de page à l'utilisateur
@@ -49,12 +50,16 @@ public class CLI {
 		return computerName;
 	}
 	
-	protected static void pageCommand(Page page) throws ComputerServiceException, PageException {
+	protected static void pageCommand(Page page) throws ComputerServiceException {
 		boolean quit = false;
 		while(!quit)
 		{
 			System.out.println("Entrez \"prec\" pour voir la page précédente, \"suiv\" pour la page suivante, \"page\" pour aller à une page et \"menu\" pour retourner au menu principal.");
-			quit = pageCommandSwitch(page, quit);
+			try {
+				quit = pageCommandSwitch(page, quit);
+			} catch (PageException pae) {
+				printSingleError(pae.getMessage());
+			}
 		}
 	}
 
@@ -153,8 +158,8 @@ public class CLI {
 					{
 						System.out.println("La date de fin est avant la date de début");
 					}
-				} catch (DateTimeParseException e) {
-					System.out.println("Date invalide.");
+				} catch (DateTimeParseException dtpe) {
+					printSingleError("Date invalide.");
 				}
 			}
 		}
@@ -187,8 +192,8 @@ public class CLI {
 				{
 					System.out.println("L'entrée doit être comprise entre " + min + " et " + max);
 				}
-			} catch (NumberFormatException e) {
-				System.out.println("Entrée invalide.");
+			} catch (NumberFormatException nfe) {
+				printSingleError("Entrée invalide.");
 			}
 		}
 	}

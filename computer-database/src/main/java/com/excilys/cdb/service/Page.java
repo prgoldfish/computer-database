@@ -3,6 +3,9 @@ package com.excilys.cdb.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.model.Company;
@@ -15,6 +18,7 @@ public class Page {
 	private int currentPage;
 	private int maxPage;
 	private static String header = setHeader();
+	private static Logger logger = LoggerFactory.getLogger(Page.class);
 	
 	/**
 	 * Crée le header en haut de chaque page
@@ -87,6 +91,7 @@ public class Page {
 	public String getNextPageContents() throws ComputerServiceException, PageException {
 		if(currentPage + 1 > maxPage)
 		{
+			logger.error("Tentative d'accès à la page suivante alors qu'elle n'existe pas.");
 			throw new PageException("Il n'y a pas de page suivante");
 		}
 		currentPage++;
@@ -99,10 +104,10 @@ public class Page {
 	 * @throws ComputerServiceException 
 	 * @throws PageException 
 	 */
-	public String getPreviousPageContents() throws ComputerServiceException, PageException
-	{
+	public String getPreviousPageContents() throws ComputerServiceException, PageException {
 		if(currentPage - 1 < 0)
 		{
+			logger.error("Tentative d'accès à la page précédente alors qu'elle n'existe pas.");
 			throw new PageException("Il n'y a pas de page précédente");
 		}
 		currentPage--;
@@ -118,6 +123,9 @@ public class Page {
 		if(pageNumber >= 0 && pageNumber <= maxPage)
 		{
 			currentPage = pageNumber;
+		}
+		else {
+			logger.error("Tentative d'accès à une page inexistante.");
 		}
 	}
 	

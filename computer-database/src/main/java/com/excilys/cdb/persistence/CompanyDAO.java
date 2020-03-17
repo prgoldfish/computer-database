@@ -7,12 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.model.Company;
 
 public class CompanyDAO {
 	
 	private static final String SELECT_COMPANY_LIST_QUERY = "SELECT id, name FROM company";
 	private static final String SELECT_COMPANY_BY_NAME_QUERY = "SELECT id, name FROM company WHERE name = ?";
+	private static final Logger logger = LoggerFactory.getLogger(CompanyDAO.class);
 	
 	/**
 	 * Fais une requête sur la base de données pour récupérer la liste des entreprises
@@ -22,14 +26,15 @@ public class CompanyDAO {
 	{
 		List<Company> compList = new ArrayList<>();
 		try (DBConnection conn = DBConnection.getConnection();) {
+			logger.info("Exécution de la requête \"{}\"", SELECT_COMPANY_LIST_QUERY);
 			ResultSet res = conn.query(SELECT_COMPANY_LIST_QUERY);
 			while(res.next())
 			{
 				Company c = new Company(res.getLong("id"), res.getString("name"));
 				compList.add(c);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return compList;
 	}
@@ -37,6 +42,7 @@ public class CompanyDAO {
 	public static Optional<Company> getCompanyByName(String name) 
 	{
 		DBConnection conn = DBConnection.getConnection();
+		logger.info("Exécution de la requête \"{}\"", SELECT_COMPANY_BY_NAME_QUERY);
 		try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPANY_BY_NAME_QUERY);) {
 			stmt.setString(1, name);
 			ResultSet res = stmt.executeQuery();
@@ -44,8 +50,8 @@ public class CompanyDAO {
 			{
 				return Optional.of(new Company(res.getLong("id"), res.getString("name")));
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return Optional.empty();
 	}
