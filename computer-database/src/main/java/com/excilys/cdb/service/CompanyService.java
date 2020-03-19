@@ -8,22 +8,16 @@ import com.excilys.cdb.persistence.CompanyDAO;
 
 public class CompanyService {
 
-	public CompanyService()
-	{
+    public CompanyService() {
 
-	}
-	
-	
-	public List<Company> getCompaniesList()
-	{
-		return CompanyDAO.getCompaniesList();
-	}
-	
-	public Optional<Company> getCompanyByName(String name)
-	{
-		return CompanyDAO.getCompanyByName(name);
-	}
-	
-	
-	
+    }
+
+    public List<Company> getCompaniesList() {
+        return new CompanyDAO().getCompaniesList();
+    }
+
+    public Optional<Company> getCompanyByName(String name) {
+        return new CompanyDAO().getCompanyByName(name);
+    }
+
 }
