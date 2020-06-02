@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -112,13 +111,14 @@ public class ComputerServiceTest {
     public void testGetComputerListBadStartIndex() {
         ComputerService comService = new ComputerService(dao);
         try {
-            List<Computer> resList = comService.getComputerList(-12, 20);
+            comService.getComputerList(-12, 20);
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();
         }
         try {
-            List<Computer> resList = comService.getComputerList(compList.size() + 10, 20);
+            
+            comService.getComputerList(compList.size() + 10, 20);
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();
@@ -129,7 +129,7 @@ public class ComputerServiceTest {
     public void testGetComputerBadLimit() {
         ComputerService comService = new ComputerService(dao);
         try {
-            List<Computer> resList = comService.getComputerList(0, -123);
+            comService.getComputerList(0, -123);
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();

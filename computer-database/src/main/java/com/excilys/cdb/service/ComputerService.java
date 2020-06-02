@@ -11,6 +11,7 @@ import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
+import com.excilys.cdb.persistence.CompanyDAO;
 import com.excilys.cdb.persistence.ComputerDAO;
 
 public class ComputerService {
@@ -77,7 +78,7 @@ public class ComputerService {
     public void addCompany(String companyName) throws ComputerServiceException {
         isBuildStarted();
         if (companyName != null) {
-            Optional<Company> comp = new CompanyService().getCompanyByName(companyName);
+            Optional<Company> comp = new CompanyService(new CompanyDAO()).getCompanyByName(companyName);
             if (comp.isEmpty()) {
                 logger.error("Nom de l'entreprise {} inconnu", companyName);
                 throw new ComputerServiceException("Le nom de l'entreprise est inconnu.");
