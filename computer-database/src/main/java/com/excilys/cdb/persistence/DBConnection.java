@@ -25,11 +25,12 @@ public class DBConnection implements AutoCloseable {
         String db = "computer-database-db";
         String user = "admincdb";
         String pass = "qwerty1234";
+        String config = "?serverTimezone=Europe/Paris";
 
         stmt = null;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            this.conn = DriverManager.getConnection(url + db, user, pass);
+            this.conn = DriverManager.getConnection(url + db + config, user, pass);
         } catch (Exception exc) {
             logger.error("Erreur de connexion à la base de données", exc);
             System.exit(-1);
