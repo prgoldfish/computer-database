@@ -1,6 +1,8 @@
 package com.excilys.cdb.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.dto.ComputerDTO;
-import com.excilys.cdb.exception.ComputerMapperException;
+import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
@@ -33,6 +35,7 @@ public class ListComputers extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        
         doPost(req, resp);
     }
     
@@ -53,9 +56,18 @@ public class ListComputers extends HttpServlet {
             session.setAttribute("computerservice", service);
         }
         
-        List<Computer> listComputers = null;
+        String searchParam = req.getParameter("search");
+        List<Computer> listComputers = new ArrayList<Computer>();
         try {
-             listComputers = service.getComputerList(0, Integer.MAX_VALUE);            
+            if(searchParam != null)
+            {
+                listComputers = service.searchComputersByName(searchParam);
+            }
+            else
+            {
+                listComputers = service.getComputerList(0, Integer.MAX_VALUE);  
+            }
+                      
         } catch (ComputerServiceException e) {
             throw new ServletException(e);
             //e.printStackTrace();
@@ -64,7 +76,7 @@ public class ListComputers extends HttpServlet {
         List<ComputerDTO> dtoList = listComputers.stream().map(c -> {
             try {
                 return ComputerMapper.toDTO(c);
-            } catch (ComputerMapperException e) {
+            } catch (MapperException e) {
                 logger.error("Null Computer found in computer list (shoud not happen)");
             }
             return null;
@@ -72,8 +84,9 @@ public class ListComputers extends HttpServlet {
         .collect(Collectors.toList());
 
         req.setAttribute("dtolist", dtoList);
+        req.setAttribute("dtosize", dtoList.size());
         
-        req.getRequestDispatcher("WEB-INF/views/dashboard.html").forward(req, resp);
+        req.getRequestDispatcher("WEB-INF/views/dashboard.jsp").forward(req, resp);
     }
 
 }

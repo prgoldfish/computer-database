@@ -23,6 +23,7 @@ public class ComputerDAO {
     private static final String SELECT_COMPUTER_LIST_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id LIMIT ? OFFSET ?";
     private static final String SELECT_COMPUTER_BY_ID_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.id=?";
     private static final String SELECT_COMPUTER_BY_NAME_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.name=?";
+    private static final String SEARCH_COMPUTERS_BY_NAME_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.name LIKE ?";
     private static final String ADD_COMPUTER_QUERY = "INSERT INTO computer VALUES (?,?,?,?,?)";
     private static final String GET_MAX_ID_QUERY = "SELECT MAX(id) as idMax FROM computer";
     private static final String UPDATE_COMPUTER_QUERY = "UPDATE computer SET introduced = ?, discontinued = ?, company_id = ? WHERE id = ?";
@@ -103,6 +104,23 @@ public class ComputerDAO {
             logger.error("Erreur lors de l'exécution de la requête", sqle);
         }
         return Optional.empty();
+    }
+    
+    public List<Computer> searchComputersByName(String name) {
+        DBConnection conn = DBConnection.getConnection();
+        logger.info("Exécution de la requête \"{}\"", SEARCH_COMPUTERS_BY_NAME_QUERY);
+        List<Computer> resultList = new ArrayList<Computer>();
+        try (PreparedStatement stmt = conn.prepareStement(SEARCH_COMPUTERS_BY_NAME_QUERY);) {
+            stmt.setString(1, "%" + name + "%");
+            ResultSet res = stmt.executeQuery();
+            while(res.next()) {
+                ComputerBuilder c = processGetComputerResults(res);
+                resultList.add(c.build());
+            }
+        } catch (SQLException sqle) {
+            logger.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return resultList;
     }
 
     private ComputerBuilder processGetComputerResults(ResultSet res) throws SQLException {

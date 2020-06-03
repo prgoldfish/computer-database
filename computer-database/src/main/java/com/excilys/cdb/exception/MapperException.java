@@ -1,6 +1,6 @@
 package com.excilys.cdb.exception;
 
-public class ComputerMapperException extends Exception {
+public class MapperException extends Exception {
 
     /**
      * 
@@ -10,7 +10,7 @@ public class ComputerMapperException extends Exception {
     /**
      * Constructeur par défaut.
      */
-    public ComputerMapperException() {
+    public MapperException() {
         super("Problème dans ComputerMapper.");
     }
 
@@ -19,7 +19,7 @@ public class ComputerMapperException extends Exception {
      * 
      * @param message Message de l'exception
      */
-    public ComputerMapperException(String message) {
+    public MapperException(String message) {
         super(message);
     }
 }

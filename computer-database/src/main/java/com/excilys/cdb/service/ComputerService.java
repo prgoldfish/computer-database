@@ -143,6 +143,10 @@ public class ComputerService {
 
     public Optional<Computer> getComputerByName(String name) {
         return dao.getComputerByName(name);
+    }    
+    
+    public List<Computer> searchComputersByName(String name) {
+        return dao.searchComputersByName(name);
     }
 
 }

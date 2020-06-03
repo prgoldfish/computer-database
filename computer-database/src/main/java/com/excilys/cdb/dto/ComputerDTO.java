@@ -9,7 +9,7 @@ public class ComputerDTO {
     private String nom;
     private String dateIntroduction;
     private String dateDiscontinuation;
-    private String entreprise;
+    private CompanyDTO entreprise;
     
     private ComputerDTO(ComputerBuilderDTO builder) {
         this.id = builder.id;
@@ -44,10 +44,10 @@ public class ComputerDTO {
     public void setDateDiscontinuation(String dateDiscontinuation) {
         this.dateDiscontinuation = dateDiscontinuation;
     }
-    public String getEntreprise() {
+    public CompanyDTO getEntreprise() {
         return entreprise;
     }
-    public void setEntreprise(String entreprise) {
+    public void setEntreprise(CompanyDTO entreprise) {
         this.entreprise = entreprise;
     }
     
@@ -59,7 +59,7 @@ public class ComputerDTO {
         // Optionnels
         private String dateIntroduction;
         private String dateDiscontinuation;
-        private String entreprise;
+        private CompanyDTO entreprise;
 
         public ComputerBuilderDTO(String id, String nom) {
             this.id = id;
@@ -76,7 +76,7 @@ public class ComputerDTO {
             return this;
         }
 
-        public ComputerBuilderDTO setEntreprise(String entreprise) {
+        public ComputerBuilderDTO setEntreprise(CompanyDTO entreprise) {
             this.entreprise = entreprise;
             return this;
         }

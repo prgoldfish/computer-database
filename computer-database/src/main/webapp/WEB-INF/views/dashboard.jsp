@@ -1,3 +1,4 @@
+<%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,9 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
-<link href="../../css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="../../css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="../../css/main.css" rel="stylesheet" media="screen">
+<link href="./css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="./css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="./css/main.css" rel="stylesheet" media="screen">
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
@@ -19,7 +20,7 @@
     <section id="main">
         <div class="container">
             <h1 id="homeTitle">
-                121 Computers found
+               <c:out value="${ dtosize }" /> Computers found
             </h1>
             <div id="actions" class="form-horizontal">
                 <div class="pull-left">
@@ -75,6 +76,21 @@
                 </thead>
                 <!-- Browse attribute computers -->
                 <tbody id="results">
+                    <c:forEach var="i" items="${ dtolist }">
+                        <tr>
+	                        <td class="editMode">
+	                            <input type="checkbox" name="cb" class="cb" value="0">
+	                        </td>
+	                        <td>
+	                            <a href="editComputer.html" onclick=""><c:out value="${ i.nom }"></c:out></a>
+	                        </td>
+	                        <td><c:out value="${ i.dateIntroduction }"></c:out></td>
+	                        <td><c:out value="${ i.dateDiscontinuation }"></c:out></td>
+	                        <td><c:out value="${ i.entreprise.nom }"></c:out></td>
+	
+	                    </tr>
+                    </c:forEach>
+                    <!--
                     <tr>
                         <td class="editMode">
                             <input type="checkbox" name="cb" class="cb" value="0">
@@ -219,7 +235,7 @@
                         <td>Nintendo</td>
 
                     </tr>
-                    
+                     -->
                 </tbody>
             </table>
         </div>

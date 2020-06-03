@@ -2,16 +2,16 @@ package com.excilys.cdb.mapper;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.dto.ComputerDTO.ComputerBuilderDTO;
-import com.excilys.cdb.exception.ComputerMapperException;
+import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.model.Computer;
 
 public class ComputerMapper {
     
-    public static ComputerDTO toDTO(Computer c) throws ComputerMapperException
+    public static ComputerDTO toDTO(Computer c) throws MapperException
     {
         if(c == null)
         {
-            throw new ComputerMapperException("Computer object is null");
+            throw new MapperException("Computer object is null");
         }
         ComputerBuilderDTO dto = new ComputerDTO.ComputerBuilderDTO(Long.toString(c.getId()), c.getNom());
         if(c.getDateIntroduction() != null)
@@ -24,7 +24,7 @@ public class ComputerMapper {
         }
         if(c.getEntreprise() != null)
         {
-            dto.setEntreprise(c.getEntreprise().getNom());
+            dto.setEntreprise(CompanyMapper.toDTO(c.getEntreprise()));
         }        
         return dto.build();
     }
