@@ -41,7 +41,6 @@ public class ListComputers extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //super.doPost(req, resp);
         HttpSession session = req.getSession(); 
         ComputerDAO dao = (ComputerDAO) session.getAttribute("computerdao");
         if(dao == null)
