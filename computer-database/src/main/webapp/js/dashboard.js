@@ -59,14 +59,23 @@ $(function() {
 }( jQuery ));
 
 
-// Function delete selected: Asks for confirmation to delete selected computers, then submits it to the deleteForm
+//Function delete selected: Asks for confirmation to delete selected computers, then submits it to the deleteForm
 (function ( $ ) {
-    $.fn.deleteSelected = function() {
-        if (confirm("Are you sure you want to delete the selected computers?")) { 
-            $('#deleteForm input[name=selection]').setCheckboxValues('selection','cb');
-            $('#deleteForm').submit();
-        }
-    };
+ $.fn.deleteSelected = function() {
+     if (confirm("Are you sure you want to delete the selected computers?")) { 
+         $('#deleteForm input[name=selection]').setCheckboxValues('selection','cb');
+         $('#deleteForm').submit();
+     }
+ };
+}( jQuery ));
+
+
+//Function delete selected: Asks for confirmation to delete selected computers, then submits it to the deleteForm
+(function ( $ ) {
+ $.fn.goToPage = function(pageNum) {
+	 $('#pageForm input[name=page]').val(pageNum);
+	 $('#pageForm').submit();
+ };
 }( jQuery ));
 
 

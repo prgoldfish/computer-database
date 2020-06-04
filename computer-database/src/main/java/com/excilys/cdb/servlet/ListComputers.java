@@ -2,7 +2,6 @@ package com.excilys.cdb.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,22 +53,52 @@ public class ListComputers extends HttpServlet {
             service = new ComputerService(dao);
             session.setAttribute("computerservice", service);
         }
+
+        int pageLength = 10;
+        String pageLengthParam = req.getParameter("length");
+        int pageNum = 1;
+        String pageNumParam = req.getParameter("page");
+        if(pageLengthParam != null)
+        {
+            try 
+            {
+                pageLength = Math.max(1, Integer.parseInt(pageLengthParam));
+            } catch (NumberFormatException nfe) {}
+        }
+        if(pageNumParam != null)
+        {
+            try 
+            {
+                pageNum = Math.max(1, Integer.parseInt(pageNumParam));
+            } catch (NumberFormatException nfe) {}
+        }
         
+        int computerCount = 0;
+        int startIndex = (pageNum - 1) * pageLength;        
         String searchParam = req.getParameter("search");
+        
         List<Computer> listComputers = new ArrayList<Computer>();
         try {
             if(searchParam != null)
             {
                 listComputers = service.searchComputersByName(searchParam);
+                computerCount = listComputers.size();
+                int lastPageIndex = computerCount - ((computerCount - (computerCount / pageLength) * pageLength)); 
+                int startSubList = Math.min(startIndex, lastPageIndex);
+                int endSubList = Math.min(startSubList + pageLength, computerCount);
+                logger.info("lastPageIndex = " + lastPageIndex);
+                logger.info("startSubList = " + startSubList);
+                logger.info("endSubList = " + endSubList);
+                listComputers = listComputers.subList(startSubList, endSubList);
             }
             else
             {
-                listComputers = service.getComputerList(0, Integer.MAX_VALUE);  
+                listComputers = service.getComputerList(startIndex, pageLength);
+                computerCount = service.getComputerList(0, Integer.MAX_VALUE).size();
             }
                       
         } catch (ComputerServiceException e) {
             throw new ServletException(e);
-            //e.printStackTrace();
         }
         
         List<ComputerDTO> dtoList = listComputers.stream().map(c -> {
@@ -81,9 +110,19 @@ public class ListComputers extends HttpServlet {
             return null;
         }).filter(dto -> dto != null)
         .collect(Collectors.toList());
+        
+
+        long firstPageNum = pageNum < 4 ? 1 : pageNum - 2;
+        long nbComputersAfter = computerCount - startIndex - pageLength;        
+        long lastPageNum = nbComputersAfter > 2 * pageLength ? pageNum + 2 : (computerCount / pageLength) + 1;
 
         req.setAttribute("dtolist", dtoList);
-        req.setAttribute("dtosize", dtoList.size());
+        req.setAttribute("dtosize", computerCount);
+        req.setAttribute("search", searchParam);
+        req.setAttribute("length", pageLength);
+        req.setAttribute("page", pageNum);
+        req.setAttribute("firstPageNum", firstPageNum);
+        req.setAttribute("lastPageNum", lastPageNum);
         
         req.getRequestDispatcher("WEB-INF/views/dashboard.jsp").forward(req, resp);
     }

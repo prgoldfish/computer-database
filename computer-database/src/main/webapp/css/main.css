@@ -17,6 +17,10 @@ footer .pagination {
     margin:10px 0px;
 }
 
+footer .pagination .currentPage {
+	filter: invert(20%);
+}
+
 footer .btn-group {
     margin:10px 10px;
 }
