@@ -35,7 +35,7 @@ public class ComputerService {
         return builder.map((build) -> build.getDateIntroduction());
     }
 
-    public void buildComputerFromScratch(String name) throws ComputerServiceException {
+    public void buildNewComputer(String name) throws ComputerServiceException {
         if (name == null || name.equals("")) {
             logger.error("Aucun nom en entrée");
             throw new ComputerServiceException("Aucun nom n'est mis");
@@ -45,7 +45,7 @@ public class ComputerService {
         fromScratch = true;
     }
 
-    public void buildComputerFromComputer(Computer com) throws ComputerServiceException {
+    public void buildComputerForUpdate(Computer com) throws ComputerServiceException {
         if (com == null) {
             logger.error("Aucun ordinateur en entrée");
             throw new ComputerServiceException("L'ordinateur en entrée est null");
@@ -64,7 +64,7 @@ public class ComputerService {
 
     public void addEndDate(LocalDateTime time) throws ComputerServiceException {
         isBuildStarted();
-        if (builder.get().getDateIntroduction() == null) {
+        if (builder.get().getDateIntroduction() == null && time != null) {
             logger.error("Tentative de réglage de la date de fin alors que la date de début n'est pas réglée");
             throw new ComputerServiceException(
                     "Impossible de régler la date de fin si la date de début n'est pas réglée.");

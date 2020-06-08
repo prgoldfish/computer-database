@@ -157,6 +157,10 @@ public class Computer {
             return this.dateIntroduction;
         }
 
+        public LocalDateTime getDateDiscontinuation() {
+            return this.dateDiscontinuation;
+        }
+
         public Computer build() {
             return new Computer(this);
         }

@@ -72,7 +72,7 @@ public class CLIController {
         Computer toUpdate = askComputer();
         ComputerService comService = new ComputerService(new ComputerDAO());
         try {
-            comService.buildComputerFromComputer(toUpdate);
+            comService.buildComputerForUpdate(toUpdate);
             setDateComputer(comService);
             setCompanyComputer(comService);
             comService.updateComputerToDB();
@@ -123,7 +123,7 @@ public class CLIController {
         String computerName = CLI.askComputerName();
         ComputerService comService = new ComputerService(new ComputerDAO());
         try {
-            comService.buildComputerFromScratch(computerName);
+            comService.buildNewComputer(computerName);
             setDateComputer(comService);
             setCompanyComputer(comService);
             comService.addComputerToDB();

@@ -21,6 +21,11 @@
 
     <section id="main">
         <div class="container">
+        <c:if test="${ addedcomputer == true }">
+		   <div class="alert alert-danger">
+		      The computer has succesfully been added in the database <br/>
+		  </div>
+		</c:if>
             <h1 id="homeTitle">
                <c:out value="${ dtosize }" /> Computers found
             </h1>
@@ -123,7 +128,7 @@
 				</c:forEach>
 				<c:if test="${ page != lastPageNum }">
 					<li>
-		                <a href="#" aria-label="Next" onclick="$.fn.goToPage(<fmt:formatNumber value="${ (dtosize / length) + 1 }" maxFractionDigits="0"></fmt:formatNumber>);">
+		                <a href="#" aria-label="Next" onclick="$.fn.goToPage(${ Math.floor(dtosize / length) + 1 });">
 		                    <span aria-hidden="true">&raquo;</span>
 		                </a>
 		            </li>

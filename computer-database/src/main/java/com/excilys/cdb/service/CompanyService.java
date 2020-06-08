@@ -22,4 +22,8 @@ public class CompanyService {
         return dao.getCompanyByName(name);
     }
 
+    public Optional<Company> getCompanyById(long id) {
+        return dao.getCompanyById(id);
+    }
+
 }

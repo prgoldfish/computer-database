@@ -17,6 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <mysql.connector.version>8.0.19</mysql.connector.version>
   </properties>
 
   <dependencies>
@@ -34,7 +35,7 @@
 	<dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
-	    <version>8.0.19</version>
+	    <version>${mysql.connector.version}</version>
 	</dependency>
 	<dependency>
 	  <groupId>org.mockito</groupId>

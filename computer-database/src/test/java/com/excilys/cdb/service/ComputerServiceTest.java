@@ -181,7 +181,7 @@ public class ComputerServiceTest {
     @Test
     public void testAddNewComputer() throws ComputerServiceException {
         ComputerService comService = new ComputerService(dao);
-        comService.buildComputerFromScratch("PC de Test");
+        comService.buildNewComputer("PC de Test");
         comService.addComputerToDB();
         refreshMock();
         Computer toCompare = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test").build();
@@ -203,7 +203,7 @@ public class ComputerServiceTest {
     public void testAddNewComputerFromAnother() throws ComputerServiceException {
         ComputerService comService = new ComputerService(dao);
         Computer toCompare = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test").build();
-        comService.buildComputerFromComputer(toCompare);
+        comService.buildComputerForUpdate(toCompare);
         try {
             comService.addComputerToDB();
             assert (false);
@@ -216,7 +216,7 @@ public class ComputerServiceTest {
     public void testUpdateComputer() throws ComputerServiceException {
         ComputerService comService = new ComputerService(dao);
         Computer toCompare = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test").build();
-        comService.buildComputerFromComputer(toCompare);
+        comService.buildComputerForUpdate(toCompare);
         comService.addIntroDate(LocalDateTime.of(2020, 1, 1, 0, 0));
         comService.updateComputerToDB();
         refreshMock();
@@ -238,7 +238,7 @@ public class ComputerServiceTest {
     @Test
     public void testUpdateComputerFromNew() throws ComputerServiceException {
         ComputerService comService = new ComputerService(dao);
-        comService.buildComputerFromScratch("PC de Test");
+        comService.buildNewComputer("PC de Test");
         try {
             comService.updateComputerToDB();
             assert (false);

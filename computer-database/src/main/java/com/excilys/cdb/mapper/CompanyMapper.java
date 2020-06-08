@@ -15,4 +15,21 @@ public class CompanyMapper {
         return new CompanyDTO(Long.toString(c.getId()), c.getNom());
     }
 
+    public static Company fromDTO(CompanyDTO c) throws MapperException
+    {
+        if(c == null)
+        {
+            throw new MapperException("Company object is null");
+        }
+        long id = 0;
+        try {
+            id = Long.parseLong(c.getId());
+        } catch (NumberFormatException nfe) {
+            throw new MapperException("The id is invalid");
+        }
+        
+        
+        return new Company(id, c.getNom());
+    }
+
 }
