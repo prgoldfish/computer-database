@@ -51,6 +51,40 @@ public class ComputerDTO {
         this.entreprise = entreprise;
     }
     
+    @Override
+    public String toString() {
+        String indefini = "Indefini";
+        StringBuilder res = new StringBuilder("Identifiant : ");
+        res.append(id);
+        res.append("\nNom de l'ordinateur : ").append(nom == null ? indefini : nom);
+        res.append("\nDate d'introduction : ").append(dateIntroduction == null ? indefini : dateIntroduction);
+        res.append("\nDate de fin : ").append(dateDiscontinuation == null ? indefini : dateDiscontinuation);
+        res.append("\nEntreprise : ").append(entreprise == null ? indefini : entreprise);
+        return res.toString();
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(dateDiscontinuation, dateIntroduction, entreprise, id, nom);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof ComputerDTO))
+            return false;
+        ComputerDTO other = (ComputerDTO) obj;
+        return Objects.equals(dateDiscontinuation, other.dateDiscontinuation)
+                && Objects.equals(dateIntroduction, other.dateIntroduction)
+                && Objects.equals(entreprise, other.entreprise) 
+                && Objects.equals(id, other.id)
+                && Objects.equals(nom, other.nom);
+    }
+
+
+
     public static class ComputerBuilderDTO {
         // Obligatoires
         private String id;

@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ public class ComputerServiceTest {
         refreshMockGetAddComputer();
         refreshMockUpdateComputer();
         refreshMockDeleteComputer();
+        refreshSearchComputerByName();
     }
 
     private void refreshMockGetMaxId() {
@@ -82,6 +85,13 @@ public class ComputerServiceTest {
                 }
             }
             return new ArrayList<>();
+        });
+    }
+    
+    private void refreshSearchComputerByName() {
+        when(dao.searchComputersByName(anyString())).thenAnswer(invoc -> {
+            String searchString = invoc.getArgument(0, String.class);
+            return compList.stream().filter(c -> c.getNom().contains(searchString)).collect(Collectors.toList());
         });
     }
 
@@ -264,6 +274,18 @@ public class ComputerServiceTest {
         } catch (ComputerServiceException e) {
 //            e.printStackTrace();
         }
+    }
+    
+    @Test
+    public void testSearchComputerByName() {
+        ComputerService comService = new ComputerService(dao);
+        assertEquals(compList, comService.searchComputersByName("PC"));
+    }
+    
+    @Test
+    public void testSearchComputerByNameNoResult() {
+        ComputerService comService = new ComputerService(dao);
+        assertEquals(Collections.EMPTY_LIST, comService.searchComputersByName("AZERTY"));
     }
 
 }

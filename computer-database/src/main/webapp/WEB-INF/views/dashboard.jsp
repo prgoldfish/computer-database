@@ -128,7 +128,7 @@
 				</c:forEach>
 				<c:if test="${ page != lastPageNum }">
 					<li>
-		                <a href="#" aria-label="Next" onclick="$.fn.goToPage(${ Math.floor(dtosize / length) + 1 });">
+		                <a href="#" aria-label="Next" onclick="$.fn.goToPage(${ Math.floor((dtosize - 1) / length) + 1 });">
 		                    <span aria-hidden="true">&raquo;</span>
 		                </a>
 		            </li>

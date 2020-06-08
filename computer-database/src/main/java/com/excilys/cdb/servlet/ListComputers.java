@@ -119,7 +119,7 @@ public class ListComputers extends HttpServlet {
 
         long firstPageNum = pageNum < 4 ? 1 : pageNum - 2;
         long nbComputersAfter = computerCount - startIndex - pageLength;        
-        long lastPageNum = nbComputersAfter > 2 * pageLength ? pageNum + 2 : (computerCount / pageLength) + 1;
+        long lastPageNum = nbComputersAfter > 2 * pageLength ? pageNum + 2 : ((computerCount - 1) / pageLength) + 1;
 
         req.setAttribute("dtolist", dtoList);
         req.setAttribute("dtosize", computerCount);

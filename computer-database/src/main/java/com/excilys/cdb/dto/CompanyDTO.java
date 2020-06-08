@@ -44,7 +44,7 @@ public class CompanyDTO {
         if (!(obj instanceof CompanyDTO))
             return false;
         CompanyDTO other = (CompanyDTO) obj;
-        return id == other.id && Objects.equals(nom, other.nom);
+        return id.equals(other.id) && Objects.equals(nom, other.nom);
     }
 
 }
