@@ -8,6 +8,8 @@
 <link href="./css/bootstrap.min.css" rel="stylesheet" media="screen">
 <link href="./css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="./css/main.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="./js/addComputer.js"></script>
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
@@ -35,19 +37,29 @@
                         </c:forEach></ul></div>
                     </c:if>
                     <h1>Add Computer</h1>
-                    <form action="AddComputer" method="POST">
+                    <form id="addComputer" action="AddComputer" method="POST">
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>
-                                <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name">
+                                <div id="errGroup">
+	                                <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name">
+	                                <div class="addErrText" id="cnErr"></div>
+                                </div>
+                                
                             </div>
                             <div class="form-group">
                                 <label for="introduced">Introduced date</label>
-                                <input type="date" class="form-control" id="introduced" name="introduced" placeholder="Introduced date">
+                                <div id="errGroup">
+                                    <input type="date" class="form-control" id="introduced" name="introduced" placeholder="Introduced date">
+                                    <div class="addErrText" id="introErr"></div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="discontinued">Discontinued date</label>
-                                <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="Discontinued date">
+                                <div id="errGroup">
+                                    <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="Discontinued date">
+                                    <div class="addErrText" id="discontErr"></div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="companyId">Company</label>
@@ -60,7 +72,7 @@
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
-                            <input type="submit" value="Add" class="btn btn-primary">
+                            <button type="button" onclick="checkInputs()" class="btn btn-primary">Add</button>
                             or
                             <a href="ListComputers" class="btn btn-default">Cancel</a>
                         </div>

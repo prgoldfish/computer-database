@@ -31,3 +31,28 @@ input[type='checkbox'] {
     border-radius: 5px;
     white-space: nowrap;
 }
+
+#addComputer .form-control
+{
+	border-width: 2px;
+}
+
+.addErrText
+{
+	padding-left : 2%;
+	display: none;
+}
+
+#errGroup
+{
+    background: salmon;
+    border-radius: 4px;
+}
+
+
+
+
+
+
+
+
