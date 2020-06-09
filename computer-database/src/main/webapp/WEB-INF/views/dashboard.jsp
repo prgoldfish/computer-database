@@ -95,8 +95,8 @@
 	                        <td class="editMode">
 	                            <input type="checkbox" name="cb" class="cb" value="0">
 	                        </td>
-	                        <td>
-	                            <a href="EditComputer?id=${ i.id }" onclick=""><c:out value="${ i.nom }"></c:out></a>
+	                        <td><form id="editForm${ i.id }" action="EditComputer" method="POST"></form>
+	                            <a href="#" onclick="$(#editForm${ i.id })"><c:out value="${ i.nom }"></c:out></a>
 	                        </td>
 	                        <td><c:out value="${ i.dateIntroduction }"></c:out></td>
 	                        <td><c:out value="${ i.dateDiscontinuation }"></c:out></td>
@@ -114,7 +114,7 @@
             <ul class="pagination">
                 <c:if test="${ page != firstPageNum }">
                     <li>
-	                    <a href="#" aria-label="Previous" onclick="<c:out value="$.fn.goToPage(${ 1 });"></c:out>">
+	                    <a href="#" aria-label="Previous" onclick="$.fn.goToPage(${ 1 });">
 	                      <span aria-hidden="true">&laquo;</span>
 	                    </a>
 	                </li>
