@@ -77,7 +77,7 @@ let checkDates = function() {
 	}	
 }
 
-function checkInputs() {
+function checkInputs(formName) {
 	let computerName = $("#computerName");
 	let companyId = $("#companyId");
 	let introduced = $("#introduced");
@@ -93,6 +93,6 @@ function checkInputs() {
 	}
 	else
 	{
-		$("#addComputer").submit();
+		$("#" + formName).submit();
 	}
 }

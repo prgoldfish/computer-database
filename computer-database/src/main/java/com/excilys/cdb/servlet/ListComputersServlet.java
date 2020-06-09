@@ -24,13 +24,13 @@ import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.service.ComputerService;
 
 @WebServlet("/ListComputers")
-public class ListComputers extends HttpServlet {
+public class ListComputersServlet extends HttpServlet {
 
     /**
      * 
      */
     private static final long serialVersionUID = -3042238239381847969L;
-    private static final Logger logger = LoggerFactory.getLogger(ListComputers.class);
+    private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,7 +40,7 @@ public class ListComputers extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession(); 
+        HttpSession session = req.getSession();
         ComputerDAO dao = (ComputerDAO) session.getAttribute("computerdao");
         if(dao == null)
         {
@@ -120,6 +120,10 @@ public class ListComputers extends HttpServlet {
         long firstPageNum = pageNum < 4 ? 1 : pageNum - 2;
         long nbComputersAfter = computerCount - startIndex - pageLength;        
         long lastPageNum = nbComputersAfter > 2 * pageLength ? pageNum + 2 : ((computerCount - 1) / pageLength) + 1;
+        if(pageNum > lastPageNum)
+        {
+            pageNum = (int) lastPageNum;
+        }
 
         req.setAttribute("dtolist", dtoList);
         req.setAttribute("dtosize", computerCount);

@@ -84,7 +84,7 @@ public class ComputerMapperTest {
     
     @Test(expected = MapperException.class)
     public void testFromDTONullName() throws MapperException {
-        ComputerMapper.fromDTO(new ComputerDTO.ComputerBuilderDTO("1", "").build());
+        ComputerMapper.fromDTO(new ComputerDTO.ComputerBuilderDTO("1", null).build());
     }
     
     @Test(expected = MapperException.class)
@@ -95,6 +95,47 @@ public class ComputerMapperTest {
     @Test(expected = MapperException.class)
     public void testFromDTODiscontinuationButNoIntroduction() throws MapperException {
         ComputerMapper.fromDTO(new ComputerDTO.ComputerBuilderDTO("1", "aaa").setDateDiscontinuation("2002-01-01").build());
+    }
+    
+    @Test
+    public void testFromDTOIntroductionOnly() throws MapperException {
+        ComputerBuilder resBuilder = new Computer.ComputerBuilder(123, "PC").setDateIntroduction(LocalDateTime.of(2002, 1, 1, 0, 0));
+        Computer res = resBuilder.build();
+        ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2002-01-01");
+        ComputerDTO c = cb.build();
+        assertEquals(res, ComputerMapper.fromDTO(c));
+    }
+    
+    @Test(expected = MapperException.class)
+    public void testFromDTOInvalidIntroductionString() throws MapperException {
+        ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("invalid");
+        ComputerDTO c = cb.build();
+        ComputerMapper.fromDTO(c);
+    }
+    
+    @Test(expected = MapperException.class)
+    public void testFromDTOInvalidDiscontinuationString() throws MapperException {
+        ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2002-01-01").setDateDiscontinuation("invalid");
+        ComputerDTO c = cb.build();
+        ComputerMapper.fromDTO(c);
+    }
+    
+    
+    @Test(expected = MapperException.class)
+    public void testFromDTOIntroductionAfterDiscontinuation() throws MapperException {
+        ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2003-01-01").setDateDiscontinuation("2002-01-01");
+        ComputerDTO c = cb.build();
+        ComputerMapper.fromDTO(c);
+    }
+
+    
+    @Test
+    public void testFromDTOEmptyDateStrings() throws MapperException {
+        ComputerBuilder resBuilder = new Computer.ComputerBuilder(123, "PC");
+        Computer res = resBuilder.build();
+        ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("").setDateDiscontinuation("");
+        ComputerDTO c = cb.build();
+        assertEquals(res, ComputerMapper.fromDTO(c));
     }
 
 }

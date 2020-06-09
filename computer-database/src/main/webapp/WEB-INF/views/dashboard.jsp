@@ -4,13 +4,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Computer Database</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="utf-8">
-<!-- Bootstrap -->
-<link href="./css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="./css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="./css/main.css" rel="stylesheet" media="screen">
+	<title>Computer Database</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8">
+	<!-- Bootstrap -->
+	<link href="./css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="./css/font-awesome.css" rel="stylesheet" media="screen">
+	<link href="./css/main.css" rel="stylesheet" media="screen">
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
@@ -96,7 +96,7 @@
 	                            <input type="checkbox" name="cb" class="cb" value="0">
 	                        </td>
 	                        <td>
-	                            <a href="EditComputer" onclick=""><c:out value="${ i.nom }"></c:out></a>
+	                            <a href="EditComputer?id=${ i.id }" onclick=""><c:out value="${ i.nom }"></c:out></a>
 	                        </td>
 	                        <td><c:out value="${ i.dateIntroduction }"></c:out></td>
 	                        <td><c:out value="${ i.dateDiscontinuation }"></c:out></td>
@@ -122,7 +122,7 @@
 				<c:forEach begin="${ firstPageNum }" end="${ lastPageNum }" var="i">
 				    
 				    <li><a href="#" <c:if test="${ page == i }"><c:out value="class=currentPage"></c:out></c:if>
-				            onclick="<c:out value="$.fn.goToPage(${ i });"></c:out>">
+				            onclick="$.fn.goToPage(${ i });">
 				        <c:out value="${ i }"></c:out>
 				    </a></li>
 				</c:forEach>
@@ -139,7 +139,7 @@
 					<button type="submit" class="btn btn-default" value="10" name="length">10</button>
 					<button type="submit" class="btn btn-default" value="50" name="length">50</button>
 					<button type="submit" class="btn btn-default" value="100" name="length">100</button>
-					<input type="hidden" name="search" value="<c:out value="${ search }"></c:out>">
+					<input type="hidden" name="search" value="${ search }">
 				</form>
 	        </div>
         </div>

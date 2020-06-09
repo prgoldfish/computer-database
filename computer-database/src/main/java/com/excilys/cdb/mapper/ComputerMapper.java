@@ -77,12 +77,13 @@ public class ComputerMapper {
     private static void parseDates(ComputerDTO c, List<String> errors, ComputerBuilder result) {
         boolean introSet = c.getDateIntroduction() != null && !c.getDateIntroduction().equals("");
         boolean discontSet = c.getDateDiscontinuation() != null && !c.getDateDiscontinuation().equals("");
+        boolean bothSet = introSet && discontSet;
         if(introSet)
         {
             try {
                 result.setDateIntroduction(LocalDate.parse(c.getDateIntroduction(), DateTimeFormatter.ISO_DATE).atStartOfDay());
             } catch (DateTimeParseException dtpe) {
-                introSet = false;
+                bothSet = false;
                 errors.add("The introduced date is invalid");
             }
         }
@@ -90,7 +91,7 @@ public class ComputerMapper {
         {
             if(!introSet)
             {
-                discontSet = false;
+                bothSet = false;
                 errors.add("The discontinued date is set but the introduced date is not");
             }
             else 
@@ -98,12 +99,12 @@ public class ComputerMapper {
                 try {
                     result.setDateDiscontinuation(LocalDate.parse(c.getDateDiscontinuation(), DateTimeFormatter.ISO_DATE).atStartOfDay());
                 } catch (DateTimeParseException dtpe) {
-                    discontSet = false;
+                    bothSet = false;
                     errors.add("The discontinued date is invalid");
                 }
             }                
         }
-        if(discontSet && introSet && result.getDateIntroduction().isAfter(result.getDateDiscontinuation()))
+        if(bothSet && result.getDateIntroduction().isAfter(result.getDateDiscontinuation()))
         {
             errors.add("The introduction date is after the discontinuation date");
         }

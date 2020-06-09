@@ -56,6 +56,26 @@ public class ComputerService {
         builder.get().setEntreprise(com.getEntreprise());
         fromScratch = false;
     }
+    
+    public void addNewComputer(Computer com) throws ComputerServiceException {
+        if (com == null) {
+            logger.error("Aucun ordinateur en entrée");
+            throw new ComputerServiceException("L'ordinateur en entrée est null");
+        }
+        buildNewComputer(com.getNom());
+        addIntroDate(com.getDateIntroduction());
+        addEndDate(com.getDateDiscontinuation());
+        if(com.getEntreprise() != null)
+        {
+            addCompany(com.getEntreprise().getNom());
+        }
+        addComputerToDB();
+    }
+    
+    public void updateComputer(Computer com) throws ComputerServiceException {
+        buildComputerForUpdate(com);
+        updateComputerToDB();
+    }
 
     public void addIntroDate(LocalDateTime time) throws ComputerServiceException {
         isBuildStarted();

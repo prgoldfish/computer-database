@@ -3,7 +3,6 @@ package com.excilys.cdb.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
@@ -30,13 +29,13 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
 @WebServlet("/AddComputer")
-public class AddComputer extends HttpServlet {
+public class AddComputerServlet extends HttpServlet {
 
     /**
      * 
      */
     private static final long serialVersionUID = -6234124633063870193L;
-    private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
+    private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
 
     
     @Override
@@ -131,20 +130,11 @@ public class AddComputer extends HttpServlet {
         {
             try
             {
-                //TODO: Simplifier ça un jour
-                computerService.buildNewComputer(com.getNom());
-                computerService.addIntroDate(com.getDateIntroduction());
-                computerService.addEndDate(com.getDateDiscontinuation());
-                if(com.getEntreprise() != null)
-                {
-                    computerService.addCompany(com.getEntreprise().getNom());
-                }
-                computerService.addComputerToDB();
+                computerService.addNewComputer(com);
                 req.setAttribute("addedcomputer", true);
             } catch (ComputerServiceException cse) {
                 errorMessages.add(cse.getMessage());
             }
-            logger.debug("Faudrait penser à l'upload un jour");
         }
         req.setAttribute("errors", errorMessages);
         doGet(req, resp);

@@ -18,32 +18,32 @@
         </div>
     </header>
     
-    <c:if test="${ addedcomputer == true }">
-        <form id="addedForm" action="ListComputers" method="POST">
-            <input type="hidden" value="true" name="addedcomputer"/>
+    <c:if test="${ editedcomputer == true }">
+        <form id="editedForm" action="ListComputers" method="POST">
+            <input type="hidden" value="true" name="editedcomputer"/>
         </form>
         <script type="text/javascript">
-            document.getElementById("addedForm").submit()
+            document.getElementById("editedForm").submit()
         </script>
     </c:if>
-
+    
     <section id="main">
         <div class="container">
             <div class="row">
                 <div class="col-xs-8 col-xs-offset-2 box">
-                    <c:if test="${ !empty errors }">
-                        <div class="alert alert-danger"><ul><c:forEach var="err" items="${ errors }">
-                            <li><c:out value="${ err }"></c:out></li>
-                        </c:forEach></ul></div>
-                    </c:if>
-                    <h1>Add Computer</h1>
-                    <form id="addComputer" action="AddComputer" method="POST">
+                    <div class="label label-default pull-right">
+                        id: <c:out value="${ id }"></c:out>
+                    </div>
+                    <h1>Edit Computer</h1>
+
+                    <form action="editComputer" method="POST">
+                        <input type="hidden" value="${ id }" id="id"/> <!-- TODO: Change this value with the computer id -->
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>
                                 <div id="errGroup">
-	                                <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name">
-	                                <div class="addErrText" id="cnErr"></div>
+                                    <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name">
+                                    <div class="addErrText" id="cnErr"></div>
                                 </div>
                                 
                             </div>
@@ -72,7 +72,7 @@
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
-                            <button type="button" onclick="checkInputs(addComputer)" class="btn btn-primary">Add</button>
+                            <button type="button" onclick="checkInputs(editComputer)" class="btn btn-primary">Add</button>
                             or
                             <a href="ListComputers" class="btn btn-default">Cancel</a>
                         </div>
