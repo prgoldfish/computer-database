@@ -75,7 +75,7 @@
                             <button type="button" onclick="checkInputs(&quot;editComputer&quot;)" class="btn btn-primary">Edit</button>
                             or
                             <a href="ListComputers" class="btn btn-default">Cancel</a>
-                        </div>
+                        </div> 
                     </form>
                 </div>
             </div>
