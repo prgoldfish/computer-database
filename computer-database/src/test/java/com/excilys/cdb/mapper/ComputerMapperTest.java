@@ -29,7 +29,7 @@ public class ComputerMapperTest {
         cb.setDateDiscontinuation(LocalDateTime.of(2003, 1, 1, 0, 0));
         cb.setEntreprise(new Company(1, "Company"));
         Computer c = cb.build();
-        ComputerBuilderDTO resBuilder = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2002-01-01T00:00").setDateDiscontinuation("2003-01-01T00:00");
+        ComputerBuilderDTO resBuilder = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2002-01-01").setDateDiscontinuation("2003-01-01");
         resBuilder.setEntreprise(new CompanyDTO("1", "Company"));
         ComputerDTO res = resBuilder.build();
         assertEquals(res, ComputerMapper.toDTO(c));

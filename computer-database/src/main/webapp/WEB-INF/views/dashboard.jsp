@@ -11,6 +11,9 @@
 	<link href="./css/bootstrap.min.css" rel="stylesheet" media="screen">
 	<link href="./css/font-awesome.css" rel="stylesheet" media="screen">
 	<link href="./css/main.css" rel="stylesheet" media="screen">
+	<script src="./js/jquery.min.js"></script>
+	<script src="./js/bootstrap.min.js"></script>
+	<script src="./js/dashboard.js"></script>
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
@@ -22,10 +25,15 @@
     <section id="main">
         <div class="container">
         <c:if test="${ addedcomputer == true }">
-		   <div class="alert alert-danger">
-		      The computer has succesfully been added in the database <br/>
-		  </div>
-		</c:if>
+           <div class="alert alert-danger">
+              The computer has succesfully been added in the database <br/>
+          </div>
+        </c:if>
+        <c:if test="${ editedcomputer == true }">
+           <div class="alert alert-danger">
+              The computer has succesfully been edited <br/>
+          </div>
+        </c:if>
             <h1 id="homeTitle">
                <c:out value="${ dtosize }" /> Computers found
             </h1>
@@ -93,10 +101,13 @@
                     <c:forEach var="i" items="${ dtolist }">
                         <tr>
 	                        <td class="editMode">
-	                            <input type="checkbox" name="cb" class="cb" value="0">
+	                            <input type="checkbox" name="cb" class="cb" value="${ i.id }">
 	                        </td>
-	                        <td><form id="editForm${ i.id }" action="EditComputer" method="POST"></form>
-	                            <a href="#" onclick="$(#editForm${ i.id })"><c:out value="${ i.nom }"></c:out></a>
+	                        <td>
+	                           <form id="editForm${ i.id }" action="EditComputer" method="POST">
+	                               <input type="hidden" name="id" value="${ i.id }">
+	                               <a href="#" onclick="$(&quot;#editForm${ i.id }&quot;).submit()"><c:out value="${ i.nom }"></c:out></a>
+	                           </form>
 	                        </td>
 	                        <td><c:out value="${ i.dateIntroduction }"></c:out></td>
 	                        <td><c:out value="${ i.dateDiscontinuation }"></c:out></td>
@@ -144,9 +155,5 @@
 	        </div>
         </div>
     </footer>
-<script src="./js/jquery.min.js"></script>
-<script src="./js/bootstrap.min.js"></script>
-<script src="./js/dashboard.js"></script>
-
 </body>
 </html>

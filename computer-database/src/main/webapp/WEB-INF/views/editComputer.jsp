@@ -36,13 +36,13 @@
                     </div>
                     <h1>Edit Computer</h1>
 
-                    <form action="editComputer" method="POST">
+                    <form id="editComputer" action="EditComputer" method="POST">
                         <input type="hidden" value="${ id }" id="id"/> <!-- TODO: Change this value with the computer id -->
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>
                                 <div id="errGroup">
-                                    <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name">
+                                    <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name" value="${ computerName }">
                                     <div class="addErrText" id="cnErr"></div>
                                 </div>
                                 
@@ -50,14 +50,14 @@
                             <div class="form-group">
                                 <label for="introduced">Introduced date</label>
                                 <div id="errGroup">
-                                    <input type="date" class="form-control" id="introduced" name="introduced" placeholder="Introduced date">
+                                    <input type="date" class="form-control" id="introduced" name="introduced" placeholder="Introduced date" value="${ dateIntro }">
                                     <div class="addErrText" id="introErr"></div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="discontinued">Discontinued date</label>
                                 <div id="errGroup">
-                                    <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="Discontinued date">
+                                    <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="Discontinued date" value="${ dateDiscont }">
                                     <div class="addErrText" id="discontErr"></div>
                                 </div>
                             </div>
@@ -66,13 +66,13 @@
                                 <select class="form-control" id="companyId" name="companyId" >
                                     <option value="0">--</option>
                                     <c:forEach var="company" items="${ companies }">
-                                        <option value="${ company.id }"><c:out value="${ company.nom }"></c:out></option>
+                                        <option value="${ company.id }" <c:if test="${ company.id == companyId }" >selected</c:if>><c:out value="${ company.nom }"></c:out></option>
                                     </c:forEach>
                                 </select>
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
-                            <button type="button" onclick="checkInputs(editComputer)" class="btn btn-primary">Add</button>
+                            <button type="button" onclick="checkInputs(&quot;editComputer&quot;)" class="btn btn-primary">Edit</button>
                             or
                             <a href="ListComputers" class="btn btn-default">Cancel</a>
                         </div>

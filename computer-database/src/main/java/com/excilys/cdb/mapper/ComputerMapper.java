@@ -23,11 +23,11 @@ public class ComputerMapper {
         ComputerBuilderDTO dto = new ComputerDTO.ComputerBuilderDTO(Long.toString(c.getId()), c.getNom());
         if(c.getDateIntroduction() != null)
         {
-            dto.setDateIntroduction(c.getDateIntroduction().toString());
+            dto.setDateIntroduction(c.getDateIntroduction().format(DateTimeFormatter.ISO_DATE));
         }
         if(c.getDateDiscontinuation() != null)
         {
-            dto.setDateDiscontinuation(c.getDateDiscontinuation().toString());
+            dto.setDateDiscontinuation(c.getDateDiscontinuation().format(DateTimeFormatter.ISO_DATE));
         }
         if(c.getEntreprise() != null)
         {

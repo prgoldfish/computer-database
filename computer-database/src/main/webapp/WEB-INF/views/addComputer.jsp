@@ -72,7 +72,7 @@
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
-                            <button type="button" onclick="checkInputs(addComputer)" class="btn btn-primary">Add</button>
+                            <button type="button" onclick="checkInputs(&quot;addComputer&quot;)" class="btn btn-primary">Add</button>
                             or
                             <a href="ListComputers" class="btn btn-default">Cancel</a>
                         </div>

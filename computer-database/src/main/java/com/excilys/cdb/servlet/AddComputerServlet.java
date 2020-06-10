@@ -95,11 +95,6 @@ public class AddComputerServlet extends HttpServlet {
             companyService = new CompanyService(companyDao);
             session.setAttribute("companyservice", companyService);
         }
-
-        logger.debug(Boolean.toString(computerName.equals("")));
-        logger.debug(introducedParam);
-        logger.debug(discontinuedParam);
-        logger.debug(companyIdParam);
         
         List<String> errorMessages = new ArrayList<>(); 
         
