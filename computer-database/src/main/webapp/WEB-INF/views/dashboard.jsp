@@ -1,5 +1,6 @@
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>  
 
 <!DOCTYPE html>
 <html>
@@ -24,14 +25,9 @@
 
     <section id="main">
         <div class="container">
-        <c:if test="${ addedcomputer == true }">
+        <c:if test="${ fn:length(headerMessage) > 0 }">
            <div class="alert alert-danger">
-              The computer has succesfully been added in the database <br/>
-          </div>
-        </c:if>
-        <c:if test="${ editedcomputer == true }">
-           <div class="alert alert-danger">
-              The computer has succesfully been edited <br/>
+              <c:out value="${ headerMessage }"></c:out> <br/>
           </div>
         </c:if>
             <h1 id="homeTitle">

@@ -53,12 +53,12 @@ public class ListComputersServlet extends HttpServlet {
             service = new ComputerService(dao);
             session.setAttribute("computerservice", service);
         }
-        String addedComputer = req.getParameter("addedcomputer");
-        if(addedComputer != null)
+        String headerMessage = req.getParameter("headerMessage");
+        if(headerMessage != null)
         {
-            req.setAttribute("addedcomputer", addedComputer);
+            req.setAttribute("headerMessage", headerMessage);
         }
-
+        
         int pageLength = 10;
         String pageLengthParam = req.getParameter("length");
         int pageNum = 1;

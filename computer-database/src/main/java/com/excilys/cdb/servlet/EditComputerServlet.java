@@ -60,7 +60,9 @@ public class EditComputerServlet extends HttpServlet {
         {
             req.setAttribute("id", id);
             if(computerName != null)
-            {            
+            {
+                System.out.println("Un pc va etre modifié");
+                System.out.println("Nom : " + computerName);
                 CompanyDTO comp = getCompanyDTO(companyService, companyIdParam);
                 
                 ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(idParam, computerName)
@@ -81,7 +83,7 @@ public class EditComputerServlet extends HttpServlet {
                     try
                     {
                         computerService.updateComputer(com);
-                        req.setAttribute("editedcomputer", true);
+                        req.setAttribute("headerMessage", "The computer has successfully been edited");
                     } catch (ComputerServiceException cse) {
                         errorMessages.add(cse.getMessage());
                     }

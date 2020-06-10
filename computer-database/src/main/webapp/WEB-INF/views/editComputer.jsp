@@ -1,4 +1,5 @@
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>  
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,9 +19,9 @@
         </div>
     </header>
     
-    <c:if test="${ editedcomputer == true }">
+    <c:if test="${ fn:length(headerMessage) > 0 }">
         <form id="editedForm" action="ListComputers" method="POST">
-            <input type="hidden" value="true" name="editedcomputer"/>
+            <input type="hidden" value="${ headerMessage }" name="headerMessage"/>
         </form>
         <script type="text/javascript">
             document.getElementById("editedForm").submit()
@@ -37,7 +38,7 @@
                     <h1>Edit Computer</h1>
 
                     <form id="editComputer" action="EditComputer" method="POST">
-                        <input type="hidden" value="${ id }" id="id"/> <!-- TODO: Change this value with the computer id -->
+                        <input type="hidden" value="${ id }" name="id" id="id"/>
                         <fieldset>
                             <div class="form-group">
                                 <label for="computerName">Computer name</label>

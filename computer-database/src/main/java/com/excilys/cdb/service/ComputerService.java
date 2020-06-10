@@ -50,6 +50,7 @@ public class ComputerService {
             logger.error("Aucun ordinateur en entrée");
             throw new ComputerServiceException("L'ordinateur en entrée est null");
         }
+        System.out.println("Nom 2 : " + com.getNom());
         builder = Optional.of(new ComputerBuilder(com.getId(), com.getNom()));
         builder.get().setDateIntroduction(com.getDateIntroduction());
         builder.get().setDateDiscontinuation(com.getDateDiscontinuation());

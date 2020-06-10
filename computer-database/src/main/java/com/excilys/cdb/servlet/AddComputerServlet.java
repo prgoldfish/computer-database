@@ -40,7 +40,8 @@ public class AddComputerServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if(!Boolean.TRUE.equals(req.getAttribute("addedcomputer")))
+        String headerMessage = (String) req.getAttribute("headerMessage");
+        if( headerMessage == null || headerMessage.isEmpty())
         {
             HttpSession session = req.getSession();
             CompanyDAO companyDao = (CompanyDAO) session.getAttribute("companydao");
@@ -126,7 +127,7 @@ public class AddComputerServlet extends HttpServlet {
             try
             {
                 computerService.addNewComputer(com);
-                req.setAttribute("addedcomputer", true);
+                req.setAttribute("headerMessage", "The computer has successfully been added to the database");
             } catch (ComputerServiceException cse) {
                 errorMessages.add(cse.getMessage());
             }
