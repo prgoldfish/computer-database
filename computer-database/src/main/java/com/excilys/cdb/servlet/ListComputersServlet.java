@@ -1,7 +1,6 @@
 package com.excilys.cdb.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +21,7 @@ import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.service.Page;
 
 @WebServlet("/ListComputers")
 public class ListComputersServlet extends HttpServlet {
@@ -93,31 +93,23 @@ public class ListComputersServlet extends HttpServlet {
         }
 
         int computerCount = 0;
-        int startIndex = (pageNum - 1) * pageLength;
         String searchParam = req.getParameter("search");
+        Page<Computer> pages = null;
 
-        List<Computer> listComputers = new ArrayList<Computer>();
         try {
             if (searchParam != null) {
-                listComputers = service.searchComputersByName(searchParam);
-                computerCount = listComputers.size();
-                int lastPageIndex = computerCount - ((computerCount - (computerCount / pageLength) * pageLength));
-                int startSubList = Math.min(startIndex, lastPageIndex);
-                int endSubList = Math.min(startSubList + pageLength, computerCount);
-                logger.info("lastPageIndex = " + lastPageIndex);
-                logger.info("startSubList = " + startSubList);
-                logger.info("endSubList = " + endSubList);
-                listComputers = listComputers.subList(startSubList, endSubList);
+                pages = new Page<>(service.searchComputersByName(searchParam), pageLength);
             } else {
-                listComputers = service.getComputerList(startIndex, pageLength);
-                computerCount = service.getComputerList(0, Integer.MAX_VALUE).size();
+                pages = new Page<>(service.getComputerList(0, Long.MAX_VALUE), pageLength);
             }
-
         } catch (ComputerServiceException e) {
             throw new ServletException(e);
         }
 
-        List<ComputerDTO> dtoList = listComputers.stream().map(c -> {
+        pages.gotoPage(pageNum);
+        computerCount = pages.getElementCount();
+
+        List<ComputerDTO> dtoList = pages.getPageContent().stream().map(c -> {
             try {
                 return ComputerMapper.toDTO(c);
             } catch (MapperException e) {
@@ -126,12 +118,9 @@ public class ListComputersServlet extends HttpServlet {
             return null;
         }).filter(dto -> dto != null).collect(Collectors.toList());
 
-        long firstPageNum = pageNum < 4 ? 1 : pageNum - 2;
-        long nbComputersAfter = computerCount - startIndex - pageLength;
-        long lastPageNum = nbComputersAfter > 2 * pageLength ? pageNum + 2 : ((computerCount - 1) / pageLength) + 1;
-        if (pageNum > lastPageNum) {
-            pageNum = (int) lastPageNum;
-        }
+        long firstPageNum = Math.max(pages.getCurrentPage() - 2, 1);
+        long lastPageNum = Math.min(pages.getCurrentPage() + 2, pages.getMaxPage());
+        pageNum = pages.getCurrentPage();
 
         req.setAttribute("dtolist", dtoList);
         req.setAttribute("dtosize", computerCount);

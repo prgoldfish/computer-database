@@ -6,6 +6,11 @@ $(function() {
     // Click on "selectall" box
     $("#selectall").click(function () {
         $('.cb').prop('checked', this.checked);
+        if ($(".cb:checked").length != 0) {
+            $("#deleteSelected").prop('disabled', false);
+        } else {
+            $("#deleteSelected").prop('disabled', true);
+        }
     });
     
     $("#deleteSelected").prop('disabled', true);
