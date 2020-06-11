@@ -1,12 +1,12 @@
 package com.excilys.cdb.persistence;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class ComputerDAO {
     /**
      * Fais une requête sur la base de données pour récupérer la liste des
      * ordinateurs
-     * 
+     *
      * @return Les ordinateurs dans une List
      */
     public List<Computer> getComputerList(long startIndex, long limit) {
@@ -204,6 +204,7 @@ public class ComputerDAO {
         try (PreparedStatement stmt = conn.prepareStement(DELETE_COMPUTER_QUERY);) {
             stmt.setLong(1, id);
             stmt.executeUpdate();
+            logger.info("Deleted computer with id : {}", id);
         } catch (SQLException sqle) {
             logger.error("Erreur lors de l'exécution de la requête", sqle);
         }

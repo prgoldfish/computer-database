@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.dto.ComputerDTO;
-import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.exception.ComputerServiceException;
+import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.ComputerDAO;
@@ -27,7 +27,7 @@ import com.excilys.cdb.service.ComputerService;
 public class ListComputersServlet extends HttpServlet {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -3042238239381847969L;
     private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
@@ -41,6 +41,9 @@ public class ListComputersServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
+        // System.out.println("Selection : " +
+        // req.getParameterValues("selection").length);
+
         ComputerDAO dao = (ComputerDAO) session.getAttribute("computerdao");
         if (dao == null) {
             dao = new ComputerDAO();
@@ -54,6 +57,22 @@ public class ListComputersServlet extends HttpServlet {
         String headerMessage = req.getParameter("headerMessage");
         if (headerMessage != null) {
             req.setAttribute("headerMessage", headerMessage);
+        }
+
+        String selection = req.getParameter("selection");
+        if (selection != null) {
+            int deletedCount = 0;
+            for (String toDelete : selection.split(",")) {
+                try {
+                    int id = Integer.parseInt(toDelete);
+                    service.deleteComputer(id);
+                    deletedCount++;
+                } catch (ComputerServiceException | NumberFormatException exc) {
+                    logger.error(exc.getMessage());
+                }
+            }
+            req.setAttribute("headerMessage", deletedCount + " computer(s) deleted");
+
         }
 
         int pageLength = 10;

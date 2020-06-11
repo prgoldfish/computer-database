@@ -22,7 +22,7 @@ public class Page {
 
     /**
      * Crée le header en haut de chaque page
-     * 
+     *
      * @return Une String repésentant le header
      */
     private static String setHeader() {
@@ -43,7 +43,7 @@ public class Page {
 
     /**
      * Affiche chaque élément de la page actuelle sous forme de tableau
-     * 
+     *
      * @throws ComputerServiceException
      */
     public String getPageContent() throws ComputerServiceException {
@@ -54,6 +54,10 @@ public class Page {
             outString += computerDetailsString(c) + '\n';
         }
         return outString + "\nPage " + (currentPage + 1) + "/" + (maxPage + 1) + "\n";
+    }
+
+    public List<Computer> getPageList() throws ComputerServiceException {
+        return new ComputerService(new ComputerDAO()).getComputerList(currentPage * pageLength, pageLength);
     }
 
     private String computerDetailsString(Computer c) {
@@ -75,7 +79,7 @@ public class Page {
 
     /**
      * Renvoie le nombre maximum de pages
-     * 
+     *
      * @return Le nombre max de pages (en partant de 0)
      */
     public int getMaxPage() {
@@ -84,7 +88,7 @@ public class Page {
 
     /**
      * Passe à la page suivante et l'affiche
-     * 
+     *
      * @return
      * @throws ComputerServiceException
      * @throws PageException
@@ -100,7 +104,7 @@ public class Page {
 
     /**
      * Passe à la page précédente et l'affiche
-     * 
+     *
      * @return
      * @throws ComputerServiceException
      * @throws PageException
@@ -116,7 +120,7 @@ public class Page {
 
     /**
      * Va à la page indiquée en paramètre
-     * 
+     *
      * @param pageNumber Le numéro de page voulu
      */
     public void gotoPage(int pageNumber) {

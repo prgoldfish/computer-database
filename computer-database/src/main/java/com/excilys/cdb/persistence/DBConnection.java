@@ -24,15 +24,17 @@ public class DBConnection implements AutoCloseable {
      * Se connecte à la base de données et stocke la connexion
      */
     private DBConnection() {
-        String url = "jdbc:mysql://localhost:3306/";
-        String db = "computer-database-db";
-        String user = "admincdb";
-        String pass = "qwerty1234";
-        String urlConfig = "?serverTimezone=Europe/Paris";
-
+        /*
+         * String url = "jdbc:mysql://localhost:3306/";
+         * String db = "computer-database-db";
+         * String user = "admincdb";
+         * String pass = "qwerty1234";
+         * String urlConfig = "?serverTimezone=Europe/Paris";
+         */
         HikariConfig config = new HikariConfig("/hikari.properties");
         /*
-         * config.setJdbcUrl(url + db + urlConfig); config.setUsername(user);
+         * config.setJdbcUrl(url + db + urlConfig);
+         * config.setUsername(user);
          * config.setPassword(pass);
          * config.setDriverClassName("com.mysql.cj.jdbc.Driver");
          */

@@ -7,6 +7,8 @@ $(function() {
     $("#selectall").click(function () {
         $('.cb').prop('checked', this.checked);
     });
+    
+    $("#deleteSelected").prop('disabled', true);
 
     // Click on a checkbox
     $(".cb").click(function() {
@@ -16,9 +18,9 @@ $(function() {
             $("#selectall").prop("checked", false);
         }
         if ($(".cb:checked").length != 0) {
-            $("#deleteSelected").enable();
+            $("#deleteSelected").prop('disabled', false);
         } else {
-            $("#deleteSelected").disable();
+            $("#deleteSelected").prop('disabled', true);
         }
     });
 
@@ -70,7 +72,6 @@ $(function() {
 }( jQuery ));
 
 
-//Function delete selected: Asks for confirmation to delete selected computers, then submits it to the deleteForm
 (function ( $ ) {
  $.fn.goToPage = function(pageNum) {
 	 $('#pageForm input[name=page]').val(pageNum);
