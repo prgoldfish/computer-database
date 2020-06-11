@@ -151,8 +151,7 @@ public class ComputerDAO {
         executeAddComputerQuery(c, conn, entreprise, introTimestamp, discontTimestamp);
     }
 
-    private void executeAddComputerQuery(Computer c, DBConnection conn, Company entreprise, Timestamp introTimestamp,
-            Timestamp discontTimestamp) {
+    private void executeAddComputerQuery(Computer c, DBConnection conn, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
         logger.info("Exécution de la requête \"{}\"", ADD_COMPUTER_QUERY);
         try (PreparedStatement stmt = conn.prepareStement(ADD_COMPUTER_QUERY);) {
             stmt.setLong(1, c.getId());
@@ -181,8 +180,7 @@ public class ComputerDAO {
         executeUpdateComputerQuery(c, nom, conn, entreprise, introTimestamp, discontTimestamp);
     }
 
-    private void executeUpdateComputerQuery(Computer c, String nom, DBConnection conn, Company entreprise,
-            Timestamp introTimestamp, Timestamp discontTimestamp) {
+    private void executeUpdateComputerQuery(Computer c, String nom, DBConnection conn, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
         logger.info("Exécution de la requête \"{}\"", UPDATE_COMPUTER_QUERY);
         try (PreparedStatement stmt = conn.prepareStement(UPDATE_COMPUTER_QUERY);) {
             stmt.setString(1, nom);

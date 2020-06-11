@@ -32,7 +32,7 @@ import com.excilys.cdb.service.ComputerService;
 public class EditComputerServlet extends HttpServlet {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3345158907466408519L;
     private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
@@ -152,8 +152,7 @@ public class EditComputerServlet extends HttpServlet {
         return computerService;
     }
 
-    private int parseId(HttpServletRequest req, HttpServletResponse resp, List<String> errorMessages, String idParam)
-            throws ServletException, IOException {
+    private int parseId(HttpServletRequest req, HttpServletResponse resp, List<String> errorMessages, String idParam) throws ServletException, IOException {
         int id = 0;
         if (idParam != null) {
             try {
@@ -163,6 +162,7 @@ public class EditComputerServlet extends HttpServlet {
                 errorMessages.add("Invalid id received");
             }
         }
+
         return id;
     }
 
