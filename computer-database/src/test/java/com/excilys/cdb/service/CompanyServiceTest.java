@@ -51,14 +51,13 @@ public class CompanyServiceTest {
         assertEquals(compList, resList);
     }
 
-
     @Test
     public void testGetComputerByName() {
         CompanyService comService = new CompanyService(dao);
         Optional<Company> c1 = comService.getCompanyByName("Company 1");
         Optional<Company> c2 = comService.getCompanyByName("Company 2");
-        assert(c1.isPresent());
-        assert(c2.isPresent());
+        assert (c1.isPresent());
+        assert (c2.isPresent());
         assertEquals(compList.get(0), c1.get());
         assertEquals(compList.get(1), c2.get());
 

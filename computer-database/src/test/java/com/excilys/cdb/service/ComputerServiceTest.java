@@ -87,7 +87,7 @@ public class ComputerServiceTest {
             return new ArrayList<>();
         });
     }
-    
+
     private void refreshSearchComputerByName() {
         when(dao.searchComputersByName(anyString())).thenAnswer(invoc -> {
             String searchString = invoc.getArgument(0, String.class);
@@ -127,7 +127,7 @@ public class ComputerServiceTest {
             // e.printStackTrace();
         }
         try {
-            
+
             comService.getComputerList(compList.size() + 10, 20);
             assert (false);
         } catch (ComputerServiceException e) {
@@ -256,32 +256,31 @@ public class ComputerServiceTest {
 //          e.printStackTrace();
         }
     }
-    
+
     @Test
     public void testDeleteComputer() throws ComputerServiceException {
         ComputerService comService = new ComputerService(dao);
         comService.deleteComputer(1);
         assertEquals(compList, comService.getComputerList(0, 1000));
     }
-    
-    
+
     @Test
     public void testDeleteComputerNotExisting() {
         ComputerService comService = new ComputerService(dao);
         try {
             comService.deleteComputer(1234);
-            assert(false);
+            assert (false);
         } catch (ComputerServiceException e) {
 //            e.printStackTrace();
         }
     }
-    
+
     @Test
     public void testSearchComputerByName() {
         ComputerService comService = new ComputerService(dao);
         assertEquals(compList, comService.searchComputersByName("PC"));
     }
-    
+
     @Test
     public void testSearchComputerByNameNoResult() {
         ComputerService comService = new ComputerService(dao);

@@ -7,7 +7,7 @@ import com.excilys.cdb.model.Company;
 import com.excilys.cdb.persistence.CompanyDAO;
 
 public class CompanyService {
-    
+
     private CompanyDAO dao;
 
     public CompanyService(CompanyDAO dao) {

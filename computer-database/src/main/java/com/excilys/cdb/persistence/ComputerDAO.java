@@ -105,7 +105,7 @@ public class ComputerDAO {
         }
         return Optional.empty();
     }
-    
+
     public List<Computer> searchComputersByName(String name) {
         DBConnection conn = DBConnection.getConnection();
         logger.info("Exécution de la requête \"{}\"", SEARCH_COMPUTERS_BY_NAME_QUERY);
@@ -113,7 +113,7 @@ public class ComputerDAO {
         try (PreparedStatement stmt = conn.prepareStement(SEARCH_COMPUTERS_BY_NAME_QUERY);) {
             stmt.setString(1, "%" + name + "%");
             ResultSet res = stmt.executeQuery();
-            while(res.next()) {
+            while (res.next()) {
                 ComputerBuilder c = processGetComputerResults(res);
                 resultList.add(c.build());
             }
@@ -181,8 +181,8 @@ public class ComputerDAO {
         executeUpdateComputerQuery(c, nom, conn, entreprise, introTimestamp, discontTimestamp);
     }
 
-    private void executeUpdateComputerQuery(Computer c, String nom, DBConnection conn, Company entreprise, Timestamp introTimestamp,
-            Timestamp discontTimestamp) {
+    private void executeUpdateComputerQuery(Computer c, String nom, DBConnection conn, Company entreprise,
+            Timestamp introTimestamp, Timestamp discontTimestamp) {
         logger.info("Exécution de la requête \"{}\"", UPDATE_COMPUTER_QUERY);
         try (PreparedStatement stmt = conn.prepareStement(UPDATE_COMPUTER_QUERY);) {
             stmt.setString(1, nom);

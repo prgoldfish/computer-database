@@ -2,7 +2,6 @@ package com.excilys.cdb.dto;
 
 import java.util.Objects;
 
-
 public class ComputerDTO {
 
     private String id;
@@ -10,7 +9,7 @@ public class ComputerDTO {
     private String dateIntroduction;
     private String dateDiscontinuation;
     private CompanyDTO entreprise;
-    
+
     private ComputerDTO(ComputerBuilderDTO builder) {
         this.id = builder.id;
         this.nom = builder.nom;
@@ -18,39 +17,47 @@ public class ComputerDTO {
         this.dateDiscontinuation = builder.dateDiscontinuation;
         this.entreprise = builder.entreprise;
     }
-    
-    
+
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public String getNom() {
         return nom;
     }
+
     public void setNom(String nom) {
         this.nom = nom;
     }
+
     public String getDateIntroduction() {
         return dateIntroduction;
     }
+
     public void setDateIntroduction(String dateIntroduction) {
         this.dateIntroduction = dateIntroduction;
     }
+
     public String getDateDiscontinuation() {
         return dateDiscontinuation;
     }
+
     public void setDateDiscontinuation(String dateDiscontinuation) {
         this.dateDiscontinuation = dateDiscontinuation;
     }
+
     public CompanyDTO getEntreprise() {
         return entreprise;
     }
+
     public void setEntreprise(CompanyDTO entreprise) {
         this.entreprise = entreprise;
     }
-    
+
     @Override
     public String toString() {
         String indefini = "Indefini";
@@ -62,12 +69,11 @@ public class ComputerDTO {
         res.append("\nEntreprise : ").append(entreprise == null ? indefini : entreprise);
         return res.toString();
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(dateDiscontinuation, dateIntroduction, entreprise, id, nom);
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -78,12 +84,9 @@ public class ComputerDTO {
         ComputerDTO other = (ComputerDTO) obj;
         return Objects.equals(dateDiscontinuation, other.dateDiscontinuation)
                 && Objects.equals(dateIntroduction, other.dateIntroduction)
-                && Objects.equals(entreprise, other.entreprise) 
-                && Objects.equals(id, other.id)
+                && Objects.equals(entreprise, other.entreprise) && Objects.equals(id, other.id)
                 && Objects.equals(nom, other.nom);
     }
-
-
 
     public static class ComputerBuilderDTO {
         // Obligatoires
@@ -114,7 +117,7 @@ public class ComputerDTO {
             this.entreprise = entreprise;
             return this;
         }
-        
+
         public ComputerDTO build() {
             return new ComputerDTO(this);
         }

@@ -57,7 +57,7 @@ public class ComputerService {
         builder.get().setEntreprise(com.getEntreprise());
         fromScratch = false;
     }
-    
+
     public void addNewComputer(Computer com) throws ComputerServiceException {
         if (com == null) {
             logger.error("Aucun ordinateur en entrée");
@@ -66,13 +66,12 @@ public class ComputerService {
         buildNewComputer(com.getNom());
         addIntroDate(com.getDateIntroduction());
         addEndDate(com.getDateDiscontinuation());
-        if(com.getEntreprise() != null)
-        {
+        if (com.getEntreprise() != null) {
             addCompany(com.getEntreprise().getNom());
         }
         addComputerToDB();
     }
-    
+
     public void updateComputer(Computer com) throws ComputerServiceException {
         buildComputerForUpdate(com);
         updateComputerToDB();
@@ -164,8 +163,8 @@ public class ComputerService {
 
     public Optional<Computer> getComputerByName(String name) {
         return dao.getComputerByName(name);
-    }    
-    
+    }
+
     public List<Computer> searchComputersByName(String name) {
         return dao.searchComputersByName(name);
     }

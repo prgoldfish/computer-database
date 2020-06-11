@@ -36,18 +36,18 @@ public class EditComputerServlet extends HttpServlet {
      */
     private static final long serialVersionUID = 3345158907466408519L;
     private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("./ListComputers"); 
+        resp.sendRedirect("./ListComputers");
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         ComputerService computerService = getComputerService(session);
         CompanyService companyService = getCompanyService(session);
-        List<String> errorMessages = new ArrayList<>(); 
+        List<String> errorMessages = new ArrayList<>();
         String computerName = req.getParameter("computerName");
         String introducedParam = req.getParameter("introduced");
         String discontinuedParam = req.getParameter("discontinued");
@@ -56,49 +56,38 @@ public class EditComputerServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         int id = parseId(req, resp, errorMessages, idParam);
         System.out.println(idParam);
-        if(id > 0)
-        {
+        if (id > 0) {
             req.setAttribute("id", id);
-            if(computerName != null)
-            {
+            if (computerName != null) {
                 System.out.println("Un pc va etre modifié");
                 System.out.println("Nom : " + computerName);
                 CompanyDTO comp = getCompanyDTO(companyService, companyIdParam);
-                
+
                 ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(idParam, computerName)
-                                            .setDateIntroduction(introducedParam)
-                                            .setDateDiscontinuation(discontinuedParam)
-                                            .setEntreprise(comp)
-                                            .build();
-                
+                        .setDateIntroduction(introducedParam).setDateDiscontinuation(discontinuedParam)
+                        .setEntreprise(comp).build();
+
                 Computer com = null;
                 try {
                     com = ComputerMapper.fromDTO(dtoComputer);
                 } catch (MapperException mape) {
                     errorMessages.addAll(mape.getErrorList());
                 }
-                
-                if(errorMessages.isEmpty())
-                {
-                    try
-                    {
+
+                if (errorMessages.isEmpty()) {
+                    try {
                         computerService.updateComputer(com);
                         req.setAttribute("headerMessage", "The computer has successfully been edited");
                     } catch (ComputerServiceException cse) {
                         errorMessages.add(cse.getMessage());
                     }
                 }
-            }
-            else
-            {
+            } else {
                 Optional<Computer> optComp = computerService.getComputerById(id);
-                if(optComp.isEmpty())
-                {
+                if (optComp.isEmpty()) {
                     doGet(req, resp);
                     return;
-                }
-                else
-                {
+                } else {
                     ComputerDTO c;
                     try {
                         c = ComputerMapper.toDTO(optComp.get());
@@ -116,12 +105,10 @@ public class EditComputerServlet extends HttpServlet {
             List<Company> companyList = companyService.getCompaniesList();
             req.setAttribute("companies", companyList);
             req.getRequestDispatcher("WEB-INF/views/editComputer.jsp").forward(req, resp);
-        }
-        else
-        {
+        } else {
             doGet(req, resp);
         }
-        
+
     }
 
     private CompanyDTO getCompanyDTO(CompanyService companyService, String companyIdParam) {
@@ -129,24 +116,22 @@ public class EditComputerServlet extends HttpServlet {
         try {
             int idCompany = Integer.parseInt(companyIdParam);
             Optional<Company> optComp = companyService.getCompanyById(idCompany);
-            if(optComp.isPresent())
-            {
+            if (optComp.isPresent()) {
                 comp = new CompanyDTO(companyIdParam, CompanyMapper.toDTO(optComp.get()).getNom());
-            }            
-        } catch (NumberFormatException | MapperException nfe) {}
+            }
+        } catch (NumberFormatException | MapperException nfe) {
+        }
         return comp;
     }
 
     private CompanyService getCompanyService(HttpSession session) {
         CompanyDAO companyDao = (CompanyDAO) session.getAttribute("companydao");
-        if(companyDao == null)
-        {
+        if (companyDao == null) {
             companyDao = new CompanyDAO();
             session.setAttribute("companydao", companyDao);
         }
         CompanyService companyService = (CompanyService) session.getAttribute("companyservice");
-        if(companyService == null)
-        {
+        if (companyService == null) {
             companyService = new CompanyService(companyDao);
             session.setAttribute("companyservice", companyService);
         }
@@ -155,24 +140,22 @@ public class EditComputerServlet extends HttpServlet {
 
     private ComputerService getComputerService(HttpSession session) {
         ComputerDAO computerDao = (ComputerDAO) session.getAttribute("computerdao");
-        if(computerDao == null)
-        {
+        if (computerDao == null) {
             computerDao = new ComputerDAO();
             session.setAttribute("computerdao", computerDao);
         }
         ComputerService computerService = (ComputerService) session.getAttribute("computerservice");
-        if(computerService == null)
-        {
+        if (computerService == null) {
             computerService = new ComputerService(computerDao);
             session.setAttribute("computerservice", computerService);
         }
         return computerService;
     }
 
-    private int parseId(HttpServletRequest req, HttpServletResponse resp, List<String> errorMessages, String idParam) throws ServletException, IOException {
+    private int parseId(HttpServletRequest req, HttpServletResponse resp, List<String> errorMessages, String idParam)
+            throws ServletException, IOException {
         int id = 0;
-        if(idParam != null)
-        {
+        if (idParam != null) {
             try {
                 id = Integer.parseInt(idParam);
             } catch (NumberFormatException nfe) {

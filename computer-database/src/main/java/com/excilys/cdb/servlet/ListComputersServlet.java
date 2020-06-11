@@ -31,81 +31,73 @@ public class ListComputersServlet extends HttpServlet {
      */
     private static final long serialVersionUID = -3042238239381847969L;
     private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
+
         doPost(req, resp);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         ComputerDAO dao = (ComputerDAO) session.getAttribute("computerdao");
-        if(dao == null)
-        {
+        if (dao == null) {
             dao = new ComputerDAO();
             session.setAttribute("computerdao", dao);
         }
         ComputerService service = (ComputerService) session.getAttribute("computerservice");
-        if(service == null)
-        {
+        if (service == null) {
             service = new ComputerService(dao);
             session.setAttribute("computerservice", service);
         }
         String headerMessage = req.getParameter("headerMessage");
-        if(headerMessage != null)
-        {
+        if (headerMessage != null) {
             req.setAttribute("headerMessage", headerMessage);
         }
-        
+
         int pageLength = 10;
         String pageLengthParam = req.getParameter("length");
         int pageNum = 1;
         String pageNumParam = req.getParameter("page");
-        if(pageLengthParam != null)
-        {
-            try 
-            {
+        if (pageLengthParam != null) {
+            try {
                 pageLength = Math.max(1, Integer.parseInt(pageLengthParam));
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+            }
         }
-        if(pageNumParam != null)
-        {
-            try 
-            {
+        if (pageNumParam != null) {
+            try {
                 pageNum = Math.max(1, Integer.parseInt(pageNumParam));
-            } catch (NumberFormatException nfe) {}
+            } catch (NumberFormatException nfe) {
+            }
         }
-        
+
         int computerCount = 0;
-        int startIndex = (pageNum - 1) * pageLength;        
+        int startIndex = (pageNum - 1) * pageLength;
         String searchParam = req.getParameter("search");
-        
+
         List<Computer> listComputers = new ArrayList<Computer>();
         try {
-            if(searchParam != null)
-            {
+            if (searchParam != null) {
                 listComputers = service.searchComputersByName(searchParam);
                 computerCount = listComputers.size();
-                int lastPageIndex = computerCount - ((computerCount - (computerCount / pageLength) * pageLength)); 
+                int lastPageIndex = computerCount - ((computerCount - (computerCount / pageLength) * pageLength));
                 int startSubList = Math.min(startIndex, lastPageIndex);
                 int endSubList = Math.min(startSubList + pageLength, computerCount);
                 logger.info("lastPageIndex = " + lastPageIndex);
                 logger.info("startSubList = " + startSubList);
                 logger.info("endSubList = " + endSubList);
                 listComputers = listComputers.subList(startSubList, endSubList);
-            }
-            else
-            {
+            } else {
                 listComputers = service.getComputerList(startIndex, pageLength);
                 computerCount = service.getComputerList(0, Integer.MAX_VALUE).size();
             }
-                      
+
         } catch (ComputerServiceException e) {
             throw new ServletException(e);
         }
-        
+
         List<ComputerDTO> dtoList = listComputers.stream().map(c -> {
             try {
                 return ComputerMapper.toDTO(c);
@@ -113,15 +105,12 @@ public class ListComputersServlet extends HttpServlet {
                 logger.error("Null Computer found in computer list (shoud not happen)");
             }
             return null;
-        }).filter(dto -> dto != null)
-        .collect(Collectors.toList());
-        
+        }).filter(dto -> dto != null).collect(Collectors.toList());
 
         long firstPageNum = pageNum < 4 ? 1 : pageNum - 2;
-        long nbComputersAfter = computerCount - startIndex - pageLength;        
+        long nbComputersAfter = computerCount - startIndex - pageLength;
         long lastPageNum = nbComputersAfter > 2 * pageLength ? pageNum + 2 : ((computerCount - 1) / pageLength) + 1;
-        if(pageNum > lastPageNum)
-        {
+        if (pageNum > lastPageNum) {
             pageNum = (int) lastPageNum;
         }
 
@@ -132,7 +121,7 @@ public class ListComputersServlet extends HttpServlet {
         req.setAttribute("page", pageNum);
         req.setAttribute("firstPageNum", firstPageNum);
         req.setAttribute("lastPageNum", lastPageNum);
-        
+
         req.getRequestDispatcher("WEB-INF/views/dashboard.jsp").forward(req, resp);
     }
 

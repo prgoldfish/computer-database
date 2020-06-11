@@ -24,7 +24,7 @@ public class CompanyDAO {
     }
 
     /**
-     * Fais une requête sur la base de données pour récupérer la liste des
+     * Fait une requête sur la base de données pour récupérer la liste des
      * entreprises
      * 
      * @return Les entreprises dans une List
@@ -58,7 +58,7 @@ public class CompanyDAO {
         }
         return Optional.empty();
     }
-    
+
     public Optional<Company> getCompanyById(long id) {
         DBConnection conn = DBConnection.getConnection();
         logger.info("Exécution de la requête \"{}\"", SELECT_COMPANY_BY_ID_QUERY);

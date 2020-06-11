@@ -2,9 +2,8 @@ package com.excilys.cdb.dto;
 
 import java.util.Objects;
 
-
 public class CompanyDTO {
-    
+
     String nom;
     String id;
 
