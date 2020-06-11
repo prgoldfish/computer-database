@@ -1,7 +1,6 @@
 package com.excilys.cdb.persistence;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,9 +9,13 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 public class DBConnection implements AutoCloseable {
 
     private static DBConnection instance;
+    private HikariDataSource ds;
     private Connection conn;
     private Statement stmt;
     private static final Logger logger = LoggerFactory.getLogger(DBConnection.class);
@@ -25,20 +28,29 @@ public class DBConnection implements AutoCloseable {
         String db = "computer-database-db";
         String user = "admincdb";
         String pass = "qwerty1234";
-        String config = "?serverTimezone=Europe/Paris";
+        String urlConfig = "?serverTimezone=Europe/Paris";
+
+        HikariConfig config = new HikariConfig("/hikari.properties");
+        /*
+         * config.setJdbcUrl(url + db + urlConfig); config.setUsername(user);
+         * config.setPassword(pass);
+         * config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+         */
 
         stmt = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            this.conn = DriverManager.getConnection(url + db + config, user, pass);
-        } catch (Exception exc) {
-            logger.error("Erreur de connexion à la base de données", exc);
+            // Class.forName("com.mysql.cj.jdbc.Driver");
+            // this.conn = DriverManager.getConnection(url + db + urlConfig, user, pass);
+            ds = new HikariDataSource(config);
+            this.conn = ds.getConnection();
+        } catch (SQLException sqle) {
+            logger.error("Erreur de connexion à la base de données", sqle);
             System.exit(-1);
         }
     }
 
     /**
-     * 
+     *
      * @return Renvoie l'unique objet de la connection vers la BDD
      */
     public static DBConnection getConnection() {
@@ -49,7 +61,7 @@ public class DBConnection implements AutoCloseable {
     }
 
     /**
-     * 
+     *
      * @param query La requête SQL à exécuter
      * @return Le resultat de la requête sous la forme d'un ResultSet
      * @throws SQLException
@@ -60,7 +72,7 @@ public class DBConnection implements AutoCloseable {
     }
 
     /**
-     * 
+     *
      * @param query La requête SQL à exécuter
      * @return Le nombre de lignes modifiées
      * @throws SQLException
@@ -72,7 +84,7 @@ public class DBConnection implements AutoCloseable {
 
     /**
      * Crée une PreparedStement sur l'objet conn et le renvoie
-     * 
+     *
      * @param query la requête à executer
      * @return Une preparedStatement de l'objet conn
      * @throws SQLException
@@ -82,15 +94,22 @@ public class DBConnection implements AutoCloseable {
     }
 
     /**
-     * Libère les ressources pour l'objet Statement
-     * 
+     * Libère les ressources pour l'objet Statement et DataSource
+     *
      * @throws SQLException
      */
     @Override
     public void close() throws SQLException {
-        if (stmt != null) {
+        if (stmt != null && !stmt.isClosed()) {
             stmt.close();
         }
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+        }
+        if (ds != null && !ds.isClosed()) {
+            ds.close();
+        }
+        instance = null;
 
     }
 
