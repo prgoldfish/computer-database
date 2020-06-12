@@ -71,7 +71,7 @@
                                     </c:forEach>
                                 </select>
                             </div>                  
-                        </fieldset>
+                        </fieldset> 
                         <div class="actions pull-right">
                             <button type="button" onclick="checkInputs(&quot;addComputer&quot;)" class="btn btn-primary">Add</button>
                             or

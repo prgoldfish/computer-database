@@ -9,6 +9,7 @@ import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.CompanyDAO;
 import com.excilys.cdb.persistence.ComputerDAO;
+import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.Page;
@@ -153,8 +154,8 @@ public class CLIController {
      */
     private static void showComputerList() {
         try {
-            Page<Computer> page = new Page<>(new ComputerService(new ComputerDAO()).getComputerList(0, Long.MAX_VALUE),
-                    20);
+            Page<Computer> page = new Page<>(new ComputerService(new ComputerDAO()).getComputerList(0, Long.MAX_VALUE,
+                    OrderByColumn.COMPUTERID, true), 20);
             CLI.printPage(page.getPageContent(), page.getCurrentPage(), page.getMaxPage());
             CLI.pageCommand(page);
         } catch (ComputerServiceException cse) {

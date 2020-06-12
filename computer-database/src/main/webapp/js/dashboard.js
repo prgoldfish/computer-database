@@ -28,6 +28,40 @@ $(function() {
             $("#deleteSelected").prop('disabled', true);
         }
     });
+    
+    $(".column").click(function(){
+    	let orderParameter = "";
+    	switch ($(this).attr('id')) {
+		case "nameColumn":
+			orderParameter = "ComputerName";
+			break;
+		case "introColumn":
+			orderParameter = "IntroducedDate";
+			break;
+		case "discontColumn":
+			orderParameter = "DiscontinuedDate";
+			break;
+		case "companyColumn":
+			orderParameter = "CompanyName";
+			break;
+		default:
+			break;
+		}
+    	
+    	let oldOrder = $("#orderParameter").val();
+    	let oldAscendent = $("#ascendentParameter").val();
+    	let ascendent = "asc"
+    	
+    	if(oldOrder == orderParameter && oldAscendent != "desc")
+		{
+    		ascendent = "desc";
+		}
+    	$("#orderForm input[name=order]").val(orderParameter);
+    	$("#orderForm input[name=ascendent]").val(ascendent);
+    	$("#orderForm").submit();
+    	console.log("Coucou");
+    	
+    });
 
 });
 

@@ -37,9 +37,9 @@
                 <div class="pull-left">
                     <form id="searchForm" action="#" method="GET" class="form-inline">
 
-                        <input type="search" id="searchbox" name="search" class="form-control" placeholder="Search name" />
+                        <input type="search" id="searchbox" name="search" class="form-control" placeholder="Search name" value="${ search }" />
                         <input type="submit" id="searchsubmit" value="Filter by name" class="btn btn-primary" />
-                        <input type="hidden" name="length" value="<c:out value="${ length }"></c:out>">
+                        <input type="hidden" name="length" value="${ length }">
                     </form>
                 </div>
                 <div class="pull-right">
@@ -51,13 +51,24 @@
 
         <form id="deleteForm" action="#" method="POST">
             <input type="hidden" name="selection" value="">
+            <input type="hidden" name="order" value="${ order }">
+            <input type="hidden" name="ascendent" value="${ ascendent }">
         </form>
         
 
         <form id="pageForm" action="#" method="GET">
             <input type="hidden" name="page" value="">
-            <input type="hidden" name="length" value="<c:out value="${ length }"></c:out>">
-            <input type="hidden" name="search" value="<c:out value="${ search }"></c:out>">
+            <input type="hidden" name="length" value="${ length }">
+            <input type="hidden" name="search" value="${ search }">
+            <input type="hidden" id="orderParameter" name="order" value="${ order }">
+            <input type="hidden" id="ascendentParameter" name="ascendent" value="${ ascendent }">
+        </form>
+        
+        <form id="orderForm" action="#" method="get">
+            <input type="hidden" name="length" value="${ length }">
+            <input type="hidden" name="search" value="${ search }">
+            <input type="hidden" name="order" value="">
+            <input type="hidden" name="ascendent" value="">
         </form>
 
         <div class="container" style="margin-top: 10px;">
@@ -75,20 +86,20 @@
                                     </button>
                             </span>
                         </th>
-                        <th>
+                        <th><a href="#" id="nameColumn" class="column">
                             Computer name
-                        </th>
-                        <th>
+                        </a></th>
+                        <th><a href="#" id="introColumn" class="column">
                             Introduced date
-                        </th>
+                        </a></th>
                         <!-- Table header for Discontinued Date -->
-                        <th>
+                        <th><a href="#" id="discontColumn" class="column">
                             Discontinued date
-                        </th>
+                        </a></th>
                         <!-- Table header for Company -->
-                        <th>
+                        <th><a href="#" id="companyColumn" class="column">
                             Company
-                        </th>
+                        </a></th>
 
                     </tr>
                 </thead>
@@ -147,6 +158,8 @@
 					<button type="submit" class="btn btn-default" value="50" name="length">50</button>
 					<button type="submit" class="btn btn-default" value="100" name="length">100</button>
 					<input type="hidden" name="search" value="${ search }">
+		            <input type="hidden" name="order" value="${ order }">
+		            <input type="hidden" name="ascendent" value="${ ascendent }">
 				</form>
 	        </div>
         </div>

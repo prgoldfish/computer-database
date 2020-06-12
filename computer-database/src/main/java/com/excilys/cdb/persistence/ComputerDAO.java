@@ -20,14 +20,15 @@ import com.excilys.cdb.model.Computer.ComputerBuilder;
 
 public class ComputerDAO {
 
-    private static final String SELECT_COMPUTER_LIST_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id LIMIT ? OFFSET ?";
+    private static final String SELECT_COMPUTER_LIST_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id ORDER BY ";
     private static final String SELECT_COMPUTER_BY_ID_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.id=?";
     private static final String SELECT_COMPUTER_BY_NAME_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.name=?";
-    private static final String SEARCH_COMPUTERS_BY_NAME_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.name LIKE ?";
+    private static final String SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.name LIKE ? OR company.name LIKE ? ORDER BY ";
     private static final String ADD_COMPUTER_QUERY = "INSERT INTO computer VALUES (?,?,?,?,?)";
     private static final String GET_MAX_ID_QUERY = "SELECT MAX(id) as idMax FROM computer";
     private static final String UPDATE_COMPUTER_QUERY = "UPDATE computer SET name = ?, introduced = ?, discontinued = ?, company_id = ? WHERE id = ?";
     private static final String DELETE_COMPUTER_QUERY = "DELETE FROM computer WHERE id = ?";
+    private static final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
     private static final Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
     public ComputerDAO() {
@@ -40,12 +41,14 @@ public class ComputerDAO {
      *
      * @return Les ordinateurs dans une List
      */
-    public List<Computer> getComputerList(long startIndex, long limit) {
+    public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy, boolean ascendentOrder) {
         DBConnection conn = DBConnection.getConnection();
         ResultSet res = null;
         List<Computer> compList = new ArrayList<>();
-        logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_LIST_QUERY);
-        try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_LIST_QUERY)) {
+        String request = SELECT_COMPUTER_LIST_QUERY + orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC")
+                + LIMIT_OFFSET;
+        logger.info("Exécution de la requête \"{}\"", request);
+        try (PreparedStatement stmt = conn.prepareStement(request)) {
             stmt.setLong(1, limit);
             stmt.setLong(2, startIndex);
             res = stmt.executeQuery();
@@ -106,12 +109,15 @@ public class ComputerDAO {
         return Optional.empty();
     }
 
-    public List<Computer> searchComputersByName(String name) {
+    public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
         DBConnection conn = DBConnection.getConnection();
-        logger.info("Exécution de la requête \"{}\"", SEARCH_COMPUTERS_BY_NAME_QUERY);
+        String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + orderBy.getColumnName()
+                + (ascendentOrder ? " ASC" : " DESC");
+        logger.info("Exécution de la requête \"{}\"", request);
         List<Computer> resultList = new ArrayList<Computer>();
-        try (PreparedStatement stmt = conn.prepareStement(SEARCH_COMPUTERS_BY_NAME_QUERY);) {
+        try (PreparedStatement stmt = conn.prepareStement(request);) {
             stmt.setString(1, "%" + name + "%");
+            stmt.setString(2, "%" + name + "%");
             ResultSet res = stmt.executeQuery();
             while (res.next()) {
                 ComputerBuilder c = processGetComputerResults(res);
@@ -226,7 +232,7 @@ public class ComputerDAO {
 
     public static void main(String[] args) {
         ComputerDAO dao = new ComputerDAO();
-        List<Computer> l = dao.getComputerList(0, 10000);
+        List<Computer> l = dao.getComputerList(0, 10000, OrderByColumn.COMPUTERID, true);
         System.out.println(l);
         System.out.println(dao.getComputerById(494));
         System.out.println(dao.getComputerByName("Apple II"));

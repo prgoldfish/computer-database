@@ -20,6 +20,7 @@ import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.ComputerDAO;
+import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.Page;
 
@@ -41,8 +42,11 @@ public class ListComputersServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
-        // System.out.println("Selection : " +
-        // req.getParameterValues("selection").length);
+
+        String orderParam = req.getParameter("order");
+        OrderByColumn orderColumn = getOrder(orderParam);
+        String ascendentOrderParam = req.getParameter("ascendent");
+        boolean ascendentOrder = ascendentOrderParam == null || !ascendentOrderParam.equals("desc");
 
         ComputerDAO dao = (ComputerDAO) session.getAttribute("computerdao");
         if (dao == null) {
@@ -98,9 +102,9 @@ public class ListComputersServlet extends HttpServlet {
 
         try {
             if (searchParam != null) {
-                pages = new Page<>(service.searchComputersByName(searchParam), pageLength);
+                pages = new Page<>(service.searchComputersByName(searchParam, orderColumn, ascendentOrder), pageLength);
             } else {
-                pages = new Page<>(service.getComputerList(0, Long.MAX_VALUE), pageLength);
+                pages = new Page<>(service.getComputerList(0, Long.MAX_VALUE, orderColumn, ascendentOrder), pageLength);
             }
         } catch (ComputerServiceException e) {
             throw new ServletException(e);
@@ -129,8 +133,28 @@ public class ListComputersServlet extends HttpServlet {
         req.setAttribute("page", pageNum);
         req.setAttribute("firstPageNum", firstPageNum);
         req.setAttribute("lastPageNum", lastPageNum);
+        req.setAttribute("order", orderParam);
+        req.setAttribute("ascendent", ascendentOrderParam);
 
         req.getRequestDispatcher("WEB-INF/views/dashboard.jsp").forward(req, resp);
+    }
+
+    private OrderByColumn getOrder(String orderParam) {
+        if (orderParam == null) {
+            return OrderByColumn.COMPUTERID;
+        }
+        switch (orderParam) {
+        case "ComputerName":
+            return OrderByColumn.COMPUTERNAME;
+        case "IntroducedDate":
+            return OrderByColumn.COMPUTERINTRO;
+        case "DiscontinuedDate":
+            return OrderByColumn.COMPUTERDISCONT;
+        case "CompanyName":
+            return OrderByColumn.COMPANYNAME;
+        default:
+            return OrderByColumn.COMPUTERID;
+        }
     }
 
 }

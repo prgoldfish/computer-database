@@ -13,6 +13,7 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.persistence.CompanyDAO;
 import com.excilys.cdb.persistence.ComputerDAO;
+import com.excilys.cdb.persistence.OrderByColumn;
 
 public class ComputerService {
 
@@ -145,7 +146,7 @@ public class ComputerService {
         dao.deleteComputer(computerId);
     }
 
-    public List<Computer> getComputerList(long startIndex, long limit) throws ComputerServiceException {
+    public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy, boolean ascendentOrder) throws ComputerServiceException {
         if (startIndex < 0 || startIndex > dao.getMaxId()) {
             logger.error("Index de départ invalide. Index = {}", startIndex);
             throw new ComputerServiceException("L'index de départ est invalide");
@@ -154,7 +155,11 @@ public class ComputerService {
             logger.error("Limite inférieure à 0. Limite = {}", limit);
             throw new ComputerServiceException("Le nombre maximum de résultats doit être supérieur à 0");
         }
-        return dao.getComputerList(startIndex, limit);
+        if (orderBy == null) {
+            orderBy = OrderByColumn.COMPUTERID;
+        }
+
+        return dao.getComputerList(startIndex, limit, orderBy, ascendentOrder);
     }
 
     public Optional<Computer> getComputerById(long id) {
@@ -165,8 +170,11 @@ public class ComputerService {
         return dao.getComputerByName(name);
     }
 
-    public List<Computer> searchComputersByName(String name) {
-        return dao.searchComputersByName(name);
+    public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
+        if (orderBy == null) {
+            orderBy = OrderByColumn.COMPUTERID;
+        }
+        return dao.searchComputersByName(name, orderBy, ascendentOrder);
     }
 
 }
