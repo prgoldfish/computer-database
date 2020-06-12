@@ -10,23 +10,70 @@ import java.util.Scanner;
 
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.PageException;
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.Page;
 
 public class CLI {
 
     private static final Scanner sc = new Scanner(System.in);
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static String header = setHeader();
     // private static final Logger logger = LoggerFactory.getLogger(CLI.class);
 
     /**
      * Demande un numéro de page à l'utilisateur
-     * 
+     *
      * @param p L'objet page contenant les informations de pagination
      */
-    private static void askPage(Page p) {
-        System.out.println("Entrez un numéro de page entre 1 et " + (p.getMaxPage() + 1));
-        int pageNum = getIntBetween(1, p.getMaxPage() + 1);
-        p.gotoPage(pageNum - 1);
+    private static void askPage(Page<Computer> p) {
+        System.out.println("Entrez un numéro de page entre 1 et " + p.getMaxPage());
+        int pageNum = getIntBetween(1, p.getMaxPage());
+        p.gotoPage(pageNum);
+    }
+
+    /**
+     * Crée le header en haut de chaque page
+     *
+     * @return Une String repésentant le header
+     */
+    private static String setHeader() {
+        StringBuilder head = new StringBuilder("| Id\t| ");
+        head.append(String.format("%1$-70s", "Nom"));
+        head.append(String.format("%1$-22s", "| Date d'introduction"));
+        head.append(String.format("%1$-26s", "| Date de discontinuation"));
+        head.append(String.format("%1$-47s", "| Entreprise"));
+        head.append("|\n");
+        return head.toString();
+    }
+
+    /**
+     * Affiche chaque élément de la page actuelle sous forme de tableau
+     *
+     */
+    public static void printPage(List<Computer> comList, int currentPage, int maxPage) {
+        String outString = header;
+        for (Computer c : comList) {
+            outString += computerDetailsString(c) + '\n';
+        }
+        System.out.println(outString + "\nPage " + currentPage + "/" + maxPage + "\n");
+    }
+
+    private static String computerDetailsString(Computer c) {
+        StringBuilder outString = new StringBuilder();
+        LocalDateTime intro = c.getDateIntroduction();
+        LocalDateTime discont = c.getDateDiscontinuation();
+        Company entreprise = c.getEntreprise();
+        String introString = intro == null ? "Indefini" : intro.toString();
+        String discontString = discont == null ? "Indéfini" : discont.toString();
+        String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getNom();
+        outString.append("| ").append(c.getId());
+        outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
+        outString.append("| ").append(String.format("%1$-20s", introString));
+        outString.append("| ").append(String.format("%1$-24s", discontString));
+        outString.append("| ").append(String.format("%1$-45s", nomEntreprise));
+        outString.append("|");
+        return outString.toString();
     }
 
     protected static void printErrors(List<String> errors) {
@@ -49,7 +96,7 @@ public class CLI {
         return computerName;
     }
 
-    protected static void pageCommand(Page page) throws ComputerServiceException {
+    protected static void pageCommand(Page<Computer> page) throws ComputerServiceException {
         boolean quit = false;
         while (!quit) {
             System.out.println(
@@ -62,19 +109,19 @@ public class CLI {
         }
     }
 
-    private static boolean pageCommandSwitch(Page page, boolean quit) throws ComputerServiceException, PageException {
+    private static boolean pageCommandSwitch(Page<Computer> page, boolean quit) throws ComputerServiceException, PageException {
         switch (sc.nextLine()) {
         case "prec":
-            printString(page.getPreviousPageContents());
+            printPage(page.getPreviousPageContents(), page.getCurrentPage(), page.getMaxPage());
             break;
 
         case "suiv":
-            printString(page.getNextPageContents());
+            printPage(page.getNextPageContents(), page.getCurrentPage(), page.getMaxPage());
             break;
 
         case "page":
             askPage(page);
-            printString(page.getPageContent());
+            printPage(page.getPageContent(), page.getCurrentPage(), page.getMaxPage());
             break;
 
         case "menu":
@@ -90,7 +137,7 @@ public class CLI {
 
     /**
      * Pose une question à l'utilisateur et lui demande une entrée si oui
-     * 
+     *
      * @param question    La question à poser à l'utilisateur
      * @param actionIfYes Demande l'entrée
      * @return Un Optional contenant l'entrée de l'utilisateur s'il y en a une
@@ -128,7 +175,7 @@ public class CLI {
     /**
      * Demande si l'utilisateur veut entrer une date puis demande une date à
      * l'utilisateur sous la forme DD/MM/YYYY
-     * 
+     *
      * @param debut   Indique si c'est la date de début ou de fin. Ca change
      *                seulement l'affichage
      * @param minDate La date entrée doit être supérieure à cette date
@@ -164,7 +211,7 @@ public class CLI {
 
     /**
      * Demande un entier à l'utilisateur entre min et max
-     * 
+     *
      * @param min Le minimum acceptable
      * @param max le maximum acceptable
      * @return Un entier entre min et max

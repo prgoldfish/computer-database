@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
@@ -20,7 +17,7 @@ public class CLIController {
 
     /**
      * Demande un identifiant à l'utilisateur et renvoie l'ordianteur associé
-     * 
+     *
      * @return L'ordinateur avec l'identifiant rentré
      */
     protected static Computer askComputer() {
@@ -155,9 +152,10 @@ public class CLIController {
      * Affiche la liste des ordinateurs avec un système de pagination
      */
     private static void showComputerList() {
-        Page page = new Page(20);
         try {
-            CLI.printString(page.getPageContent());
+            Page<Computer> page = new Page<>(new ComputerService(new ComputerDAO()).getComputerList(0, Long.MAX_VALUE),
+                    20);
+            CLI.printPage(page.getPageContent(), page.getCurrentPage(), page.getMaxPage());
             CLI.pageCommand(page);
         } catch (ComputerServiceException cse) {
             CLI.printSingleError(cse.getMessage());
@@ -207,9 +205,6 @@ public class CLIController {
     }
 
     public static void main(String[] args) {
-        Logger logger = LoggerFactory.getLogger(CLIController.class);
-        logger.info("Hello World");
-        logger.info("HELLO HELLO");
         menu();
 
     }

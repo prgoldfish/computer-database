@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
@@ -32,10 +29,10 @@ import com.excilys.cdb.service.ComputerService;
 public class AddComputerServlet extends HttpServlet {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -6234124633063870193L;
-    private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
+    //private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

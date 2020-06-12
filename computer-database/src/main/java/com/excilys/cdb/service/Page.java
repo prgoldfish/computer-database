@@ -5,7 +5,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.PageException;
 
 public class Page<T> {
@@ -14,23 +13,7 @@ public class Page<T> {
     private int currentPage;
     private int maxPage;
     private List<T> list;
-    //private static String header = setHeader();
     private static Logger logger = LoggerFactory.getLogger(Page.class);
-
-    /**
-     * Crée le header en haut de chaque page
-     *
-     * @return Une String repésentant le header
-     */
-    /*private static String setHeader() {
-        StringBuilder head = new StringBuilder("| Id\t| ");
-        head.append(String.format("%1$-70s", "Nom"));
-        head.append(String.format("%1$-22s", "| Date d'introduction"));
-        head.append(String.format("%1$-26s", "| Date de discontinuation"));
-        head.append(String.format("%1$-47s", "| Entreprise"));
-        head.append("|\n");
-        return head.toString();
-    }*/
 
     public Page(List<T> list, int pageLength) {
         this.list = list;
@@ -40,62 +23,45 @@ public class Page<T> {
     }
 
     /**
-     * Affiche chaque élément de la page actuelle sous forme de tableau
+     * Renvoie le contenu de la page actuelle
      *
-     * @throws ComputerServiceException
+     * @return Une liste des éléments de la page
      */
-    /*public String getPageContent() throws ComputerServiceException {
-        List<Computer> computerList = new ComputerService(new ComputerDAO()).getComputerList(currentPage * pageLength,
-                pageLength);
-        String outString = header;
-        for (Computer c : computerList) {
-            outString += computerDetailsString(c) + '\n';
-        }
-        return outString + "\nPage " + (currentPage + 1) + "/" + (maxPage + 1) + "\n";
-    }*/
     public List<T> getPageContent() {
         return list.subList(currentPage * pageLength, Math.min(list.size(), (currentPage + 1) * pageLength));
     }
 
-    /*private String computerDetailsString(Computer c) {
-        StringBuilder outString = new StringBuilder();
-        LocalDateTime intro = c.getDateIntroduction();
-        LocalDateTime discont = c.getDateDiscontinuation();
-        Company entreprise = c.getEntreprise();
-        String introString = intro == null ? "Indefini" : intro.toString();
-        String discontString = discont == null ? "Indéfini" : discont.toString();
-        String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getNom();
-        outString.append("| ").append(c.getId());
-        outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
-        outString.append("| ").append(String.format("%1$-20s", introString));
-        outString.append("| ").append(String.format("%1$-24s", discontString));
-        outString.append("| ").append(String.format("%1$-45s", nomEntreprise));
-        outString.append("|");
-        return outString.toString();
-    }*/
-
     /**
      * Renvoie le nombre maximum de pages
      *
-     * @return Le nombre max de pages (en partant de 0)
+     * @return Le nombre max de pages
      */
     public int getMaxPage() {
         return maxPage + 1;
     }
 
+    /**
+     * Renvoie la page actuelle
+     *
+     * @return Le numéro de page actuel
+     */
     public int getCurrentPage() {
         return currentPage + 1;
     }
 
+    /**
+     * Renvoie le nombre d'éléments total de la liste
+     *
+     * @return le nombre d'éléments
+     */
     public int getElementCount() {
         return list.size();
     }
 
     /**
-     * Passe à la page suivante et l'affiche
+     * Passe à la page suivante et renvoie son contenu
      *
-     * @return
-     * @throws ComputerServiceException
+     * @return Le contenu de la page suivante
      * @throws PageException
      */
     public List<T> getNextPageContents() throws PageException {
@@ -108,10 +74,9 @@ public class Page<T> {
     }
 
     /**
-     * Passe à la page précédente et l'affiche
+     * Passe à la page précédente et renvoie son contenu
      *
-     * @return
-     * @throws ComputerServiceException
+     * @return Le contenu de la page précédente
      * @throws PageException
      */
     public List<T> getPreviousPageContents() throws PageException {
