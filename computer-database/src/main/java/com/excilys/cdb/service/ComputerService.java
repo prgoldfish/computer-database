@@ -177,4 +177,8 @@ public class ComputerService {
         return dao.searchComputersByName(name, orderBy, ascendentOrder);
     }
 
+    public long getMaxId() {
+        return dao.getMaxId();
+    }
+
 }

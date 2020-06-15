@@ -113,6 +113,7 @@ public class ComputerDAO {
 
     public Optional<Computer> getComputerByName(String name) {
         logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_NAME_QUERY);
+        name = name.replace("%", "\\%");
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(SELECT_COMPUTER_BY_NAME_QUERY);) {
             stmt.setString(1, name);
@@ -130,6 +131,7 @@ public class ComputerDAO {
     public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
         String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + orderBy.getColumnName()
                 + (ascendentOrder ? " ASC" : " DESC");
+        name = name.replace("%", "\\%");
         logger.info("Exécution de la requête \"{}\"", request);
         List<Computer> resultList = new ArrayList<Computer>();
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(request);) {

@@ -24,6 +24,7 @@
     <slf4j.version>2.0.0-alpha1</slf4j.version>
     <taglibs.version>1.2.5</taglibs.version>
     <hikaricp.version>3.4.5</hikaricp.version>
+    <selenium.version>4.0.0-alpha-6</selenium.version>
   </properties>
 
   <dependencies>
@@ -74,7 +75,11 @@
         <artifactId>HikariCP</artifactId>
         <version>${hikaricp.version}</version>
     </dependency>
-	
+    <dependency>
+	  <groupId>org.seleniumhq.selenium</groupId>
+	  <artifactId>selenium-java</artifactId>
+	  <version>${selenium.version}</version>
+	</dependency>	
   </dependencies>
 
   <build>
