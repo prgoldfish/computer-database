@@ -184,8 +184,8 @@ public class CLIController {
     private static void deleteCompany() {
         CLI.printString("Suppression d'une entreprise.");
         long companyId = askCompany();
-        CompanyDAO dao = new CompanyDAO();
-        dao.deleteCompany(companyId);
+        CompanyService service = new CompanyService(new CompanyDAO());
+        service.deleteCompany(companyId);
 
     }
 

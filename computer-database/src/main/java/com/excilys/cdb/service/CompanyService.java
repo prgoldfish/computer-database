@@ -26,4 +26,8 @@ public class CompanyService {
         return dao.getCompanyById(id);
     }
 
+    public void deleteCompany(long id) {
+        dao.deleteCompany(id);
+    }
+
 }
