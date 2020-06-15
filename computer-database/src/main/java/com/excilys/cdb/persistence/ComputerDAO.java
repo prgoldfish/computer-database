@@ -1,12 +1,13 @@
 package com.excilys.cdb.persistence;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class ComputerDAO {
 
     private static final String SELECT_COMPUTER_LIST_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id ORDER BY ";
     private static final String SELECT_COMPUTER_BY_ID_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.id=?";
+    private static final String SELECT_COMPUTER_BY_COMPANY_ID_QUERY = "SELECT id FROM computer WHERE computer.company_id=?";
     private static final String SELECT_COMPUTER_BY_NAME_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.name=?";
     private static final String SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY = "SELECT computer.id, computer.name as computerName, introduced, discontinued, company_id, company.name as companyName FROM computer LEFT JOIN company ON computer.company_id = company.id WHERE computer.name LIKE ? OR company.name LIKE ? ORDER BY ";
     private static final String ADD_COMPUTER_QUERY = "INSERT INTO computer VALUES (?,?,?,?,?)";
@@ -42,13 +44,12 @@ public class ComputerDAO {
      * @return Les ordinateurs dans une List
      */
     public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy, boolean ascendentOrder) {
-        DBConnection conn = DBConnection.getConnection();
         ResultSet res = null;
         List<Computer> compList = new ArrayList<>();
         String request = SELECT_COMPUTER_LIST_QUERY + orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC")
                 + LIMIT_OFFSET;
         logger.info("Exécution de la requête \"{}\"", request);
-        try (PreparedStatement stmt = conn.prepareStement(request)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(request)) {
             stmt.setLong(1, limit);
             stmt.setLong(2, startIndex);
             res = stmt.executeQuery();
@@ -62,10 +63,27 @@ public class ComputerDAO {
         return compList;
     }
 
+    public List<Long> getComputersByCompanyId(long companyId) {
+        ResultSet res = null;
+        List<Long> idList = new ArrayList<Long>();
+        logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_COMPANY_ID_QUERY);
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(SELECT_COMPUTER_BY_COMPANY_ID_QUERY)) {
+            stmt.setLong(1, companyId);
+            res = stmt.executeQuery();
+            while (res.next()) {
+                idList.add(res.getLong("id"));
+            }
+        } catch (SQLException sqle) {
+            logger.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return idList;
+    }
+
     public long getMaxId() {
-        try (DBConnection conn = DBConnection.getConnection();) {
+        try (Connection conn = DBConnection.getConnection(); Statement stmt = conn.createStatement();) {
             logger.info("Exécution de la requête \"{}\"", GET_MAX_ID_QUERY);
-            ResultSet res = conn.query(GET_MAX_ID_QUERY);
+            ResultSet res = stmt.executeQuery(GET_MAX_ID_QUERY);
             if (res.next()) {
                 return res.getLong("idMax");
             }
@@ -78,9 +96,9 @@ public class ComputerDAO {
     }
 
     public Optional<Computer> getComputerById(long id) {
-        DBConnection conn = DBConnection.getConnection();
         logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_ID_QUERY);
-        try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_BY_ID_QUERY);) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(SELECT_COMPUTER_BY_ID_QUERY);) {
             stmt.setLong(1, id);
             ResultSet res = stmt.executeQuery();
             if (res.next()) {
@@ -94,9 +112,9 @@ public class ComputerDAO {
     }
 
     public Optional<Computer> getComputerByName(String name) {
-        DBConnection conn = DBConnection.getConnection();
         logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_NAME_QUERY);
-        try (PreparedStatement stmt = conn.prepareStement(SELECT_COMPUTER_BY_NAME_QUERY);) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(SELECT_COMPUTER_BY_NAME_QUERY);) {
             stmt.setString(1, name);
             ResultSet res = stmt.executeQuery();
             if (res.next()) {
@@ -110,12 +128,11 @@ public class ComputerDAO {
     }
 
     public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
-        DBConnection conn = DBConnection.getConnection();
         String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + orderBy.getColumnName()
                 + (ascendentOrder ? " ASC" : " DESC");
         logger.info("Exécution de la requête \"{}\"", request);
         List<Computer> resultList = new ArrayList<Computer>();
-        try (PreparedStatement stmt = conn.prepareStement(request);) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(request);) {
             stmt.setString(1, "%" + name + "%");
             stmt.setString(2, "%" + name + "%");
             ResultSet res = stmt.executeQuery();
@@ -148,18 +165,18 @@ public class ComputerDAO {
     }
 
     public void addComputer(Computer c) {
-        DBConnection conn = DBConnection.getConnection();
         LocalDateTime intro = c.getDateIntroduction();
         LocalDateTime discont = c.getDateDiscontinuation();
         Company entreprise = c.getEntreprise();
         Timestamp introTimestamp = intro == null ? null : Timestamp.valueOf(intro);
         Timestamp discontTimestamp = discont == null ? null : Timestamp.valueOf(discont);
-        executeAddComputerQuery(c, conn, entreprise, introTimestamp, discontTimestamp);
+        executeAddComputerQuery(c, entreprise, introTimestamp, discontTimestamp);
     }
 
-    private void executeAddComputerQuery(Computer c, DBConnection conn, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
+    private void executeAddComputerQuery(Computer c, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
         logger.info("Exécution de la requête \"{}\"", ADD_COMPUTER_QUERY);
-        try (PreparedStatement stmt = conn.prepareStement(ADD_COMPUTER_QUERY);) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(ADD_COMPUTER_QUERY);) {
             stmt.setLong(1, c.getId());
             stmt.setString(2, c.getNom());
             stmt.setTimestamp(3, introTimestamp);
@@ -176,19 +193,19 @@ public class ComputerDAO {
     }
 
     public void updateComputer(Computer c) {
-        DBConnection conn = DBConnection.getConnection();
         String nom = c.getNom();
         LocalDateTime intro = c.getDateIntroduction();
         LocalDateTime discont = c.getDateDiscontinuation();
         Company entreprise = c.getEntreprise();
         Timestamp introTimestamp = intro == null ? null : Timestamp.valueOf(intro);
         Timestamp discontTimestamp = discont == null ? null : Timestamp.valueOf(discont);
-        executeUpdateComputerQuery(c, nom, conn, entreprise, introTimestamp, discontTimestamp);
+        executeUpdateComputerQuery(c, nom, entreprise, introTimestamp, discontTimestamp);
     }
 
-    private void executeUpdateComputerQuery(Computer c, String nom, DBConnection conn, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
+    private void executeUpdateComputerQuery(Computer c, String nom, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
         logger.info("Exécution de la requête \"{}\"", UPDATE_COMPUTER_QUERY);
-        try (PreparedStatement stmt = conn.prepareStement(UPDATE_COMPUTER_QUERY);) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(UPDATE_COMPUTER_QUERY);) {
             stmt.setString(1, nom);
             stmt.setTimestamp(2, introTimestamp);
             stmt.setTimestamp(3, discontTimestamp);
@@ -205,9 +222,9 @@ public class ComputerDAO {
     }
 
     public void deleteComputer(long id) {
-        DBConnection conn = DBConnection.getConnection();
         logger.info("Exécution de la requête \"{}\"", DELETE_COMPUTER_QUERY);
-        try (PreparedStatement stmt = conn.prepareStement(DELETE_COMPUTER_QUERY);) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(DELETE_COMPUTER_QUERY);) {
             stmt.setLong(1, id);
             stmt.executeUpdate();
             logger.info("Deleted computer with id : {}", id);
@@ -216,27 +233,14 @@ public class ComputerDAO {
         }
     }
 
-    private void testDAO() {
-        LocalDateTime d1 = LocalDateTime.of(1996, Month.SEPTEMBER, 23, 20, 31);
-        LocalDateTime d2 = LocalDateTime.now();
-        Computer c = new Computer.ComputerBuilder(getMaxId() + 1, "SuperPc").setDateIntroduction(d1).build();
-        addComputer(c);
-        System.out.println(getComputerById(c.getId()));
-        c.setDateDiscontinuation(d2);
-        c.setEntreprise(new Company(8, "BBB"));
-        updateComputer(c);
-        System.out.println(getComputerById(c.getId()));
-        deleteComputer(c.getId());
-        System.out.println(getComputerById(c.getId()));
-    }
-
-    public static void main(String[] args) {
-        ComputerDAO dao = new ComputerDAO();
-        List<Computer> l = dao.getComputerList(0, 10000, OrderByColumn.COMPUTERID, true);
-        System.out.println(l);
-        System.out.println(dao.getComputerById(494));
-        System.out.println(dao.getComputerByName("Apple II"));
-        System.out.println(dao.getMaxId());
-        dao.testDAO();
+    public void deleteComputer(long id, Connection conn) {
+        logger.info("Exécution de la requête \"{}\"", DELETE_COMPUTER_QUERY);
+        try (PreparedStatement stmt = conn.prepareStatement(DELETE_COMPUTER_QUERY);) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+            logger.info("Deleted computer with id : {}", id);
+        } catch (SQLException sqle) {
+            logger.error("Erreur lors de l'exécution de la requête", sqle);
+        }
     }
 }

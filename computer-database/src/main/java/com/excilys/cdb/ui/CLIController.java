@@ -21,7 +21,7 @@ public class CLIController {
      *
      * @return L'ordinateur avec l'identifiant rentré
      */
-    protected static Computer askComputer() {
+    private static Computer askComputer() {
         ComputerService computerService = new ComputerService(new ComputerDAO());
         while (true) {
             CLI.printString("Entrez l'identifiant de l'ordinateur : ");
@@ -30,6 +30,24 @@ public class CLIController {
                 Optional<Computer> c = computerService.getComputerById(cId);
                 if (c.isPresent()) {
                     return c.get();
+                } else {
+                    CLI.printSingleError("L'identifiant n'existe pas");
+                }
+            } catch (NumberFormatException nfe) {
+                CLI.printSingleError("Entrée invalide");
+            }
+        }
+    }
+
+    private static long askCompany() {
+        CompanyService companyService = new CompanyService(new CompanyDAO());
+        while (true) {
+            CLI.printString("Entrez l'identifiant de entreprise : ");
+            try {
+                int cId = CLI.getInt();
+                Optional<Company> c = companyService.getCompanyById(cId);
+                if (c.isPresent()) {
+                    return cId;
                 } else {
                     CLI.printSingleError("L'identifiant n'existe pas");
                 }
@@ -163,6 +181,14 @@ public class CLIController {
         }
     }
 
+    private static void deleteCompany() {
+        CLI.printString("Suppression d'une entreprise.");
+        long companyId = askCompany();
+        CompanyDAO dao = new CompanyDAO();
+        dao.deleteCompany(companyId);
+
+    }
+
     /**
      * Affiche le menu principal, récupère l'entrée de l'utilisateur et fait
      * l'action correspondante
@@ -170,7 +196,7 @@ public class CLIController {
     public static void menu() {
         while (true) {
             CLI.printMenu();
-            switch (CLI.getIntBetween(1, 7)) {
+            switch (CLI.getIntBetween(1, 8)) {
             case 1:
                 showComputerList();
                 break;
@@ -196,6 +222,10 @@ public class CLIController {
                 break;
 
             case 7:
+                deleteCompany();
+                break;
+
+            case 8:
                 return;
 
             default:

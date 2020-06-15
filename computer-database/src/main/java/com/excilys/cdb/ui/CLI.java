@@ -243,6 +243,7 @@ public class CLI {
         System.out.println("4 - Modifier un ordinateur");
         System.out.println("5 - Supprimer un ordinateur");
         System.out.println("6 - Afficher les détails d'un ordinateur");
-        System.out.println("7 - Quitter\n");
+        System.out.println("7 - Supprimer une entreprise");
+        System.out.println("8 - Quitter\n");
     }
 }

@@ -24,25 +24,9 @@ public class DBConnection implements AutoCloseable {
      * Se connecte à la base de données et stocke la connexion
      */
     private DBConnection() {
-        /*
-         * String url = "jdbc:mysql://localhost:3306/";
-         * String db = "computer-database-db";
-         * String user = "admincdb";
-         * String pass = "qwerty1234";
-         * String urlConfig = "?serverTimezone=Europe/Paris";
-         */
         HikariConfig config = new HikariConfig("/hikari.properties");
-        /*
-         * config.setJdbcUrl(url + db + urlConfig);
-         * config.setUsername(user);
-         * config.setPassword(pass);
-         * config.setDriverClassName("com.mysql.cj.jdbc.Driver");
-         */
-
         stmt = null;
         try {
-            // Class.forName("com.mysql.cj.jdbc.Driver");
-            // this.conn = DriverManager.getConnection(url + db + urlConfig, user, pass);
             ds = new HikariDataSource(config);
             this.conn = ds.getConnection();
         } catch (SQLException sqle) {
@@ -55,11 +39,19 @@ public class DBConnection implements AutoCloseable {
      *
      * @return Renvoie l'unique objet de la connection vers la BDD
      */
-    public static DBConnection getConnection() {
+    public static Connection getConnection() {
         if (instance == null) {
             instance = new DBConnection();
         }
-        return instance;
+        try {
+            if (instance.conn == null || instance.conn.isClosed()) {
+                instance.conn = instance.ds.getConnection();
+            }
+        } catch (SQLException sqle) {
+            logger.error("Erreur de connexion à la base de données", sqle);
+            System.exit(-1);
+        }
+        return instance.conn;
     }
 
     /**
