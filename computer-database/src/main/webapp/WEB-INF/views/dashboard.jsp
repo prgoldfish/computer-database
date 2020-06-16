@@ -64,7 +64,7 @@
             <input type="hidden" id="ascendentParameter" name="ascendent" value="${ ascendent }">
         </form>
         
-        <form id="orderForm" action="#" method="get">
+        <form id="orderForm" action="#" method="GET">
             <input type="hidden" name="length" value="${ length }">
             <input type="hidden" name="search" value="${ search }">
             <input type="hidden" name="order" value="">

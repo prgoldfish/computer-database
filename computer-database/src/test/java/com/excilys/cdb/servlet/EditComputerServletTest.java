@@ -21,7 +21,7 @@ import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
-public class AddComputerServletTest {
+public class EditComputerServletTest {
 
     private WebDriver driver;
     JavascriptExecutor js;
@@ -43,30 +43,68 @@ public class AddComputerServletTest {
     }
 
     @Test
-    public void addCompleteTest() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
-        driver.findElement(By.id("computerName")).click();
-        driver.findElement(By.id("computerName")).sendKeys("Test encore et encore");
+    public void editComputerFullAndBackTest() {
+        driver.get("http://localhost:8080/computer-database/ListComputers");
+        firstEdit(); //Edite le premier ordinateur de la dernière page
+        Computer expected = new Computer.ComputerBuilder(1, "Test Selenium")
+                .setDateIntroduction(LocalDateTime.of(2020, 6, 1, 0, 0))
+                .setDateDiscontinuation(LocalDateTime.of(2020, 6, 7, 0, 0))
+                .setEntreprise(companyService.getCompanyByName("Cray").get()).build();
+        assertEquals(expected, computerService.getComputerById(1).get());
+
+        editback(); //Ré-édite le même ordinateur pour remettre ses valeurs d'avant
+        expected = new Computer.ComputerBuilder(1, "MacBook Pro 15.4 inch")
+                .setDateIntroduction(LocalDateTime.of(2020, 6, 2, 0, 0))
+                .setDateDiscontinuation(LocalDateTime.of(2020, 6, 3, 0, 0))
+                .setEntreprise(companyService.getCompanyByName("Apple Inc.").get()).build();
+        assertEquals(expected, computerService.getComputerById(1).get());
+    }
+
+    private void editback() {
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(driver -> driver.findElement(By.linkText("Test Selenium"))).click();
+        new WebDriverWait(driver, Duration.ofSeconds(5)).until(driver -> driver.findElement(By.id("computerName")))
+                .click();
+        driver.findElement(By.id("computerName")).clear();
+        driver.findElement(By.id("computerName")).sendKeys("MacBook Pro 15.4 inch");
         driver.findElement(By.id("introduced")).click();
-        driver.findElement(By.id("introduced")).sendKeys("2020-06-01");
+        driver.findElement(By.id("introduced")).clear();
+        driver.findElement(By.id("introduced")).sendKeys("2020-06-02");
         driver.findElement(By.id("discontinued")).click();
-        driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
+        driver.findElement(By.id("discontinued")).clear();
+        driver.findElement(By.id("discontinued")).sendKeys("2020-06-03");
         driver.findElement(By.id("companyId")).click();
         {
             WebElement dropdown = driver.findElement(By.id("companyId"));
-            dropdown.findElement(By.xpath("//option[. = 'MOS Technology']")).click();
+            dropdown.findElement(By.xpath("//option[. = 'Apple Inc.']")).click();
         }
-        driver.findElement(By.cssSelector("option:nth-child(8)")).click();
+        driver.findElement(By.cssSelector("option:nth-child(2)")).click();
         driver.findElement(By.cssSelector(".btn-primary")).click();
-        Computer expected = new Computer.ComputerBuilder(computerService.getMaxId(), "Test encore et encore")
-                .setDateIntroduction(LocalDateTime.of(2020, 6, 1, 0, 0))
-                .setDateDiscontinuation(LocalDateTime.of(2020, 6, 4, 0, 0))
-                .setEntreprise(companyService.getCompanyByName("MOS Technology").get()).build();
-        assertEquals(expected, computerService.getComputerById(computerService.getMaxId()).get());
+    }
+
+    private void firstEdit() {
+        driver.findElement(By.linkText("MacBook Pro 15.4 inch")).click();
+        new WebDriverWait(driver, Duration.ofSeconds(5)).until(driver -> driver.findElement(By.id("computerName")))
+                .click();
+        driver.findElement(By.id("computerName")).clear();
+        driver.findElement(By.id("computerName")).sendKeys("Test Selenium");
+        driver.findElement(By.id("introduced")).click();
+        driver.findElement(By.id("introduced")).clear();
+        driver.findElement(By.id("introduced")).sendKeys("2020-06-01");
+        driver.findElement(By.id("discontinued")).click();
+        driver.findElement(By.id("discontinued")).clear();
+        driver.findElement(By.id("discontinued")).sendKeys("2020-06-07");
+        driver.findElement(By.id("companyId")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("companyId"));
+            dropdown.findElement(By.xpath("//option[. = 'Cray']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(31)")).click();
+        driver.findElement(By.cssSelector(".btn-primary")).click();
     }
 
     @Test
-    public void addEmptyName() {
+    public void editEmptyName() {
         driver.get("http://localhost:8080/computer-database/AddComputer");
         driver.findElement(By.id("computerName")).click();
         driver.findElement(By.id("computerName")).sendKeys("Nothing");
@@ -76,7 +114,7 @@ public class AddComputerServletTest {
     }
 
     @Test
-    public void addIntroInputBoxTest() {
+    public void editIntroInputBoxTest() {
         driver.get("http://localhost:8080/computer-database/AddComputer");
         driver.findElement(By.id("discontinued")).click();
         driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
@@ -100,7 +138,7 @@ public class AddComputerServletTest {
     }
 
     @Test
-    public void addDiscontInputBoxTest() {
+    public void editDiscontInputBoxTest() {
         driver.get("http://localhost:8080/computer-database/AddComputer");
         driver.findElement(By.id("discontinued")).click();
         driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
