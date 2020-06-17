@@ -11,9 +11,11 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.model.Company;
 
+@Repository
 public class CompanyDAO {
 
     private static final String SELECT_COMPANY_LIST_QUERY = "SELECT id, name FROM company";

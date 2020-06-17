@@ -3,15 +3,19 @@ package com.excilys.cdb.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.persistence.CompanyDAO;
 
+@Service
 public class CompanyService {
 
+    @Autowired
     private CompanyDAO dao;
 
-    private CompanyService(CompanyDAO dao) {
-        this.dao = dao;
+    private CompanyService() {
     }
 
     public List<Company> getCompaniesList() {

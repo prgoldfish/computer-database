@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Company;
@@ -16,19 +16,22 @@ import com.excilys.cdb.model.Computer.ComputerBuilder;
 import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.persistence.OrderByColumn;
 
+@Service
 public class ComputerService {
 
     private Optional<ComputerBuilder> builder;
     private boolean fromScratch;
     private static final Logger logger = LoggerFactory.getLogger(ComputerService.class);
+
+    @Autowired
     private ComputerDAO dao;
 
-    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    @Autowired
+    private CompanyService companyService;
 
-    private ComputerService(ComputerDAO dao) {
+    private ComputerService() {
         builder = Optional.empty();
         fromScratch = false;
-        this.dao = dao;
     }
 
     public boolean canAddEndDate() {
@@ -102,7 +105,6 @@ public class ComputerService {
     public void addCompany(String companyName) throws ComputerServiceException {
         isBuildStarted();
         if (companyName != null) {
-            CompanyService companyService = context.getBean("companyService", CompanyService.class);
             Optional<Company> comp = companyService.getCompanyByName(companyName);
             if (comp.isEmpty()) {
                 logger.error("Nom de l'entreprise {} inconnu", companyName);

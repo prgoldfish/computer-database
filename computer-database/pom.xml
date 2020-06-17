@@ -21,7 +21,7 @@
     <junit.version>4.12</junit.version>
     <servlet.version>3.1.0</servlet.version>
     <mockito.version>3.3.3</mockito.version>
-    <slf4j.version>2.0.0-alpha1</slf4j.version>
+    <logback.version>1.2.3</logback.version>
     <taglibs.version>1.2.5</taglibs.version>
     <hikaricp.version>3.4.5</hikaricp.version>
     <selenium.version>4.0.0-alpha-6</selenium.version>
@@ -51,17 +51,11 @@
 	  <version>${mockito.version}</version>
 	</dependency>
 	<dependency>
-	  <groupId>org.slf4j</groupId>
-	  <artifactId>slf4j-api</artifactId>
-	  <version>${slf4j.version}</version>
-	  <scope>compile</scope>
+	  <groupId>ch.qos.logback</groupId>
+	  <artifactId>logback-classic</artifactId>
+	  <version>${logback.version}</version>
 	</dependency>
-	<dependency> 
- 	  <groupId>org.slf4j</groupId>
-	  <artifactId>slf4j-log4j12</artifactId>
-	  <version>${slf4j.version}</version>
-	</dependency>
-	 <dependency>
+    <dependency>
       <groupId>org.apache.taglibs</groupId>
       <artifactId>taglibs-standard-spec</artifactId>
       <version>${taglibs.version}</version>
