@@ -6,12 +6,13 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.model.Computer.ComputerBuilder;
-import com.excilys.cdb.persistence.CompanyDAO;
 import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.persistence.OrderByColumn;
 
@@ -22,7 +23,9 @@ public class ComputerService {
     private static final Logger logger = LoggerFactory.getLogger(ComputerService.class);
     private ComputerDAO dao;
 
-    public ComputerService(ComputerDAO dao) {
+    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+    private ComputerService(ComputerDAO dao) {
         builder = Optional.empty();
         fromScratch = false;
         this.dao = dao;
@@ -99,7 +102,8 @@ public class ComputerService {
     public void addCompany(String companyName) throws ComputerServiceException {
         isBuildStarted();
         if (companyName != null) {
-            Optional<Company> comp = new CompanyService(new CompanyDAO()).getCompanyByName(companyName);
+            CompanyService companyService = context.getBean("companyService", CompanyService.class);
+            Optional<Company> comp = companyService.getCompanyByName(companyName);
             if (comp.isEmpty()) {
                 logger.error("Nom de l'entreprise {} inconnu", companyName);
                 throw new ComputerServiceException("Le nom de l'entreprise est inconnu.");

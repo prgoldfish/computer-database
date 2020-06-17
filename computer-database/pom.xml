@@ -18,7 +18,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <mysql.connector.version>8.0.19</mysql.connector.version>
-    <junit.version>4.11</junit.version>
+    <junit.version>4.12</junit.version>
     <servlet.version>3.1.0</servlet.version>
     <mockito.version>3.3.3</mockito.version>
     <slf4j.version>2.0.0-alpha1</slf4j.version>
@@ -90,8 +90,14 @@
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-context</artifactId>
 	    <version>${spring.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.springframework</groupId>
+	    <artifactId>spring-test</artifactId>
+	    <version>${spring.version}</version>
+	    <scope>test</scope>
 	</dependency>	
-  </dependencies>
+</dependencies>
 
   <build>
     <finalName>computer-database</finalName>

@@ -23,10 +23,6 @@ public class CompanyDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(CompanyDAO.class);
 
-    public CompanyDAO() {
-
-    }
-
     /**
      * Fait une requête sur la base de données pour récupérer la liste des
      * entreprises

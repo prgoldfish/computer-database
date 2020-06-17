@@ -9,17 +9,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.Page;
@@ -32,6 +32,8 @@ public class ListComputersServlet extends HttpServlet {
      */
     private static final long serialVersionUID = -3042238239381847969L;
     private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
+    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -41,23 +43,11 @@ public class ListComputersServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession();
-
         String orderParam = req.getParameter("order");
         OrderByColumn orderColumn = getOrder(orderParam);
         String ascendentOrderParam = req.getParameter("ascendent");
         boolean ascendentOrder = ascendentOrderParam == null || !ascendentOrderParam.equals("desc");
 
-        ComputerDAO dao = (ComputerDAO) session.getAttribute("computerdao");
-        if (dao == null) {
-            dao = new ComputerDAO();
-            session.setAttribute("computerdao", dao);
-        }
-        ComputerService service = (ComputerService) session.getAttribute("computerservice");
-        if (service == null) {
-            service = new ComputerService(dao);
-            session.setAttribute("computerservice", service);
-        }
         String headerMessage = req.getParameter("headerMessage");
         if (headerMessage != null) {
             req.setAttribute("headerMessage", headerMessage);
@@ -69,7 +59,7 @@ public class ListComputersServlet extends HttpServlet {
             for (String toDelete : selection.split(",")) {
                 try {
                     int id = Integer.parseInt(toDelete);
-                    service.deleteComputer(id);
+                    computerService.deleteComputer(id);
                     deletedCount++;
                 } catch (ComputerServiceException | NumberFormatException exc) {
                     logger.error(exc.getMessage());
@@ -102,9 +92,11 @@ public class ListComputersServlet extends HttpServlet {
 
         try {
             if (searchParam != null) {
-                pages = new Page<>(service.searchComputersByName(searchParam, orderColumn, ascendentOrder), pageLength);
+                pages = new Page<>(computerService.searchComputersByName(searchParam, orderColumn, ascendentOrder),
+                        pageLength);
             } else {
-                pages = new Page<>(service.getComputerList(0, Long.MAX_VALUE, orderColumn, ascendentOrder), pageLength);
+                pages = new Page<>(computerService.getComputerList(0, Long.MAX_VALUE, orderColumn, ascendentOrder),
+                        pageLength);
             }
         } catch (ComputerServiceException e) {
             throw new ServletException(e);

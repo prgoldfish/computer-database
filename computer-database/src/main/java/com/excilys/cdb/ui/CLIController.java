@@ -4,11 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.CompanyDAO;
-import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
@@ -16,13 +17,16 @@ import com.excilys.cdb.service.Page;
 
 public class CLIController {
 
+    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
+    private static CompanyService companyService = context.getBean("companyService", CompanyService.class);
+
     /**
      * Demande un identifiant à l'utilisateur et renvoie l'ordianteur associé
      *
      * @return L'ordinateur avec l'identifiant rentré
      */
     private static Computer askComputer() {
-        ComputerService computerService = new ComputerService(new ComputerDAO());
         while (true) {
             CLI.printString("Entrez l'identifiant de l'ordinateur : ");
             try {
@@ -40,7 +44,6 @@ public class CLIController {
     }
 
     private static long askCompany() {
-        CompanyService companyService = new CompanyService(new CompanyDAO());
         while (true) {
             CLI.printString("Entrez l'identifiant de entreprise : ");
             try {
@@ -69,9 +72,8 @@ public class CLIController {
     private static void deleteComputer() {
         CLI.printString("Suppression d'un ordinateur\n");
         Computer toDelete = askComputer();
-        ComputerService comService = new ComputerService(new ComputerDAO());
         try {
-            comService.deleteComputer(toDelete.getId());
+            computerService.deleteComputer(toDelete.getId());
             CLI.printString("Ordinateur supprimé");
         } catch (ComputerServiceException cse) {
             CLI.printSingleError(cse.getMessage());
@@ -86,39 +88,38 @@ public class CLIController {
     private static void updateComputer() {
         CLI.printString("Modification d'un ordinateur\n");
         Computer toUpdate = askComputer();
-        ComputerService comService = new ComputerService(new ComputerDAO());
         try {
-            comService.buildComputerForUpdate(toUpdate);
-            setDateComputer(comService);
-            setCompanyComputer(comService);
-            comService.updateComputerToDB();
+            computerService.buildComputerForUpdate(toUpdate);
+            setDateComputer();
+            setCompanyComputer();
+            computerService.updateComputerToDB();
             CLI.printString("Ordinateur mis à jour");
         } catch (ComputerServiceException cse) {
             CLI.printSingleError(cse.getMessage());
         }
     }
 
-    private static void setDateComputer(ComputerService service) throws ComputerServiceException {
+    private static void setDateComputer() throws ComputerServiceException {
         Optional<LocalDateTime> dateDebut = CLI.askDate(true, null);
         if (dateDebut.isPresent()) {
-            service.addIntroDate(dateDebut.get());
+            computerService.addIntroDate(dateDebut.get());
         }
-        if (service.getBeginDate().isPresent()) {
-            Optional<LocalDateTime> dateFin = CLI.askDate(false, service.getBeginDate().get());
+        if (computerService.getBeginDate().isPresent()) {
+            Optional<LocalDateTime> dateFin = CLI.askDate(false, computerService.getBeginDate().get());
             if (dateFin.isPresent()) {
-                service.addEndDate(dateFin.get());
+                computerService.addEndDate(dateFin.get());
             }
         }
     }
 
-    private static void setCompanyComputer(ComputerService service) {
+    private static void setCompanyComputer() {
         boolean loop = true;
         while (loop) {
             Optional<String> entreprise = CLI.optionalActionYesNo("Voulez-vous mettre un fabricant ?",
                     "Veuillez entrer le nom du fabricant : ");
             if (entreprise.isPresent()) {
                 try {
-                    service.addCompany(entreprise.get());
+                    computerService.addCompany(entreprise.get());
                     loop = false;
                 } catch (ComputerServiceException cse) {
                     CLI.printSingleError(cse.getMessage());
@@ -136,12 +137,11 @@ public class CLIController {
     private static void createNewComputer() {
         CLI.printString("Création d'un nouvel ordinateur\n");
         String computerName = CLI.askComputerName();
-        ComputerService comService = new ComputerService(new ComputerDAO());
         try {
-            comService.buildNewComputer(computerName);
-            setDateComputer(comService);
-            setCompanyComputer(comService);
-            comService.addComputerToDB();
+            computerService.buildNewComputer(computerName);
+            setDateComputer();
+            setCompanyComputer();
+            computerService.addComputerToDB();
             CLI.printString("Ordinateur ajouté");
         } catch (ComputerServiceException cse) {
             CLI.printSingleError(cse.getMessage());
@@ -153,8 +153,7 @@ public class CLIController {
      * Affiche la liste des entreprises sous la forme d'un tableau
      */
     private static void showCompaniesList() {
-        CompanyService comService = new CompanyService(new CompanyDAO());
-        List<Company> compList = comService.getCompaniesList();
+        List<Company> compList = companyService.getCompaniesList();
         StringBuilder outString = new StringBuilder("| Id\t| ");
         outString.append(String.format("%1$-70s", "Nom"));
         outString.append("|\n");
@@ -171,8 +170,8 @@ public class CLIController {
      */
     private static void showComputerList() {
         try {
-            Page<Computer> page = new Page<>(new ComputerService(new ComputerDAO()).getComputerList(0, Long.MAX_VALUE,
-                    OrderByColumn.COMPUTERID, true), 20);
+            Page<Computer> page = new Page<>(
+                    computerService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true), 20);
             CLI.printPage(page.getPageContent(), page.getCurrentPage(), page.getMaxPage());
             CLI.pageCommand(page);
         } catch (ComputerServiceException cse) {
@@ -183,8 +182,7 @@ public class CLIController {
     private static void deleteCompany() {
         CLI.printString("Suppression d'une entreprise.");
         long companyId = askCompany();
-        CompanyService service = new CompanyService(new CompanyDAO());
-        service.deleteCompany(companyId);
+        companyService.deleteCompany(companyId);
 
     }
 

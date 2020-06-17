@@ -8,24 +8,31 @@ import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.CompanyDAO;
-import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:applicationContext.xml" })
 public class EditComputerServletTest {
 
     private WebDriver driver;
     JavascriptExecutor js;
+
+    @Autowired
     ComputerService computerService;
+    @Autowired
     CompanyService companyService;
 
     @Before
@@ -33,8 +40,6 @@ public class EditComputerServletTest {
         System.setProperty("webdriver.gecko.driver", "/opt/WebDriver/bin/geckodriver");
         driver = new FirefoxDriver();
         js = (JavascriptExecutor) driver;
-        computerService = new ComputerService(new ComputerDAO());
-        companyService = new CompanyService(new CompanyDAO());
     }
 
     @After

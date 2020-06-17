@@ -8,15 +8,14 @@
     <context:component-scan base-package="com.excilys.cdb"/> 
     
     <bean id = "computerService" class = "com.excilys.cdb.service.ComputerService" scope="singleton">
-        <property name="dao">
-            <bean id="computerDao" class = "com.excilys.cdb.persistence.ComputerDAO" scope="singleton"></bean>
-        </property>
+        <constructor-arg>
+            <bean id="dao" class = "com.excilys.cdb.persistence.ComputerDAO" scope="singleton"/>
+        </constructor-arg>
     </bean>    
     
     <bean id = "companyService" class = "com.excilys.cdb.service.CompanyService" scope="singleton">
-        <property name="dao">
-            <bean id="companyDao" class = "com.excilys.cdb.persistence.CompanyDAO" scope="singleton"></bean>
-        </property>
+        <constructor-arg>
+            <bean id="dao" class = "com.excilys.cdb.persistence.CompanyDAO" scope="singleton"/>
+        </constructor-arg>
     </bean>
- 
  </beans>

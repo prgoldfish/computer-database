@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -19,16 +18,26 @@ import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.persistence.OrderByColumn;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ComputerServiceTest {
 
+    @Mock
     private ComputerDAO dao;
+
+    @InjectMocks
+    private ComputerService computerService;
+
     private List<Computer> compList;
 
     private void refreshMock() {
@@ -157,16 +166,14 @@ public class ComputerServiceTest {
         compList.add(new Computer.ComputerBuilder(1, "PC 1").setDateIntroduction(LocalDateTime.now()).build());
         compList.add(new Computer.ComputerBuilder(2, "PC 2").setDateIntroduction(LocalDateTime.now()).build());
         MockitoAnnotations.initMocks(this);
-        dao = mock(ComputerDAO.class);
         refreshMock();
     }
 
     @Test
     public void testGetComputerList() throws ComputerServiceException {
-        ComputerService comService = new ComputerService(dao);
-        List<Computer> resList = comService.getComputerList(0, 20, OrderByColumn.COMPUTERID, true);
-        List<Computer> resList2 = comService.getComputerList(1, 20, OrderByColumn.COMPUTERID, true);
-        List<Computer> resList3 = comService.getComputerList(0, 1, OrderByColumn.COMPUTERID, true);
+        List<Computer> resList = computerService.getComputerList(0, 20, OrderByColumn.COMPUTERID, true);
+        List<Computer> resList2 = computerService.getComputerList(1, 20, OrderByColumn.COMPUTERID, true);
+        List<Computer> resList3 = computerService.getComputerList(0, 1, OrderByColumn.COMPUTERID, true);
         assertEquals(compList, resList);
         assertEquals(compList.subList(1, compList.size()), resList2);
         assertEquals(compList.subList(0, 1), resList3);
@@ -175,16 +182,15 @@ public class ComputerServiceTest {
 
     @Test
     public void testGetComputerListBadStartIndex() {
-        ComputerService comService = new ComputerService(dao);
         try {
-            comService.getComputerList(-12, 20, OrderByColumn.COMPUTERID, true);
+            computerService.getComputerList(-12, 20, OrderByColumn.COMPUTERID, true);
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();
         }
         try {
 
-            comService.getComputerList(compList.size() + 10, 20, OrderByColumn.COMPUTERID, true);
+            computerService.getComputerList(compList.size() + 10, 20, OrderByColumn.COMPUTERID, true);
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();
@@ -193,9 +199,8 @@ public class ComputerServiceTest {
 
     @Test
     public void testGetComputerBadLimit() {
-        ComputerService comService = new ComputerService(dao);
         try {
-            comService.getComputerList(0, -123, OrderByColumn.COMPUTERID, true);
+            computerService.getComputerList(0, -123, OrderByColumn.COMPUTERID, true);
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();
@@ -204,9 +209,8 @@ public class ComputerServiceTest {
 
     @Test
     public void testGetComputerById() {
-        ComputerService comService = new ComputerService(dao);
-        Optional<Computer> c1 = comService.getComputerById(1);
-        Optional<Computer> c2 = comService.getComputerById(2);
+        Optional<Computer> c1 = computerService.getComputerById(1);
+        Optional<Computer> c2 = computerService.getComputerById(2);
         assert (c1.isPresent());
         assert (c2.isPresent());
         assertEquals(compList.get(0), c1.get());
@@ -216,18 +220,16 @@ public class ComputerServiceTest {
 
     @Test
     public void testGetComputerByIdNoResult() {
-        ComputerService comService = new ComputerService(dao);
-        Optional<Computer> c1 = comService.getComputerById(78);
-        Optional<Computer> c2 = comService.getComputerById(-100);
+        Optional<Computer> c1 = computerService.getComputerById(78);
+        Optional<Computer> c2 = computerService.getComputerById(-100);
         assert (c1.isEmpty());
         assert (c2.isEmpty());
     }
 
     @Test
     public void testGetComputerByName() {
-        ComputerService comService = new ComputerService(dao);
-        Optional<Computer> c1 = comService.getComputerByName("PC 1");
-        Optional<Computer> c2 = comService.getComputerByName("PC 2");
+        Optional<Computer> c1 = computerService.getComputerByName("PC 1");
+        Optional<Computer> c2 = computerService.getComputerByName("PC 2");
         assert (c1.isPresent());
         assert (c2.isPresent());
         assertEquals(compList.get(0), c1.get());
@@ -237,28 +239,25 @@ public class ComputerServiceTest {
 
     @Test
     public void testGetComputerByNameNoResult() {
-        ComputerService comService = new ComputerService(dao);
-        Optional<Computer> c1 = comService.getComputerByName("");
-        Optional<Computer> c2 = comService.getComputerByName("Supercalculateur");
+        Optional<Computer> c1 = computerService.getComputerByName("");
+        Optional<Computer> c2 = computerService.getComputerByName("Supercalculateur");
         assert (c1.isEmpty());
         assert (c2.isEmpty());
     }
 
     @Test
     public void testAddNewComputer() throws ComputerServiceException {
-        ComputerService comService = new ComputerService(dao);
-        comService.buildNewComputer("PC de Test");
-        comService.addComputerToDB();
+        computerService.buildNewComputer("PC de Test");
+        computerService.addComputerToDB();
         refreshMock();
         Computer toCompare = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test").build();
-        assertEquals(toCompare, comService.getComputerByName("PC de Test").get());
+        assertEquals(toCompare, computerService.getComputerByName("PC de Test").get());
     }
 
     @Test
     public void testAddNewComputerNoBuild() {
-        ComputerService comService = new ComputerService(dao);
         try {
-            comService.addComputerToDB();
+            computerService.addComputerToDB();
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();
@@ -267,11 +266,10 @@ public class ComputerServiceTest {
 
     @Test
     public void testAddNewComputerFromAnother() throws ComputerServiceException {
-        ComputerService comService = new ComputerService(dao);
         Computer toCompare = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test").build();
-        comService.buildComputerForUpdate(toCompare);
+        computerService.buildComputerForUpdate(toCompare);
         try {
-            comService.addComputerToDB();
+            computerService.addComputerToDB();
             assert (false);
         } catch (ComputerServiceException e) {
             // e.printStackTrace();
@@ -280,21 +278,19 @@ public class ComputerServiceTest {
 
     @Test
     public void testUpdateComputer() throws ComputerServiceException {
-        ComputerService comService = new ComputerService(dao);
         Computer toCompare = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test").build();
-        comService.buildComputerForUpdate(toCompare);
-        comService.addIntroDate(LocalDateTime.of(2020, 1, 1, 0, 0));
-        comService.updateComputerToDB();
+        computerService.buildComputerForUpdate(toCompare);
+        computerService.addIntroDate(LocalDateTime.of(2020, 1, 1, 0, 0));
+        computerService.updateComputerToDB();
         refreshMock();
         toCompare.setDateIntroduction(LocalDateTime.of(2020, 1, 1, 0, 0));
-        assertEquals(toCompare, comService.getComputerByName("PC de Test").get());
+        assertEquals(toCompare, computerService.getComputerByName("PC de Test").get());
     }
 
     @Test
     public void testUpdateComputerNoBuild() {
-        ComputerService comService = new ComputerService(dao);
         try {
-            comService.updateComputerToDB();
+            computerService.updateComputerToDB();
             assert (false);
         } catch (ComputerServiceException e) {
             //			e.printStackTrace();
@@ -303,10 +299,9 @@ public class ComputerServiceTest {
 
     @Test
     public void testUpdateComputerFromNew() throws ComputerServiceException {
-        ComputerService comService = new ComputerService(dao);
-        comService.buildNewComputer("PC de Test");
+        computerService.buildNewComputer("PC de Test");
         try {
-            comService.updateComputerToDB();
+            computerService.updateComputerToDB();
             assert (false);
         } catch (ComputerServiceException e) {
             //          e.printStackTrace();
@@ -315,16 +310,14 @@ public class ComputerServiceTest {
 
     @Test
     public void testDeleteComputer() throws ComputerServiceException {
-        ComputerService comService = new ComputerService(dao);
-        comService.deleteComputer(1);
-        assertEquals(compList, comService.getComputerList(0, 1000, OrderByColumn.COMPUTERID, true));
+        computerService.deleteComputer(1);
+        assertEquals(compList, computerService.getComputerList(0, 1000, OrderByColumn.COMPUTERID, true));
     }
 
     @Test
     public void testDeleteComputerNotExisting() {
-        ComputerService comService = new ComputerService(dao);
         try {
-            comService.deleteComputer(1234);
+            computerService.deleteComputer(1234);
             assert (false);
         } catch (ComputerServiceException e) {
             //            e.printStackTrace();
@@ -333,15 +326,13 @@ public class ComputerServiceTest {
 
     @Test
     public void testSearchComputerByName() {
-        ComputerService comService = new ComputerService(dao);
-        assertEquals(compList, comService.searchComputersByName("PC", OrderByColumn.COMPUTERID, true));
+        assertEquals(compList, computerService.searchComputersByName("PC", OrderByColumn.COMPUTERID, true));
     }
 
     @Test
     public void testSearchComputerByNameNoResult() {
-        ComputerService comService = new ComputerService(dao);
         assertEquals(Collections.EMPTY_LIST,
-                comService.searchComputersByName("AZERTY", OrderByColumn.COMPUTERID, true));
+                computerService.searchComputersByName("AZERTY", OrderByColumn.COMPUTERID, true));
     }
 
 }

@@ -33,10 +33,6 @@ public class ComputerDAO {
     private static final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
     private static final Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
-    public ComputerDAO() {
-
-    }
-
     /**
      * Fais une requête sur la base de données pour récupérer la liste des
      * ordinateurs

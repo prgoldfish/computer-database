@@ -10,10 +10,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -23,8 +24,6 @@ import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.CompanyDAO;
-import com.excilys.cdb.persistence.ComputerDAO;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
@@ -36,6 +35,9 @@ public class EditComputerServlet extends HttpServlet {
      */
     private static final long serialVersionUID = 3345158907466408519L;
     private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
+    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
+    private static CompanyService companyService = context.getBean("companyService", CompanyService.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -44,9 +46,6 @@ public class EditComputerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession();
-        ComputerService computerService = getComputerService(session);
-        CompanyService companyService = getCompanyService(session);
         List<String> errorMessages = new ArrayList<>();
         String computerName = req.getParameter("computerName");
         String introducedParam = req.getParameter("introduced");
@@ -61,7 +60,7 @@ public class EditComputerServlet extends HttpServlet {
             if (computerName != null) {
                 System.out.println("Un pc va etre modifié");
                 System.out.println("Nom : " + computerName);
-                CompanyDTO comp = getCompanyDTO(companyService, companyIdParam);
+                CompanyDTO comp = getCompanyDTO(companyIdParam);
 
                 ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(idParam, computerName)
                         .setDateIntroduction(introducedParam).setDateDiscontinuation(discontinuedParam)
@@ -111,7 +110,7 @@ public class EditComputerServlet extends HttpServlet {
 
     }
 
-    private CompanyDTO getCompanyDTO(CompanyService companyService, String companyIdParam) {
+    private CompanyDTO getCompanyDTO(String companyIdParam) {
         CompanyDTO comp = null;
         try {
             int idCompany = Integer.parseInt(companyIdParam);
@@ -122,34 +121,6 @@ public class EditComputerServlet extends HttpServlet {
         } catch (NumberFormatException | MapperException nfe) {
         }
         return comp;
-    }
-
-    private CompanyService getCompanyService(HttpSession session) {
-        CompanyDAO companyDao = (CompanyDAO) session.getAttribute("companydao");
-        if (companyDao == null) {
-            companyDao = new CompanyDAO();
-            session.setAttribute("companydao", companyDao);
-        }
-        CompanyService companyService = (CompanyService) session.getAttribute("companyservice");
-        if (companyService == null) {
-            companyService = new CompanyService(companyDao);
-            session.setAttribute("companyservice", companyService);
-        }
-        return companyService;
-    }
-
-    private ComputerService getComputerService(HttpSession session) {
-        ComputerDAO computerDao = (ComputerDAO) session.getAttribute("computerdao");
-        if (computerDao == null) {
-            computerDao = new ComputerDAO();
-            session.setAttribute("computerdao", computerDao);
-        }
-        ComputerService computerService = (ComputerService) session.getAttribute("computerservice");
-        if (computerService == null) {
-            computerService = new ComputerService(computerDao);
-            session.setAttribute("computerservice", computerService);
-        }
-        return computerService;
     }
 
     private int parseId(HttpServletRequest req, HttpServletResponse resp, List<String> errorMessages, String idParam) throws ServletException, IOException {
