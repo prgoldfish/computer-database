@@ -8,8 +8,8 @@ import java.sql.Statement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class DBConnection implements AutoCloseable {
@@ -24,10 +24,9 @@ public class DBConnection implements AutoCloseable {
      * Se connecte à la base de données et stocke la connexion
      */
     private DBConnection() {
-        HikariConfig config = new HikariConfig("/hikari.properties");
         stmt = null;
-        try {
-            ds = new HikariDataSource(config);
+        try (ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");) {
+            ds = context.getBean(com.zaxxer.hikari.HikariDataSource.class);
             this.conn = ds.getConnection();
         } catch (SQLException sqle) {
             logger.error("Erreur de connexion à la base de données", sqle);
@@ -100,10 +99,6 @@ public class DBConnection implements AutoCloseable {
         if (conn != null && !conn.isClosed()) {
             conn.close();
         }
-        if (ds != null && !ds.isClosed()) {
-            ds.close();
-        }
-        instance = null;
 
     }
 

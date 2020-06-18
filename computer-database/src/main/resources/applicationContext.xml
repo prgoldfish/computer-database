@@ -7,4 +7,12 @@
  
     <context:component-scan base-package="com.excilys.cdb"/> 
 
+    <bean id="dataSource" class = "com.zaxxer.hikari.HikariDataSource" scope="prototype">
+	    <constructor-arg>
+	        <bean id="config" class="com.zaxxer.hikari.HikariConfig">
+		        <constructor-arg value="/hikari.properties" />
+	        </bean>
+	    </constructor-arg>		
+    </bean>
+
  </beans>
