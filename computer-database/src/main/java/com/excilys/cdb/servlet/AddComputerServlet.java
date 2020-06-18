@@ -13,8 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
@@ -35,7 +36,7 @@ public class AddComputerServlet extends HttpServlet {
     private static final long serialVersionUID = -6234124633063870193L;
     //private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
     @Autowired
-    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private static ApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
 
     ComputerService computerService = context.getBean(ComputerService.class);
     CompanyService companyService = context.getBean(CompanyService.class);

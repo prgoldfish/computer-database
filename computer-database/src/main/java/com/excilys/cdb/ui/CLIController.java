@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
@@ -17,7 +18,7 @@ import com.excilys.cdb.service.Page;
 
 public class CLIController {
 
-    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private static ApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
     private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
     private static CompanyService companyService = context.getBean("companyService", CompanyService.class);
 

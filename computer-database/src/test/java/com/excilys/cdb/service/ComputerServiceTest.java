@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.excilys.cdb.exception.ComputerServiceException;
@@ -165,7 +164,6 @@ public class ComputerServiceTest {
         compList = new ArrayList<>();
         compList.add(new Computer.ComputerBuilder(1, "PC 1").setDateIntroduction(LocalDateTime.now()).build());
         compList.add(new Computer.ComputerBuilder(2, "PC 2").setDateIntroduction(LocalDateTime.now()).build());
-        MockitoAnnotations.initMocks(this);
         refreshMock();
     }
 

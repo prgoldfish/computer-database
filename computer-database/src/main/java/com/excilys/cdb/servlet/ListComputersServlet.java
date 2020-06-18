@@ -13,8 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.MapperException;
@@ -32,7 +33,7 @@ public class ListComputersServlet extends HttpServlet {
      */
     private static final long serialVersionUID = -3042238239381847969L;
     private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
-    private static ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private static ApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
     private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
 
     @Override

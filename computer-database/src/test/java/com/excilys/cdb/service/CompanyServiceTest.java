@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.excilys.cdb.exception.ComputerServiceException;
@@ -50,7 +49,6 @@ public class CompanyServiceTest {
         compList = new ArrayList<>();
         compList.add(new Company(1, "Company 1"));
         compList.add(new Company(2, "Company 2"));
-        MockitoAnnotations.initMocks(this);
         refreshMock();
     }
 

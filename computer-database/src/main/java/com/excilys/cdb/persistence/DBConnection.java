@@ -8,8 +8,9 @@ import java.sql.Statement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import com.excilys.cdb.CDBConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class DBConnection implements AutoCloseable {
@@ -25,8 +26,8 @@ public class DBConnection implements AutoCloseable {
      */
     private DBConnection() {
         stmt = null;
-        try (ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");) {
-            ds = context.getBean(com.zaxxer.hikari.HikariDataSource.class);
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);) {
+            ds = context.getBean(HikariDataSource.class);
             this.conn = ds.getConnection();
         } catch (SQLException sqle) {
             logger.error("Erreur de connexion à la base de données", sqle);
