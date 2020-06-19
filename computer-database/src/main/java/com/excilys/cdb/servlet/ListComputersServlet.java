@@ -34,7 +34,7 @@ public class ListComputersServlet extends HttpServlet {
     private static final long serialVersionUID = -3042238239381847969L;
     private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
     private static ApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
-    private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
+    private ComputerService computerService = context.getBean("computerService", ComputerService.class);;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,7 +45,7 @@ public class ListComputersServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String orderParam = req.getParameter("order");
-        OrderByColumn orderColumn = getOrder(orderParam);
+        OrderByColumn orderColumn = OrderByColumn.getEnum(orderParam);
         String ascendentOrderParam = req.getParameter("ascendent");
         boolean ascendentOrder = ascendentOrderParam == null || !ascendentOrderParam.equals("desc");
 
@@ -130,24 +130,6 @@ public class ListComputersServlet extends HttpServlet {
         req.setAttribute("ascendent", ascendentOrderParam);
 
         req.getRequestDispatcher("WEB-INF/views/dashboard.jsp").forward(req, resp);
-    }
-
-    private OrderByColumn getOrder(String orderParam) {
-        if (orderParam == null) {
-            return OrderByColumn.COMPUTERID;
-        }
-        switch (orderParam) {
-        case "ComputerName":
-            return OrderByColumn.COMPUTERNAME;
-        case "IntroducedDate":
-            return OrderByColumn.COMPUTERINTRO;
-        case "DiscontinuedDate":
-            return OrderByColumn.COMPUTERDISCONT;
-        case "CompanyName":
-            return OrderByColumn.COMPANYNAME;
-        default:
-            return OrderByColumn.COMPUTERID;
-        }
     }
 
 }

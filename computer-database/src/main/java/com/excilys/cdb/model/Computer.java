@@ -27,26 +27,10 @@ public class Computer {
     }
 
     /**
-     * 
-     * @param id Identifiant de l'ordinateur
-     */
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    /**
      * @return Renvoie le nom de l'ordinateur
      */
     public String getNom() {
         return nom;
-    }
-
-    /**
-     * 
-     * @param nom Nom de l'ordinateur
-     */
-    public void setNom(String nom) {
-        this.nom = nom;
     }
 
     /**
@@ -57,14 +41,6 @@ public class Computer {
     }
 
     /**
-     * 
-     * @param dateIntroduction Date d'introduction de l'ordinateur
-     */
-    public void setDateIntroduction(LocalDateTime dateIntroduction) {
-        this.dateIntroduction = dateIntroduction;
-    }
-
-    /**
      * @return Renvoie la date de discontinuation de l'ordinateur
      */
     public LocalDateTime getDateDiscontinuation() {
@@ -72,26 +48,10 @@ public class Computer {
     }
 
     /**
-     * 
-     * @param dateDiscontinuation Date de discontinuation de l'ordinateur
-     */
-    public void setDateDiscontinuation(LocalDateTime dateDiscontinuation) {
-        this.dateDiscontinuation = dateDiscontinuation;
-    }
-
-    /**
      * @return Renvoie l'identifiant de l'entreprise associée à l'ordinateur
      */
     public Company getEntreprise() {
         return entreprise;
-    }
-
-    /**
-     * 
-     * @param idEntreprise Identifiant de l'entreprise associée à l'ordinateur
-     */
-    public void setEntreprise(Company entreprise) {
-        this.entreprise = entreprise;
     }
 
     @Override
@@ -113,10 +73,12 @@ public class Computer {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!(obj instanceof Computer))
+        }
+        if (!(obj instanceof Computer)) {
             return false;
+        }
         Computer other = (Computer) obj;
         return Objects.equals(dateDiscontinuation, other.dateDiscontinuation)
                 && Objects.equals(dateIntroduction, other.dateIntroduction)
@@ -172,10 +134,12 @@ public class Computer {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (!(obj instanceof ComputerBuilder))
+            }
+            if (!(obj instanceof ComputerBuilder)) {
                 return false;
+            }
             ComputerBuilder other = (ComputerBuilder) obj;
             return Objects.equals(dateDiscontinuation, other.dateDiscontinuation)
                     && Objects.equals(dateIntroduction, other.dateIntroduction)

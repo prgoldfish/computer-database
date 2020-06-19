@@ -2,7 +2,7 @@ package com.excilys.cdb.model;
 
 import java.util.Objects;
 
-public class Company implements Comparable<Company> {
+public class Company {
 
     String nom;
     long id;
@@ -46,12 +46,6 @@ public class Company implements Comparable<Company> {
         }
         Company other = (Company) obj;
         return id == other.id && Objects.equals(nom, other.nom);
-    }
-
-    @Override
-    public int compareTo(Company o) {
-        long otherId = o == null ? 0 : o.id;
-        return (int) (id - otherId);
     }
 
 }

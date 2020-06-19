@@ -4,8 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Controller;
 
 import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.exception.ComputerServiceException;
@@ -16,18 +17,20 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.Page;
 
+@Controller
 public class CLIController {
 
-    private static ApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
-    private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
-    private static CompanyService companyService = context.getBean("companyService", CompanyService.class);
+    @Autowired
+    private ComputerService computerService;
+    @Autowired
+    private CompanyService companyService;
 
     /**
      * Demande un identifiant à l'utilisateur et renvoie l'ordianteur associé
      *
      * @return L'ordinateur avec l'identifiant rentré
      */
-    private static Computer askComputer() {
+    private Computer askComputer() {
         while (true) {
             CLI.printString("Entrez l'identifiant de l'ordinateur : ");
             try {
@@ -44,7 +47,7 @@ public class CLIController {
         }
     }
 
-    private static long askCompany() {
+    private long askCompany() {
         while (true) {
             CLI.printString("Entrez l'identifiant de entreprise : ");
             try {
@@ -61,7 +64,7 @@ public class CLIController {
         }
     }
 
-    private static void showComputerDetails() {
+    private void showComputerDetails() {
         Computer c = askComputer();
         CLI.printString("Details de l'ordinateur : ");
         CLI.printString(c.toString());
@@ -70,7 +73,7 @@ public class CLIController {
     /**
      * Supprime un ordinateur de la base de données
      */
-    private static void deleteComputer() {
+    private void deleteComputer() {
         CLI.printString("Suppression d'un ordinateur\n");
         Computer toDelete = askComputer();
         try {
@@ -86,7 +89,7 @@ public class CLIController {
      * Demande des informations à l'utilisateur pour mettre à jour un ordinateur
      * déjà existant
      */
-    private static void updateComputer() {
+    private void updateComputer() {
         CLI.printString("Modification d'un ordinateur\n");
         Computer toUpdate = askComputer();
         try {
@@ -100,7 +103,7 @@ public class CLIController {
         }
     }
 
-    private static void setDateComputer() throws ComputerServiceException {
+    private void setDateComputer() throws ComputerServiceException {
         Optional<LocalDateTime> dateDebut = CLI.askDate(true, null);
         if (dateDebut.isPresent()) {
             computerService.addIntroDate(dateDebut.get());
@@ -113,7 +116,7 @@ public class CLIController {
         }
     }
 
-    private static void setCompanyComputer() {
+    private void setCompanyComputer() {
         boolean loop = true;
         while (loop) {
             Optional<String> entreprise = CLI.optionalActionYesNo("Voulez-vous mettre un fabricant ?",
@@ -135,7 +138,7 @@ public class CLIController {
      * Demande des informations à l'utilisateur et crée un nouvel ordinateur puis
      * l'ajoute dans la base de données
      */
-    private static void createNewComputer() {
+    private void createNewComputer() {
         CLI.printString("Création d'un nouvel ordinateur\n");
         String computerName = CLI.askComputerName();
         try {
@@ -153,7 +156,7 @@ public class CLIController {
     /**
      * Affiche la liste des entreprises sous la forme d'un tableau
      */
-    private static void showCompaniesList() {
+    private void showCompaniesList() {
         List<Company> compList = companyService.getCompaniesList();
         StringBuilder outString = new StringBuilder("| Id\t| ");
         outString.append(String.format("%1$-70s", "Nom"));
@@ -169,7 +172,7 @@ public class CLIController {
     /**
      * Affiche la liste des ordinateurs avec un système de pagination
      */
-    private static void showComputerList() {
+    private void showComputerList() {
         try {
             Page<Computer> page = new Page<>(
                     computerService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true), 20);
@@ -180,7 +183,7 @@ public class CLIController {
         }
     }
 
-    private static void deleteCompany() {
+    private void deleteCompany() {
         CLI.printString("Suppression d'une entreprise.");
         long companyId = askCompany();
         companyService.deleteCompany(companyId);
@@ -191,7 +194,7 @@ public class CLIController {
      * Affiche le menu principal, récupère l'entrée de l'utilisateur et fait
      * l'action correspondante
      */
-    public static void menu() {
+    public void menu() {
         while (true) {
             CLI.printMenu();
             switch (CLI.getIntBetween(1, 8)) {
@@ -234,7 +237,9 @@ public class CLIController {
     }
 
     public static void main(String[] args) {
-        menu();
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
+        context.getBean(CLIController.class).menu();
+        context.close();
 
     }
 

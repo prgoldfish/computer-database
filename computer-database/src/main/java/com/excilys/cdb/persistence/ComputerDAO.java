@@ -44,8 +44,9 @@ public class ComputerDAO {
     public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy, boolean ascendentOrder) {
         ResultSet res = null;
         List<Computer> compList = new ArrayList<>();
-        String request = SELECT_COMPUTER_LIST_QUERY + orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC")
-                + LIMIT_OFFSET;
+        String orderByColumns = orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC");
+        orderByColumns += orderBy == OrderByColumn.COMPUTERID ? "" : ", computer.id asc";
+        String request = SELECT_COMPUTER_LIST_QUERY + orderByColumns + LIMIT_OFFSET;
         logger.info("Exécution de la requête \"{}\"", request);
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(request)) {
             stmt.setLong(1, limit);
@@ -127,8 +128,9 @@ public class ComputerDAO {
     }
 
     public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
-        String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + orderBy.getColumnName()
-                + (ascendentOrder ? " ASC" : " DESC");
+        String orderByColumns = orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC");
+        orderByColumns += orderBy == OrderByColumn.COMPUTERID ? "" : ", computer.id asc";
+        String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + orderByColumns;
         name = name.replace("%", "\\%");
         logger.info("Exécution de la requête \"{}\"", request);
         List<Computer> resultList = new ArrayList<Computer>();

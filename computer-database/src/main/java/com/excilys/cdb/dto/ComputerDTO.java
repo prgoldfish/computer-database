@@ -22,40 +22,20 @@ public class ComputerDTO {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getNom() {
         return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
     }
 
     public String getDateIntroduction() {
         return dateIntroduction;
     }
 
-    public void setDateIntroduction(String dateIntroduction) {
-        this.dateIntroduction = dateIntroduction;
-    }
-
     public String getDateDiscontinuation() {
         return dateDiscontinuation;
     }
 
-    public void setDateDiscontinuation(String dateDiscontinuation) {
-        this.dateDiscontinuation = dateDiscontinuation;
-    }
-
     public CompanyDTO getEntreprise() {
         return entreprise;
-    }
-
-    public void setEntreprise(CompanyDTO entreprise) {
-        this.entreprise = entreprise;
     }
 
     @Override
@@ -77,10 +57,12 @@ public class ComputerDTO {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!(obj instanceof ComputerDTO))
+        }
+        if (!(obj instanceof ComputerDTO)) {
             return false;
+        }
         ComputerDTO other = (ComputerDTO) obj;
         return Objects.equals(dateDiscontinuation, other.dateDiscontinuation)
                 && Objects.equals(dateIntroduction, other.dateIntroduction)
@@ -129,10 +111,12 @@ public class ComputerDTO {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (!(obj instanceof ComputerBuilderDTO))
+            }
+            if (!(obj instanceof ComputerBuilderDTO)) {
                 return false;
+            }
             ComputerBuilderDTO other = (ComputerBuilderDTO) obj;
             return Objects.equals(dateDiscontinuation, other.dateDiscontinuation)
                     && Objects.equals(dateIntroduction, other.dateIntroduction)

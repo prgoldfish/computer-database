@@ -281,8 +281,9 @@ public class ComputerServiceTest {
         computerService.addIntroDate(LocalDateTime.of(2020, 1, 1, 0, 0));
         computerService.updateComputerToDB();
         refreshMock();
-        toCompare.setDateIntroduction(LocalDateTime.of(2020, 1, 1, 0, 0));
-        assertEquals(toCompare, computerService.getComputerByName("PC de Test").get());
+        Computer toCompareWithIntro = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test")
+                .setDateIntroduction(LocalDateTime.of(2020, 1, 1, 0, 0)).build();
+        assertEquals(toCompareWithIntro, computerService.getComputerByName("PC de Test").get());
     }
 
     @Test
