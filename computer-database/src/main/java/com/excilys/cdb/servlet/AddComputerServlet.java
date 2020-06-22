@@ -11,10 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
 import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -35,11 +31,8 @@ public class AddComputerServlet extends HttpServlet {
      */
     private static final long serialVersionUID = -6234124633063870193L;
     //private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
-    @Autowired
-    private static ApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
-
-    ComputerService computerService = context.getBean(ComputerService.class);
-    CompanyService companyService = context.getBean(CompanyService.class);
+    ComputerService computerService = CDBConfig.getContext().getBean(ComputerService.class);
+    CompanyService companyService = CDBConfig.getContext().getBean(CompanyService.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

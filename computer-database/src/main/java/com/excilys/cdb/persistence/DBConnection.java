@@ -8,12 +8,11 @@ import java.sql.Statement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.excilys.cdb.CDBConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-public class DBConnection implements AutoCloseable {
+public class DBConnection {
 
     private static DBConnection instance;
     private HikariDataSource ds;
@@ -26,8 +25,8 @@ public class DBConnection implements AutoCloseable {
      */
     private DBConnection() {
         stmt = null;
-        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);) {
-            ds = context.getBean(HikariDataSource.class);
+        try {
+            ds = CDBConfig.getContext().getBean(HikariDataSource.class);
             this.conn = ds.getConnection();
         } catch (SQLException sqle) {
             logger.error("Erreur de connexion à la base de données", sqle);
@@ -85,22 +84,6 @@ public class DBConnection implements AutoCloseable {
      */
     public PreparedStatement prepareStement(String query) throws SQLException {
         return conn.prepareStatement(query);
-    }
-
-    /**
-     * Libère les ressources pour l'objet Statement et DataSource
-     *
-     * @throws SQLException
-     */
-    @Override
-    public void close() throws SQLException {
-        if (stmt != null && !stmt.isClosed()) {
-            stmt.close();
-        }
-        if (conn != null && !conn.isClosed()) {
-            conn.close();
-        }
-
     }
 
 }

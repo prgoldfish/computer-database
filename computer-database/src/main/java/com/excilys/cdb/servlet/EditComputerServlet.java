@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.dto.CompanyDTO;
@@ -36,9 +34,10 @@ public class EditComputerServlet extends HttpServlet {
      */
     private static final long serialVersionUID = 3345158907466408519L;
     private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
-    private static ApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
-    private static ComputerService computerService = context.getBean("computerService", ComputerService.class);
-    private static CompanyService companyService = context.getBean("companyService", CompanyService.class);
+    private static ComputerService computerService = CDBConfig.getContext().getBean("computerService",
+            ComputerService.class);
+    private static CompanyService companyService = CDBConfig.getContext().getBean("companyService",
+            CompanyService.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
