@@ -28,7 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -53,8 +52,7 @@ public class ListComputersServletTest {
     @InjectMocks
     ListComputersServlet servlet;
 
-    @Autowired
-    ComputerService computerService;
+    ComputerService computerService = CDBConfig.getContext().getBean(ComputerService.class);
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();

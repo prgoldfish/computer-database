@@ -6,7 +6,7 @@
 
   <groupId>com.excilys</groupId>
   <artifactId>computer-database</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>4.0</version>
   <packaging>war</packaging>
 
   <name>computer-database Maven Webapp</name>
@@ -49,6 +49,7 @@
 	  <groupId>org.mockito</groupId>
 	  <artifactId>mockito-core</artifactId>
 	  <version>${mockito.version}</version>
+	  <scope>test</scope>
 	</dependency>
 	<dependency>
 	  <groupId>ch.qos.logback</groupId>
@@ -93,7 +94,7 @@
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-test</artifactId>
-	    <version>${spring.version}</version>
+        <version>${spring.version}</version>
 	    <scope>test</scope>
 	</dependency>	
 </dependencies>
