@@ -1,19 +1,17 @@
 package com.excilys.cdb.servlet;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.MapperException;
@@ -23,38 +21,32 @@ import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.Page;
 
-@WebServlet("/ListComputers")
-public class ListComputersServlet extends HttpServlet {
+@Controller
+@RequestMapping("/ListComputers")
+public class ListComputersServlet {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3042238239381847969L;
     private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
-    private ComputerService computerService = CDBConfig.getContext().getBean("computerService", ComputerService.class);
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @Autowired
+    private ComputerService computerService;
 
-        doPost(req, resp);
-    }
+    @RequestMapping(method = { RequestMethod.POST, RequestMethod.GET })
+    public String dashboard(ModelMap model, @RequestParam(defaultValue = "1") String page,
+            @RequestParam(defaultValue = "10") String length, @RequestParam(required = false) String search,
+            @RequestParam(required = false) String headerMessage, @RequestParam(required = false) String order,
+            @RequestParam(required = false) String ascendent,
+            @RequestParam(required = false, name = "selection") String deleteString) {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String orderParam = req.getParameter("order");
-        OrderByColumn orderColumn = OrderByColumn.getEnum(orderParam);
-        String ascendentOrderParam = req.getParameter("ascendent");
-        boolean ascendentOrder = ascendentOrderParam == null || !ascendentOrderParam.equals("desc");
+        OrderByColumn orderColumn = OrderByColumn.getEnum(order);
+        boolean ascendentOrder = ascendent == null || !ascendent.equals("desc");
 
-        String headerMessage = req.getParameter("headerMessage");
         if (headerMessage != null) {
-            req.setAttribute("headerMessage", headerMessage);
+            model.addAttribute("headerMessage", headerMessage);
         }
 
-        String selection = req.getParameter("selection");
-        if (selection != null) {
+        if (deleteString != null) {
             int deletedCount = 0;
-            for (String toDelete : selection.split(",")) {
+            for (String toDelete : deleteString.split(",")) {
                 try {
                     int id = Integer.parseInt(toDelete);
                     computerService.deleteComputer(id);
@@ -63,41 +55,37 @@ public class ListComputersServlet extends HttpServlet {
                     logger.error(exc.getMessage());
                 }
             }
-            req.setAttribute("headerMessage", deletedCount + " computer(s) deleted");
-
+            model.addAttribute("headerMessage", deletedCount + " computer(s) deleted");
         }
 
         int pageLength = 10;
-        String pageLengthParam = req.getParameter("length");
         int pageNum = 1;
-        String pageNumParam = req.getParameter("page");
-        if (pageLengthParam != null) {
+        if (length != null) {
             try {
-                pageLength = Math.max(1, Integer.parseInt(pageLengthParam));
+                pageLength = Math.max(1, Integer.parseInt(length));
             } catch (NumberFormatException nfe) {
             }
         }
-        if (pageNumParam != null) {
+        if (page != null) {
             try {
-                pageNum = Math.max(1, Integer.parseInt(pageNumParam));
+                pageNum = Math.max(1, Integer.parseInt(page));
             } catch (NumberFormatException nfe) {
             }
         }
 
         int computerCount = 0;
-        String searchParam = req.getParameter("search");
         Page<Computer> pages = null;
 
         try {
-            if (searchParam != null) {
-                pages = new Page<>(computerService.searchComputersByName(searchParam, orderColumn, ascendentOrder),
+            if (search != null) {
+                pages = new Page<>(computerService.searchComputersByName(search, orderColumn, ascendentOrder),
                         pageLength);
             } else {
                 pages = new Page<>(computerService.getComputerList(0, Long.MAX_VALUE, orderColumn, ascendentOrder),
                         pageLength);
             }
-        } catch (ComputerServiceException e) {
-            throw new ServletException(e);
+        } catch (ComputerServiceException cse) {
+            logger.error(cse.getMessage());
         }
 
         pages.gotoPage(pageNum);
@@ -116,17 +104,17 @@ public class ListComputersServlet extends HttpServlet {
         long lastPageNum = Math.min(pages.getCurrentPage() + 2, pages.getMaxPage());
         pageNum = pages.getCurrentPage();
 
-        req.setAttribute("dtolist", dtoList);
-        req.setAttribute("dtosize", computerCount);
-        req.setAttribute("search", searchParam);
-        req.setAttribute("length", pageLength);
-        req.setAttribute("page", pageNum);
-        req.setAttribute("firstPageNum", firstPageNum);
-        req.setAttribute("lastPageNum", lastPageNum);
-        req.setAttribute("order", orderParam);
-        req.setAttribute("ascendent", ascendentOrderParam);
+        model.addAttribute("dtolist", dtoList);
+        model.addAttribute("dtosize", computerCount);
+        model.addAttribute("search", search);
+        model.addAttribute("length", pageLength);
+        model.addAttribute("page", pageNum);
+        model.addAttribute("firstPageNum", firstPageNum);
+        model.addAttribute("lastPageNum", lastPageNum);
+        model.addAttribute("order", order);
+        model.addAttribute("ascendent", ascendent);
 
-        req.getRequestDispatcher("WEB-INF/views/dashboard.jsp").forward(req, resp);
+        return "dashboard";
     }
 
 }

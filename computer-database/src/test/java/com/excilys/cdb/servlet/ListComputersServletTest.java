@@ -27,12 +27,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.springconfig.CDBConfig;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ListComputersServletTest {
