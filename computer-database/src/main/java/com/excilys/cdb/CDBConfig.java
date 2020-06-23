@@ -4,6 +4,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -13,6 +14,11 @@ import com.zaxxer.hikari.HikariDataSource;
 public class CDBConfig {
 
     private static AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(CDBConfig.class);
+
+    @Bean
+    public JdbcTemplate jdbcTemplate() {
+        return new JdbcTemplate(hikariDataSource());
+    }
 
     @Bean
     public HikariDataSource hikariDataSource() {

@@ -6,12 +6,10 @@
 
   <groupId>com.excilys</groupId>
   <artifactId>computer-database</artifactId>
-  <version>4.0</version>
+  <version>4.1</version>
   <packaging>war</packaging>
 
   <name>computer-database Maven Webapp</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

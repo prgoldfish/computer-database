@@ -1,19 +1,18 @@
 package com.excilys.cdb.persistence;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.model.Company;
@@ -35,6 +34,11 @@ public class ComputerDAO {
     private static final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
     private static final Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
+    private static RowMapper<Computer> computerMapper = (resultSet, numRow) -> processGetComputerResults(resultSet);
+
+    @Autowired
+    private JdbcTemplate jdbcTemplateObject;
+
     /**
      * Fais une requête sur la base de données pour récupérer la liste des
      * ordinateurs
@@ -42,113 +46,54 @@ public class ComputerDAO {
      * @return Les ordinateurs dans une List
      */
     public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy, boolean ascendentOrder) {
-        ResultSet res = null;
-        List<Computer> compList = new ArrayList<>();
-        String orderByColumns = orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC");
-        orderByColumns += orderBy == OrderByColumn.COMPUTERID ? "" : ", computer.id asc";
+        String orderByColumns = processOrderBy(orderBy, ascendentOrder);
         String request = SELECT_COMPUTER_LIST_QUERY + orderByColumns + LIMIT_OFFSET;
+
         logger.info("Exécution de la requête \"{}\"", request);
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(request)) {
-            stmt.setLong(1, limit);
-            stmt.setLong(2, startIndex);
-            res = stmt.executeQuery();
-            while (res.next()) {
-                ComputerBuilder c = processGetComputerResults(res);
-                compList.add(c.build());
-            }
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return compList;
+        return jdbcTemplateObject.query(request, computerMapper, limit, startIndex);
     }
 
-    public List<Long> getComputersByCompanyId(long companyId) {
-        ResultSet res = null;
-        List<Long> idList = new ArrayList<Long>();
+    public List<Long> getComputersIdsByCompanyId(long companyId) {
         logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_COMPANY_ID_QUERY);
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(SELECT_COMPUTER_BY_COMPANY_ID_QUERY)) {
-            stmt.setLong(1, companyId);
-            res = stmt.executeQuery();
-            while (res.next()) {
-                idList.add(res.getLong("id"));
-            }
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return idList;
+        return jdbcTemplateObject.query(SELECT_COMPUTER_BY_COMPANY_ID_QUERY,
+                (resultSet, numRow) -> resultSet.getLong("id"), companyId);
     }
 
     public long getMaxId() {
-        try (Connection conn = DBConnection.getConnection(); Statement stmt = conn.createStatement();) {
-            logger.info("Exécution de la requête \"{}\"", GET_MAX_ID_QUERY);
-            ResultSet res = stmt.executeQuery(GET_MAX_ID_QUERY);
-            if (res.next()) {
-                return res.getLong("idMax");
-            }
-            return 0; // On présume que la table est vide
+        logger.info("Exécution de la requête \"{}\"", GET_MAX_ID_QUERY);
+        return jdbcTemplateObject.queryForObject(GET_MAX_ID_QUERY, Long.class);
 
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
     }
 
     public Optional<Computer> getComputerById(long id) {
         logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_ID_QUERY);
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(SELECT_COMPUTER_BY_ID_QUERY);) {
-            stmt.setLong(1, id);
-            ResultSet res = stmt.executeQuery();
-            if (res.next()) {
-                ComputerBuilder c = processGetComputerResults(res);
-                return Optional.of(c.build());
-            }
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
+        try {
+            Computer c = jdbcTemplateObject.queryForObject(SELECT_COMPUTER_BY_ID_QUERY, computerMapper, id);
+            return Optional.of(c);
+        } catch (EmptyResultDataAccessException dae) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     public Optional<Computer> getComputerByName(String name) {
         logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_NAME_QUERY);
         name = name.replace("%", "\\%");
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(SELECT_COMPUTER_BY_NAME_QUERY);) {
-            stmt.setString(1, name);
-            ResultSet res = stmt.executeQuery();
-            if (res.next()) {
-                ComputerBuilder c = processGetComputerResults(res);
-                return Optional.of(c.build());
-            }
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
+        try {
+            Computer c = jdbcTemplateObject.queryForObject(SELECT_COMPUTER_BY_NAME_QUERY, computerMapper, name);
+            return Optional.of(c);
+        } catch (EmptyResultDataAccessException dae) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
-        String orderByColumns = orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC");
-        orderByColumns += orderBy == OrderByColumn.COMPUTERID ? "" : ", computer.id asc";
-        String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + orderByColumns;
-        name = name.replace("%", "\\%");
+        String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + processOrderBy(orderBy, ascendentOrder);
+        name = "%" + name.replace("%", "\\%") + "%";
         logger.info("Exécution de la requête \"{}\"", request);
-        List<Computer> resultList = new ArrayList<Computer>();
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(request);) {
-            stmt.setString(1, "%" + name + "%");
-            stmt.setString(2, "%" + name + "%");
-            ResultSet res = stmt.executeQuery();
-            while (res.next()) {
-                ComputerBuilder c = processGetComputerResults(res);
-                resultList.add(c.build());
-            }
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return resultList;
+        return jdbcTemplateObject.query(request, computerMapper, name, name);
     }
 
-    private ComputerBuilder processGetComputerResults(ResultSet res) throws SQLException {
+    private static Computer processGetComputerResults(ResultSet res) throws SQLException {
         Timestamp intro = res.getTimestamp("introduced");
         Timestamp discont = res.getTimestamp("discontinued");
         int idEntreprise = res.getInt("company_id");
@@ -163,7 +108,13 @@ public class ComputerDAO {
             String companyName = res.getString("companyName");
             c.setEntreprise(new Company(idEntreprise, companyName));
         }
-        return c;
+        return c.build();
+    }
+
+    private static String processOrderBy(OrderByColumn orderBy, boolean ascendentOrder) {
+        String orderByColumns = orderBy.getColumnName() + (ascendentOrder ? " ASC" : " DESC");
+        orderByColumns += orderBy == OrderByColumn.COMPUTERID ? "" : ", computer.id asc";
+        return orderByColumns;
     }
 
     public void addComputer(Computer c) {
@@ -177,72 +128,30 @@ public class ComputerDAO {
 
     private void executeAddComputerQuery(Computer c, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
         logger.info("Exécution de la requête \"{}\"", ADD_COMPUTER_QUERY);
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(ADD_COMPUTER_QUERY);) {
-            stmt.setLong(1, c.getId());
-            stmt.setString(2, c.getNom());
-            stmt.setTimestamp(3, introTimestamp);
-            stmt.setTimestamp(4, discontTimestamp);
-            if (entreprise == null) {
-                stmt.setNull(5, Types.BIGINT);
-            } else {
-                stmt.setLong(5, entreprise.getId());
-            }
-            stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
+        Long companyId = entreprise == null ? null : entreprise.getId();
+        jdbcTemplateObject.update(ADD_COMPUTER_QUERY, c.getId(), c.getNom(), introTimestamp, discontTimestamp,
+                companyId);
     }
 
     public void updateComputer(Computer c) {
-        String nom = c.getNom();
         LocalDateTime intro = c.getDateIntroduction();
         LocalDateTime discont = c.getDateDiscontinuation();
         Company entreprise = c.getEntreprise();
         Timestamp introTimestamp = intro == null ? null : Timestamp.valueOf(intro);
         Timestamp discontTimestamp = discont == null ? null : Timestamp.valueOf(discont);
-        executeUpdateComputerQuery(c, nom, entreprise, introTimestamp, discontTimestamp);
+        executeUpdateComputerQuery(c, entreprise, introTimestamp, discontTimestamp);
     }
 
-    private void executeUpdateComputerQuery(Computer c, String nom, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
+    private void executeUpdateComputerQuery(Computer c, Company entreprise, Timestamp introTimestamp, Timestamp discontTimestamp) {
         logger.info("Exécution de la requête \"{}\"", UPDATE_COMPUTER_QUERY);
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(UPDATE_COMPUTER_QUERY);) {
-            stmt.setString(1, nom);
-            stmt.setTimestamp(2, introTimestamp);
-            stmt.setTimestamp(3, discontTimestamp);
-            if (entreprise == null) {
-                stmt.setNull(4, Types.BIGINT);
-            } else {
-                stmt.setLong(4, entreprise.getId());
-            }
-            stmt.setLong(5, c.getId());
-            stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
+        Long companyId = entreprise == null ? null : entreprise.getId();
+        jdbcTemplateObject.update(UPDATE_COMPUTER_QUERY, c.getNom(), introTimestamp, discontTimestamp, companyId,
+                c.getId());
     }
 
     public void deleteComputer(long id) {
         logger.info("Exécution de la requête \"{}\"", DELETE_COMPUTER_QUERY);
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(DELETE_COMPUTER_QUERY);) {
-            stmt.setLong(1, id);
-            stmt.executeUpdate();
-            logger.info("Deleted computer with id : {}", id);
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-    }
-
-    public void deleteComputer(long id, Connection conn) {
-        logger.info("Exécution de la requête \"{}\"", DELETE_COMPUTER_QUERY);
-        try (PreparedStatement stmt = conn.prepareStatement(DELETE_COMPUTER_QUERY);) {
-            stmt.setLong(1, id);
-            stmt.executeUpdate();
-            logger.info("Deleted computer with id : {}", id);
-        } catch (SQLException sqle) {
-            logger.error("Erreur lors de l'exécution de la requête", sqle);
-        }
+        jdbcTemplateObject.update(DELETE_COMPUTER_QUERY, id);
+        logger.info("Deleted computer with id : {}", id);
     }
 }
