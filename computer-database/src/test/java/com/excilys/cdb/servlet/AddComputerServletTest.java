@@ -20,7 +20,6 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
-//@ContextConfiguration(classes = CDBConfig.class)
 public class AddComputerServletTest {
 
     private WebDriver driver;
@@ -32,7 +31,6 @@ public class AddComputerServletTest {
     @Before
     public void setUp() throws Exception {
         System.setProperty("webdriver.gecko.driver", "/opt/WebDriver/bin/geckodriver");
-        System.out.println("Coucou");
         driver = new FirefoxDriver();
         js = (JavascriptExecutor) driver;
     }

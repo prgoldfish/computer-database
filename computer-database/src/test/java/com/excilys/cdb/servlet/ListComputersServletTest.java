@@ -21,15 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.excilys.cdb.CDBConfig;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -38,8 +34,7 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CDBConfig.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ListComputersServletTest {
 
     @Mock
@@ -53,9 +48,6 @@ public class ListComputersServletTest {
     ListComputersServlet servlet;
 
     ComputerService computerService = CDBConfig.getContext().getBean(ComputerService.class);
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     Map<String, Object> expectedAttributes;
     Map<String, Object> attributeList;
