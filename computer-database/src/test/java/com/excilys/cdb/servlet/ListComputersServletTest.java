@@ -1,10 +1,6 @@
 package com.excilys.cdb.servlet;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,17 +11,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.ui.ModelMap;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
@@ -34,38 +34,36 @@ import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.springconfig.CDBConfig;
 
-@RunWith(MockitoJUnitRunner.class)
+@WebAppConfiguration
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = CDBConfig.class)
 public class ListComputersServletTest {
 
-    @Mock
-    HttpServletRequest req;
-    @Mock
-    HttpServletResponse resp;
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
     @Mock
     ComputerService mockService;
 
     @InjectMocks
     ListComputersServlet servlet;
 
-    ComputerService computerService = CDBConfig.getContext().getBean(ComputerService.class);
+    @Autowired
+    ComputerService computerService;
 
     Map<String, Object> expectedAttributes;
-    Map<String, Object> attributeList;
+    ModelMap attributeList;
     static Map<String, Class<?>> expectedTypesAttributes = initExpectedTypes();
 
     @Before
     public void setUp() throws Exception {
         expectedAttributes = new HashMap<String, Object>();
-        attributeList = new HashMap<String, Object>();
-        doAnswer(invoc -> attributeList.put(invoc.getArgument(0), invoc.getArgument(1))).when(req)
-                .setAttribute(anyString(), any());
-        RequestDispatcher rd = mock(RequestDispatcher.class);
-        when(req.getRequestDispatcher(anyString())).thenReturn(rd);
+        attributeList = new ModelMap();
     }
 
     @Test
-    public void ListComputersNoParametersTest() throws ServletException, IOException, ComputerServiceException {
-        servlet.doGet(req, resp);
+    public void ListComputersDefaultParametersTest() throws ComputerServiceException {
+        assertEquals(servlet.dashboard(attributeList, 1, 10, null, null, null, null, null), "dashboard");
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -77,19 +75,14 @@ public class ListComputersServletTest {
     }
 
     @Test
-    public void ListComputersOrderByComputerNameAscTest() throws ServletException, IOException, ComputerServiceException {
+    public void ListComputersAllOrderByTest() throws ServletException, IOException, ComputerServiceException {
         List<String> orderBys = Arrays.asList("ComputerName", "IntroducedDate", "DiscontinuedDate", "CompanyName");
         List<String> ascendentOrders = Arrays.asList("asc", "desc");
 
         for (String orderBy : orderBys) {
             for (String ascendent : ascendentOrders) {
-                when(req.getParameter("order")).thenReturn(orderBy);
-                if (ascendent.equals("desc")) {
-                    when(req.getParameter("ascendent")).thenReturn(ascendent);
-                } else {
-                    when(req.getParameter("ascendent")).thenReturn(null);
-                }
-                servlet.doGet(req, resp);
+                attributeList.clear();
+                servlet.dashboard(attributeList, 1, 10, null, null, orderBy, ascendent, null);
                 verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.getEnum(orderBy),
                         !ascendent.equals("desc"));
                 expectedAttributes.clear();
@@ -110,8 +103,7 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersUnknownOrderByParameterTest() throws ServletException, IOException, ComputerServiceException {
-        when(req.getParameter("order")).thenReturn("unknown");
-        servlet.doGet(req, resp);
+        servlet.dashboard(attributeList, 1, 10, null, null, "unknown", null, null);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -125,8 +117,7 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersUnknownAscendentParameterTest() throws ServletException, IOException, ComputerServiceException {
-        when(req.getParameter("ascendent")).thenReturn("unknown");
-        servlet.doGet(req, resp);
+        servlet.dashboard(attributeList, 1, 10, null, null, null, "unknown", null);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -148,8 +139,7 @@ public class ListComputersServletTest {
         }
         when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
-        when(req.getParameter("length")).thenReturn("50");
-        servlet.doGet(req, resp);
+        servlet.dashboard(attributeList, 1, 50, null, null, null, null, null);
         expectedAttributes.put("dtolist", expectedList.subList(0, 50));
         expectedAttributes.put("dtosize", 1000);
         expectedAttributes.put("length", 50);
@@ -169,8 +159,7 @@ public class ListComputersServletTest {
         }
         when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
-        when(req.getParameter("page")).thenReturn("3");
-        servlet.doGet(req, resp);
+        servlet.dashboard(attributeList, 3, 10, null, null, null, null, null);
         expectedAttributes.put("dtolist", expectedList.subList(20, 30));
         expectedAttributes.put("dtosize", 1000);
         expectedAttributes.put("length", 10);
@@ -182,8 +171,7 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersSearchParameterTest() throws ServletException, IOException, ComputerServiceException {
-        when(req.getParameter("search")).thenReturn("Nin");
-        servlet.doGet(req, resp);
+        servlet.dashboard(attributeList, 1, 10, "Nin", null, null, null, null);
         verify(mockService).searchComputersByName("Nin", OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -197,8 +185,7 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersHeaderMessageParameterTest() throws ServletException, IOException, ComputerServiceException {
-        when(req.getParameter("headerMessage")).thenReturn("test");
-        servlet.doGet(req, resp);
+        servlet.dashboard(attributeList, 1, 10, null, "test", null, null, null);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -212,8 +199,7 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersDeleteTest() throws ComputerServiceException, ServletException, IOException {
-        when(req.getParameter("selection")).thenReturn("1,2,3");
-        servlet.doGet(req, resp);
+        servlet.dashboard(attributeList, 1, 10, null, null, null, null, "1,2,3");
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         verify(mockService).deleteComputer(1);
         verify(mockService).deleteComputer(2);

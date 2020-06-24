@@ -1,10 +1,10 @@
 package com.excilys.cdb.springconfig;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -21,7 +21,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @ComponentScan(basePackages = "com.excilys.cdb")
 public class CDBConfig implements WebMvcConfigurer {
 
-    private static AnnotationConfigApplicationContext context;
+    private static AnnotationConfigWebApplicationContext context;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -61,9 +61,11 @@ public class CDBConfig implements WebMvcConfigurer {
         registry.addRedirectViewController("/WEB-INF/views/500.jsp", "500");
     }
 
-    public static AnnotationConfigApplicationContext getContext() {
+    public static AnnotationConfigWebApplicationContext getContext() {
         if (context == null) {
-            context = new AnnotationConfigApplicationContext(CDBConfig.class);
+            context = new AnnotationConfigWebApplicationContext();
+            context.register(CDBConfig.class);
+            context.refresh();
         }
         return context;
     }

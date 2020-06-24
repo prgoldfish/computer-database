@@ -8,25 +8,36 @@ import java.time.LocalDateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.springconfig.CDBConfig;
 
+@WebAppConfiguration
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = CDBConfig.class)
 public class AddComputerServletTest {
 
     private WebDriver driver;
     JavascriptExecutor js;
 
-    ComputerService computerService = CDBConfig.getContext().getBean(ComputerService.class);
-    CompanyService companyService = CDBConfig.getContext().getBean(CompanyService.class);
+    @Autowired
+    ComputerService computerService;
+
+    @Autowired
+    CompanyService companyService;
 
     @Before
     public void setUp() throws Exception {
@@ -111,6 +122,8 @@ public class AddComputerServletTest {
         driver.findElement(By.id("introduced")).sendKeys("2020-06-20");
         driver.findElement(By.id("discontinued")).click();
         driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
+        new WebDriverWait(driver, Duration.ofSeconds(2))
+                .until(driver -> driver.findElement(By.id("discontErr")).isDisplayed());
         assert (driver.findElement(By.id("discontErr")).isDisplayed());
         assertEquals("The discontinuation date is before the introduction date",
                 driver.findElement(By.id("discontErr")).getText());

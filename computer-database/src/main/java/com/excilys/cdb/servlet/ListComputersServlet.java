@@ -31,8 +31,8 @@ public class ListComputersServlet {
     private ComputerService computerService;
 
     @RequestMapping(method = { RequestMethod.POST, RequestMethod.GET })
-    public String dashboard(ModelMap model, @RequestParam(defaultValue = "1") String page,
-            @RequestParam(defaultValue = "10") String length, @RequestParam(required = false) String search,
+    public String dashboard(ModelMap model, @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int length, @RequestParam(required = false) String search,
             @RequestParam(required = false) String headerMessage, @RequestParam(required = false) String order,
             @RequestParam(required = false) String ascendent,
             @RequestParam(required = false, name = "selection") String deleteString) {
@@ -58,37 +58,24 @@ public class ListComputersServlet {
             model.addAttribute("headerMessage", deletedCount + " computer(s) deleted");
         }
 
-        int pageLength = 10;
-        int pageNum = 1;
-        if (length != null) {
-            try {
-                pageLength = Math.max(1, Integer.parseInt(length));
-            } catch (NumberFormatException nfe) {
-            }
-        }
-        if (page != null) {
-            try {
-                pageNum = Math.max(1, Integer.parseInt(page));
-            } catch (NumberFormatException nfe) {
-            }
-        }
+        length = Math.max(1, length);
+        page = Math.max(1, page);
 
         int computerCount = 0;
         Page<Computer> pages = null;
 
         try {
             if (search != null) {
-                pages = new Page<>(computerService.searchComputersByName(search, orderColumn, ascendentOrder),
-                        pageLength);
+                pages = new Page<>(computerService.searchComputersByName(search, orderColumn, ascendentOrder), length);
             } else {
                 pages = new Page<>(computerService.getComputerList(0, Long.MAX_VALUE, orderColumn, ascendentOrder),
-                        pageLength);
+                        length);
             }
         } catch (ComputerServiceException cse) {
             logger.error(cse.getMessage());
         }
 
-        pages.gotoPage(pageNum);
+        pages.gotoPage(page);
         computerCount = pages.getElementCount();
 
         List<ComputerDTO> dtoList = pages.getPageContent().stream().map(c -> {
@@ -102,13 +89,13 @@ public class ListComputersServlet {
 
         long firstPageNum = Math.max(pages.getCurrentPage() - 2, 1);
         long lastPageNum = Math.min(pages.getCurrentPage() + 2, pages.getMaxPage());
-        pageNum = pages.getCurrentPage();
+        page = pages.getCurrentPage();
 
         model.addAttribute("dtolist", dtoList);
         model.addAttribute("dtosize", computerCount);
         model.addAttribute("search", search);
-        model.addAttribute("length", pageLength);
-        model.addAttribute("page", pageNum);
+        model.addAttribute("length", length);
+        model.addAttribute("page", page);
         model.addAttribute("firstPageNum", firstPageNum);
         model.addAttribute("lastPageNum", lastPageNum);
         model.addAttribute("order", order);

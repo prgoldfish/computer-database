@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -21,51 +24,47 @@ import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.springconfig.CDBConfig;
 
-@WebServlet("/AddComputer")
-public class AddComputerServlet extends HttpServlet {
+@Controller
+@RequestMapping("/AddComputer")
+public class AddComputerServlet {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6234124633063870193L;
     //private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
-    ComputerService computerService = CDBConfig.getContext().getBean(ComputerService.class);
-    CompanyService companyService = CDBConfig.getContext().getBean(CompanyService.class);
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String headerMessage = (String) req.getAttribute("headerMessage");
+    @Autowired
+    ComputerService computerService;
+    @Autowired
+    CompanyService companyService;
+
+    @RequestMapping(method = RequestMethod.GET)
+    public String getCompaniesList(ModelMap model) throws ServletException, IOException {
+        String headerMessage = (String) model.getAttribute("headerMessage");
         if (headerMessage == null || headerMessage.isEmpty()) {
             List<Company> companyList = companyService.getCompaniesList();
-            req.setAttribute("companies", companyList);
+            model.addAttribute("companies", companyList);
         }
-        req.getRequestDispatcher("WEB-INF/views/addComputer.jsp").forward(req, resp);
+        return "addComputer";
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String computerName = req.getParameter("computerName");
-        String introducedParam = req.getParameter("introduced");
-        String discontinuedParam = req.getParameter("discontinued");
-        String companyIdParam = req.getParameter("companyId");
+    @RequestMapping(method = RequestMethod.POST)
+    public String addComputer(ModelMap model, @RequestParam String computerName, @RequestParam String introduced,
+            @RequestParam String discontinued, @RequestParam String companyId) throws ServletException, IOException {
 
         List<String> errorMessages = new ArrayList<>();
 
         CompanyDTO comp = null;
         try {
-            int id = Integer.parseInt(companyIdParam);
+            int id = Integer.parseInt(companyId);
             Optional<Company> optComp = companyService.getCompanyById(id);
             if (optComp.isPresent()) {
-                comp = new CompanyDTO(companyIdParam, CompanyMapper.toDTO(optComp.get()).getNom());
+                comp = new CompanyDTO(companyId, CompanyMapper.toDTO(optComp.get()).getNom());
             }
         } catch (NumberFormatException | MapperException nfe) {
         }
 
         ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(Long.toString(computerService.getMaxId() + 1),
-                computerName).setDateIntroduction(introducedParam).setDateDiscontinuation(discontinuedParam)
-                        .setEntreprise(comp).build();
+                computerName).setDateIntroduction(introduced).setDateDiscontinuation(discontinued).setEntreprise(comp)
+                        .build();
 
         Computer com = null;
         try {
@@ -77,13 +76,13 @@ public class AddComputerServlet extends HttpServlet {
         if (errorMessages.isEmpty()) {
             try {
                 computerService.addNewComputer(com);
-                req.setAttribute("headerMessage", "The computer has successfully been added to the database");
+                model.addAttribute("headerMessage", "The computer has successfully been added to the database");
             } catch (ComputerServiceException cse) {
                 errorMessages.add(cse.getMessage());
             }
         }
-        req.setAttribute("errors", errorMessages);
-        doGet(req, resp);
+        model.addAttribute("errors", errorMessages);
+        return getCompaniesList(model);
 
     }
 }

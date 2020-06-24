@@ -1,51 +1,111 @@
 package com.excilys.cdb.servlet;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.MapperException;
-import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.springconfig.CDBConfig;
 
-@WebServlet("/EditComputer")
-public class EditComputerServlet extends HttpServlet {
+@Controller
+@RequestMapping("/EditComputer")
+public class EditComputerServlet {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3345158907466408519L;
     private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
-    private static ComputerService computerService = CDBConfig.getContext().getBean("computerService",
-            ComputerService.class);
-    private static CompanyService companyService = CDBConfig.getContext().getBean("companyService",
-            CompanyService.class);
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("./ListComputers");
+    @Autowired
+    private ComputerService computerService;
+    @Autowired
+    private CompanyService companyService;
+
+    @GetMapping
+    public String redirectToDashboard() {
+        return "redirect:ListComputers";
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @PostMapping(params = "id")
+    public String getComputerInfo(ModelMap model, @RequestParam long id) {
+        if (id <= 0) {
+            return redirectToDashboard();
+        }
+        Optional<Computer> optComp = computerService.getComputerById(id);
+        if (optComp.isEmpty()) {
+            return redirectToDashboard();
+        }
+        ComputerDTO c;
+        try {
+            c = ComputerMapper.toDTO(optComp.get());
+        } catch (MapperException e) {
+            logger.error(e.getMessage());
+            return redirectToDashboard();
+        }
+        setComputerAttributes(model, c, id);
+        model.addAttribute("companies", companyService.getCompaniesList());
+
+        return "editComputer";
+    }
+
+    @PostMapping(params = { "id", "computerName", "introduced", "discontinued", "companyId" })
+    public String editComputer(ModelMap model, @RequestParam long id, @RequestParam String computerName,
+            @RequestParam String introduced, @RequestParam String discontinued, @RequestParam long companyId) {
+
+        List<String> errorMessages = new ArrayList<>();
+        if (id <= 0) {
+            return redirectToDashboard();
+        }
+        CompanyDTO comp = getCompanyDTO(companyId);
+        ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(Long.toString(id), computerName)
+                .setDateIntroduction(introduced).setDateDiscontinuation(discontinued).setEntreprise(comp).build();
+
+        setComputerAttributes(model, dtoComputer, id);
+
+        Computer com = null;
+        try {
+            com = ComputerMapper.fromDTO(dtoComputer);
+        } catch (MapperException mape) {
+            errorMessages.addAll(mape.getErrorList());
+        }
+        if (errorMessages.isEmpty()) {
+            try {
+                computerService.updateComputer(com);
+                model.addAttribute("headerMessage", "The computer has successfully been edited");
+            } catch (ComputerServiceException cse) {
+                errorMessages.add(cse.getMessage());
+            }
+        }
+        if (model.getAttribute("headerMessage") == null) {
+            model.addAttribute("companies", companyService.getCompaniesList());
+        }
+
+        return "editComputer";
+    }
+
+    private void setComputerAttributes(ModelMap model, ComputerDTO c, long id) {
+        model.addAttribute("computerName", c.getNom());
+        model.addAttribute("dateIntro", c.getDateIntroduction());
+        model.addAttribute("dateDiscont", c.getDateDiscontinuation());
+        model.addAttribute("companyId", c.getEntreprise() != null ? c.getEntreprise().getId() : 0);
+        model.addAttribute("id", id);
+    }
+
+    /*public String doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<String> errorMessages = new ArrayList<>();
         String computerName = req.getParameter("computerName");
         String introducedParam = req.getParameter("introduced");
@@ -84,8 +144,7 @@ public class EditComputerServlet extends HttpServlet {
             } else {
                 Optional<Computer> optComp = computerService.getComputerById(id);
                 if (optComp.isEmpty()) {
-                    doGet(req, resp);
-                    return;
+                    return redirectToDashboard();
                 } else {
                     ComputerDTO c;
                     try {
@@ -108,33 +167,14 @@ public class EditComputerServlet extends HttpServlet {
             doGet(req, resp);
         }
 
-    }
+    }*/
 
-    private CompanyDTO getCompanyDTO(String companyIdParam) {
+    private CompanyDTO getCompanyDTO(long companyId) {
         CompanyDTO comp = null;
-        try {
-            int idCompany = Integer.parseInt(companyIdParam);
-            Optional<Company> optComp = companyService.getCompanyById(idCompany);
-            if (optComp.isPresent()) {
-                comp = new CompanyDTO(companyIdParam, CompanyMapper.toDTO(optComp.get()).getNom());
-            }
-        } catch (NumberFormatException | MapperException nfe) {
+        Optional<Company> optComp = companyService.getCompanyById(companyId);
+        if (optComp.isPresent()) {
+            comp = new CompanyDTO(Long.toString(companyId), optComp.get().getNom());
         }
         return comp;
     }
-
-    private int parseId(HttpServletRequest req, HttpServletResponse resp, List<String> errorMessages, String idParam) throws ServletException, IOException {
-        int id = 0;
-        if (idParam != null) {
-            try {
-                id = Integer.parseInt(idParam);
-            } catch (NumberFormatException nfe) {
-                logger.error("Invalid id received");
-                errorMessages.add("Invalid id received");
-            }
-        }
-
-        return id;
-    }
-
 }

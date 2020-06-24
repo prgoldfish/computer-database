@@ -6,7 +6,7 @@
 
   <groupId>com.excilys</groupId>
   <artifactId>computer-database</artifactId>
-  <version>4.2-SNAPSHOT1</version>
+  <version>4.2-alpha1</version>
   <packaging>war</packaging>
 
   <name>computer-database Maven Webapp</name>
