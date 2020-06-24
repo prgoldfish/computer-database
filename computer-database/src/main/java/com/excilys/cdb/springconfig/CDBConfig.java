@@ -56,9 +56,9 @@ public class CDBConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addRedirectViewController("/WEB-INF/views/403.html", "WEB-INF/views/403.html");
-        registry.addRedirectViewController("/WEB-INF/views/404.html", "WEB-INF/views/404.html");
-        registry.addRedirectViewController("/WEB-INF/views/500.html", "WEB-INF/views/500.html");
+        registry.addRedirectViewController("/WEB-INF/views/403.jsp", "403");
+        registry.addRedirectViewController("/WEB-INF/views/404.jsp", "404");
+        registry.addRedirectViewController("/WEB-INF/views/500.jsp", "500");
     }
 
     public static AnnotationConfigApplicationContext getContext() {
