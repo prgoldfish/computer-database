@@ -63,8 +63,8 @@ public class ComputerMapper {
     }
 
     private static void parseDates(ComputerDTO c, List<String> errors, ComputerBuilder result) {
-        boolean introSet = c.getDateIntroduction() != null && !c.getDateIntroduction().equals("");
-        boolean discontSet = c.getDateDiscontinuation() != null && !c.getDateDiscontinuation().equals("");
+        boolean introSet = c.getDateIntroduction() != null && !c.getDateIntroduction().isBlank();
+        boolean discontSet = c.getDateDiscontinuation() != null && !c.getDateDiscontinuation().isBlank();
         boolean bothSet = introSet && discontSet;
         if (introSet) {
             try {

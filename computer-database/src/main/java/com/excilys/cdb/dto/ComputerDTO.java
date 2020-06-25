@@ -2,6 +2,8 @@ package com.excilys.cdb.dto;
 
 import java.util.Objects;
 
+import javax.validation.constraints.NotNull;
+
 public class ComputerDTO {
 
     private String id;
@@ -72,7 +74,9 @@ public class ComputerDTO {
 
     public static class ComputerBuilderDTO {
         // Obligatoires
+        @NotNull
         private String id;
+        @NotNull
         private String nom;
 
         // Optionnels
@@ -98,6 +102,26 @@ public class ComputerDTO {
         public ComputerBuilderDTO setEntreprise(CompanyDTO entreprise) {
             this.entreprise = entreprise;
             return this;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getNom() {
+            return nom;
+        }
+
+        public String getDateIntroduction() {
+            return dateIntroduction;
+        }
+
+        public String getDateDiscontinuation() {
+            return dateDiscontinuation;
+        }
+
+        public CompanyDTO getEntreprise() {
+            return entreprise;
         }
 
         public ComputerDTO build() {

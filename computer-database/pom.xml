@@ -6,7 +6,7 @@
 
   <groupId>com.excilys</groupId>
   <artifactId>computer-database</artifactId>
-  <version>4.2-alpha1</version>
+  <version>4.2-alpha2-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>computer-database Maven Webapp</name>
@@ -24,6 +24,7 @@
     <hikaricp.version>3.4.5</hikaricp.version>
     <selenium.version>4.0.0-alpha-6</selenium.version>
     <spring.version>5.2.7.RELEASE</spring.version>
+    <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
   </properties>
 
   <dependencies>
@@ -99,7 +100,12 @@
 	    <artifactId>spring-test</artifactId>
         <version>${spring.version}</version>
 	    <scope>test</scope>
-	</dependency>	
+	</dependency>
+	<dependency>  
+	    <groupId>org.hibernate.validator</groupId>  
+	    <artifactId>hibernate-validator</artifactId>  
+	    <version>${hibernate-validator.version}</version>  
+	</dependency>  
 </dependencies>
 
   <build>
