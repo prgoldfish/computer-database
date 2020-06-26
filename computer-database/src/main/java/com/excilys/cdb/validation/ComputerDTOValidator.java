@@ -3,10 +3,16 @@ package com.excilys.cdb.validation;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
@@ -18,6 +24,15 @@ public class ComputerDTOValidator implements Validator {
     @Autowired
     CompanyDTOValidator companyDtoValidator;
 
+    @Autowired
+    ReloadableResourceBundleMessageSource messageSources;
+
+    private List<String> errorList = new ArrayList<>();
+
+    public List<String> getErrorList() {
+        return errorList;
+    }
+
     @Override
     public boolean supports(Class<?> clazz) {
         return ComputerBuilderDTO.class.isAssignableFrom(clazz);
@@ -28,10 +43,11 @@ public class ComputerDTOValidator implements Validator {
         ComputerBuilderDTO dto = (ComputerBuilderDTO) target;
         validateDates(dto.getDateIntroduction(), dto.getDateDiscontinuation(), errors);
         validateId(errors, dto.getId());
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nom", "computerDTO.nom.empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nom", "empty");
         if (dto.getEntreprise() != null) {
             companyDtoValidator.validate(dto.getEntreprise(), errors);
         }
+        addErrors(errors);
 
     }
 
@@ -41,16 +57,16 @@ public class ComputerDTOValidator implements Validator {
             longId = Long.parseLong(id);
 
         } catch (NumberFormatException nfe) {
-            errors.rejectValue("id", "computerDTO.id.nan");
+            errors.rejectValue("id", "nan");
         }
         if (longId != null && longId <= 0) {
-            errors.rejectValue("id", "computerDTO.id.negativeId");
+            errors.rejectValue("id", "negativeId");
         }
     }
 
     private void validateDates(String intro, String discont, Errors errors) {
         boolean introSet = intro != null && !intro.isBlank();
-        boolean discontSet = discont != null && discont.isBlank();
+        boolean discontSet = discont != null && !discont.isBlank();
         boolean bothSet = introSet && discontSet;
         LocalDate introDate = null;
         LocalDate discontDate = null;
@@ -60,25 +76,42 @@ public class ComputerDTOValidator implements Validator {
                 introDate = LocalDate.parse(intro, DateTimeFormatter.ISO_DATE);
             } catch (DateTimeParseException dtpe) {
                 bothSet = false;
-                errors.rejectValue("dateIntroduction", "computerDTO.dateIntroduction.invalid"); //TODO: Add : The introduced date is invalid
+                errors.rejectValue("dateIntroduction", "invalid");
             }
         }
         if (discontSet) {
             if (!introSet) {
                 bothSet = false;
-                errors.rejectValue("dateDiscontinuation", "computerDTO.dateDiscontinuation.introNotSet"); //TODO: Add : The discontinued date is set but the introduced date is not
+                errors.rejectValue("dateDiscontinuation", "introNotSet");
             } else {
                 try {
                     discontDate = LocalDate.parse(discont, DateTimeFormatter.ISO_DATE);
                 } catch (DateTimeParseException dtpe) {
                     bothSet = false;
-                    errors.rejectValue("dateDiscontinuation", "computerDTO.dateDiscontinuation.invalid"); //TODO: Add : The discontinued date is invalid
+                    errors.rejectValue("dateDiscontinuation", "invalid");
                 }
             }
         }
         if (bothSet && introDate.isAfter(discontDate)) {
-            errors.rejectValue("dateIntroduction", "computerDTO.dateIntroduction.afterDiscont"); //TODO: Add : The introduction date is after the discontinuation date
+            errors.rejectValue("dateIntroduction", "afterDiscont");
         }
+    }
+
+    private void addErrors(Errors errors) {
+        List<ObjectError> errorObjList = errors.getAllErrors();
+        for (ObjectError errObj : errorObjList) {
+            String[] codes = errObj.getCodes();
+            for (String msgCode : codes) {
+                try {
+                    String message = messageSources.getMessage(msgCode, null, Locale.ROOT);
+                    errorList.add(message);
+                    System.out.println("Message found : " + message);
+                    break;
+                } catch (NoSuchMessageException nsme) {
+                }
+            }
+        }
+
     }
 
 }

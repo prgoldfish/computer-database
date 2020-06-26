@@ -6,8 +6,6 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -34,7 +32,7 @@ import com.excilys.cdb.validation.ComputerDTOValidator;
 @RequestMapping("/AddComputer")
 public class AddComputerServlet {
 
-    private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
+    //private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
 
     @Autowired
     ComputerService computerService;
@@ -84,8 +82,13 @@ public class AddComputerServlet {
 
         Computer com = null;
 
-        computerValidator.validate(builder, br);
         model.addAttribute("computerDto", dtoComputer);
+        computerValidator.validate(builder, br);
+        if (br.hasErrors()) {
+            errorMessages = computerValidator.getErrorList();
+            model.addAttribute("errors", errorMessages);
+            return jspRet;
+        }
 
         try {
             com = ComputerMapper.fromDTO(builder.build());

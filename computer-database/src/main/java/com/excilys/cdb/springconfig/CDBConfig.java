@@ -51,7 +51,7 @@ public class CDBConfig implements WebMvcConfigurer {
     @Bean
     public ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource() {
         ReloadableResourceBundleMessageSource res = new ReloadableResourceBundleMessageSource();
-        res.setBasename("/WEB-INF/messages");
+        res.setBasename("WEB-INF/messages");
         return res;
     }
 

@@ -16,15 +16,10 @@ import javax.servlet.ServletException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.ui.ModelMap;
 
 import com.excilys.cdb.dto.ComputerDTO;
@@ -32,11 +27,7 @@ import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.springconfig.CDBConfig;
 
-@WebAppConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CDBConfig.class)
 public class ListComputersServletTest {
 
     @Rule
@@ -47,9 +38,6 @@ public class ListComputersServletTest {
 
     @InjectMocks
     ListComputersServlet servlet;
-
-    @Autowired
-    ComputerService computerService;
 
     Map<String, Object> expectedAttributes;
     ModelMap attributeList;
