@@ -4,25 +4,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.dto.ComputerDTO.ComputerBuilderDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.MapperException;
+import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.validation.ComputerDTOValidator;
 
 @Controller
 @RequestMapping("/EditComputer")
@@ -34,6 +41,23 @@ public class EditComputerServlet {
     private ComputerService computerService;
     @Autowired
     private CompanyService companyService;
+    @Autowired
+    ComputerDTOValidator computerValidator;
+
+    @ModelAttribute
+    public void getCompanyDTO(ModelMap model, @RequestParam(required = false) Long companyId) {
+        if (companyId == null) {
+            return;
+        }
+        Optional<Company> optComp = companyService.getCompanyById(companyId);
+        model.addAttribute("companyDTO", optComp.map(c -> {
+            try {
+                return CompanyMapper.toDTO(c);
+            } catch (MapperException e) { //Cannot happen
+                return null;
+            }
+        }).orElse(null));
+    }
 
     @GetMapping
     public String redirectToDashboard() {
@@ -58,27 +82,37 @@ public class EditComputerServlet {
         }
         setComputerAttributes(model, c, id);
         model.addAttribute("companies", companyService.getCompaniesList());
-
+        model.addAttribute("computerDto", new ComputerBuilderDTO("", ""));
         return "editComputer";
     }
 
     @PostMapping(params = { "id", "computerName", "introduced", "discontinued", "companyId" })
-    public String editComputer(ModelMap model, @RequestParam long id, @RequestParam String computerName,
-            @RequestParam String introduced, @RequestParam String discontinued, @RequestParam long companyId) {
+    public String editComputer(ModelMap model, @Valid ComputerBuilderDTO builder, @RequestParam long companyId,
+            BindingResult br) {
 
         List<String> errorMessages = new ArrayList<>();
-        if (id <= 0) {
+        if (Long.valueOf(builder.getId()) <= 0) {
             return redirectToDashboard();
         }
-        CompanyDTO comp = getCompanyDTO(companyId);
-        ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(Long.toString(id), computerName)
-                .setDateIntroduction(introduced).setDateDiscontinuation(discontinued).setEntreprise(comp).build();
+        CompanyDTO comp = (CompanyDTO) model.getAttribute("companyDTO");
+        ComputerBuilderDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(builder.getId(), builder.getNom())
+                .setDateIntroduction(builder.getDateIntroduction())
+                .setDateDiscontinuation(builder.getDateDiscontinuation()).setEntreprise(comp);
 
-        setComputerAttributes(model, dtoComputer, id);
+        setComputerAttributes(model, dtoComputer.build(), Long.valueOf(builder.getId()));
+
+        model.addAttribute("computerDto", dtoComputer);
+        computerValidator.validate(dtoComputer, br);
+        if (br.hasErrors()) {
+            errorMessages = computerValidator.getErrorList();
+            logger.debug("Error in the edit validation");
+            model.addAttribute("errors", errorMessages);
+            return "editComputer";
+        }
 
         Computer com = null;
         try {
-            com = ComputerMapper.fromDTO(dtoComputer);
+            com = ComputerMapper.fromDTO(dtoComputer.build());
         } catch (MapperException mape) {
             errorMessages.addAll(mape.getErrorList());
         }
@@ -168,13 +202,4 @@ public class EditComputerServlet {
         }
 
     }*/
-
-    private CompanyDTO getCompanyDTO(long companyId) {
-        CompanyDTO comp = null;
-        Optional<Company> optComp = companyService.getCompanyById(companyId);
-        if (optComp.isPresent()) {
-            comp = new CompanyDTO(Long.toString(companyId), optComp.get().getNom());
-        }
-        return comp;
-    }
 }

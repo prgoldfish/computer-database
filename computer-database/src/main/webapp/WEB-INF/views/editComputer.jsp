@@ -1,5 +1,6 @@
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>  
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,28 +38,28 @@
                     </div>
                     <h1>Edit Computer</h1>
 
-                    <form id="editComputer" action="EditComputer" method="POST">
-                        <input type="hidden" value="${ id }" name="id" id="id"/>
+                    <form:form modelAttribute="computerDto" id="editComputer" action="EditComputer" method="POST">
+                        <form:input type="hidden" path="id" value="${ id }" name="id" id="id"/>
                         <fieldset>
                             <div class="form-group">
-                                <label for="computerName">Computer name</label>
+                                <form:label path="nom" for="computerName">Computer name</form:label>
                                 <div id="errGroup">
-                                    <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name" value="${ computerName }">
+                                    <form:input type="text" class="form-control" id="computerName" path="nom" value="${ computerName }" placeholder="Computer name"/>
                                     <div class="addErrText" id="cnErr"></div>
                                 </div>
                                 
                             </div>
                             <div class="form-group">
-                                <label for="introduced">Introduced date</label>
+                                <form:label path="dateIntroduction"  for="introduced">Introduced date</form:label>
                                 <div id="errGroup">
-                                    <input type="date" class="form-control" id="introduced" name="introduced" placeholder="Introduced date" value="${ dateIntro }">
+                                    <form:input type="date" class="form-control" id="introduced" path="dateIntroduction" value="${ dateIntro }" placeholder="Introduced date"/>
                                     <div class="addErrText" id="introErr"></div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="discontinued">Discontinued date</label>
+                                <form:label path="dateDiscontinuation" for="discontinued">Discontinued date</form:label>
                                 <div id="errGroup">
-                                    <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="Discontinued date" value="${ dateDiscont }">
+                                    <form:input type="date" class="form-control" id="discontinued" path="dateDiscontinuation" value="${ dateDiscont }" placeholder="Discontinued date"/>
                                     <div class="addErrText" id="discontErr"></div>
                                 </div>
                             </div>
@@ -77,7 +78,7 @@
                             or
                             <a href="ListComputers" class="btn btn-default">Cancel</a>
                         </div> 
-                    </form>
+                    </form:form>
                 </div>
             </div>
         </div>

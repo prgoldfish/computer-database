@@ -46,7 +46,6 @@
                                 <form:label path="nom" for="computerName">Computer name</form:label>
                                 <div id="errGroup">
 	                                <form:input type="text" class="form-control" id="computerName" path="nom" placeholder="Computer name"/>
-	                                <form:errors path="nom"/>
 	                                <div class="addErrText" id="cnErr"></div>
                                 </div>
                                 
@@ -55,7 +54,6 @@
                                 <form:label path="dateIntroduction"  for="introduced">Introduced date</form:label>
                                 <div id="errGroup">
                                     <form:input type="date" class="form-control" id="introduced" path="dateIntroduction" placeholder="Introduced date"/>
-                                    <form:errors path="dateIntroduction"/>
                                     <div class="addErrText" id="introErr"></div>
                                 </div>
                             </div>
@@ -63,7 +61,6 @@
                                 <form:label path="dateDiscontinuation" for="discontinued">Discontinued date</form:label>
                                 <div id="errGroup">
                                     <form:input type="date" class="form-control" id="discontinued" path="dateDiscontinuation" placeholder="Discontinued date"/>
-                                    <form:errors path="dateDiscontinuation"/>
                                     <div class="addErrText" id="discontErr"></div>
                                 </div>
                             </div>

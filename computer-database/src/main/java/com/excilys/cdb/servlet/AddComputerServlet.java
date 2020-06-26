@@ -76,14 +76,15 @@ public class AddComputerServlet {
         List<String> errorMessages = new ArrayList<>();
 
         CompanyDTO comp = (CompanyDTO) model.getAttribute("companyDTO");
-        ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(Long.toString(computerService.getMaxId() + 1),
-                builder.getNom()).setDateIntroduction(builder.getDateIntroduction())
-                        .setDateDiscontinuation(builder.getDateDiscontinuation()).setEntreprise(comp).build();
+        ComputerBuilderDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(
+                Long.toString(computerService.getMaxId() + 1), builder.getNom())
+                        .setDateIntroduction(builder.getDateIntroduction())
+                        .setDateDiscontinuation(builder.getDateDiscontinuation()).setEntreprise(comp);
 
         Computer com = null;
 
         model.addAttribute("computerDto", dtoComputer);
-        computerValidator.validate(builder, br);
+        computerValidator.validate(dtoComputer, br);
         if (br.hasErrors()) {
             errorMessages = computerValidator.getErrorList();
             model.addAttribute("errors", errorMessages);
@@ -91,7 +92,7 @@ public class AddComputerServlet {
         }
 
         try {
-            com = ComputerMapper.fromDTO(builder.build());
+            com = ComputerMapper.fromDTO(dtoComputer.build());
         } catch (MapperException mape) {
             errorMessages.addAll(mape.getErrorList());
         }
