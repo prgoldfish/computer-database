@@ -44,7 +44,7 @@
                             <div class="form-group">
                                 <form:label path="nom" for="computerName">Computer name</form:label>
                                 <div id="errGroup">
-                                    <form:input type="text" class="form-control" id="computerName" path="nom" value="${ computerName }" placeholder="Computer name"/>
+                                    <form:input type="text" class="form-control" id="computerName" path="nom" name="computerName" value="${ computerName }" placeholder="Computer name"/>
                                     <div class="addErrText" id="cnErr"></div>
                                 </div>
                                 
@@ -52,14 +52,14 @@
                             <div class="form-group">
                                 <form:label path="dateIntroduction"  for="introduced">Introduced date</form:label>
                                 <div id="errGroup">
-                                    <form:input type="date" class="form-control" id="introduced" path="dateIntroduction" value="${ dateIntro }" placeholder="Introduced date"/>
+                                    <form:input type="date" class="form-control" id="introduced" path="dateIntroduction" nam="introduced" value="${ dateIntro }" placeholder="Introduced date"/>
                                     <div class="addErrText" id="introErr"></div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <form:label path="dateDiscontinuation" for="discontinued">Discontinued date</form:label>
                                 <div id="errGroup">
-                                    <form:input type="date" class="form-control" id="discontinued" path="dateDiscontinuation" value="${ dateDiscont }" placeholder="Discontinued date"/>
+                                    <form:input type="date" class="form-control" id="discontinued" path="dateDiscontinuation" name="discontinued" value="${ dateDiscont }" placeholder="Discontinued date"/>
                                     <div class="addErrText" id="discontErr"></div>
                                 </div>
                             </div>

@@ -64,8 +64,9 @@ public class EditComputerServlet {
         return "redirect:ListComputers";
     }
 
-    @PostMapping(params = "id")
+    @PostMapping(params = { "id" })
     public String getComputerInfo(ModelMap model, @RequestParam long id) {
+        System.out.println("Au secours");
         if (id <= 0) {
             return redirectToDashboard();
         }
@@ -87,8 +88,8 @@ public class EditComputerServlet {
     }
 
     @PostMapping(params = { "id", "computerName", "introduced", "discontinued", "companyId" })
-    public String editComputer(ModelMap model, @Valid ComputerBuilderDTO builder, @RequestParam long companyId,
-            BindingResult br) {
+    public String editComputer(ModelMap model, @Valid ComputerBuilderDTO builder,
+            @RequestParam(name = "companyId") long companyId, BindingResult br) {
 
         List<String> errorMessages = new ArrayList<>();
         if (Long.valueOf(builder.getId()) <= 0) {
@@ -145,7 +146,7 @@ public class EditComputerServlet {
         String introducedParam = req.getParameter("introduced");
         String discontinuedParam = req.getParameter("discontinued");
         String companyIdParam = req.getParameter("companyId");
-
+    
         String idParam = req.getParameter("id");
         int id = parseId(req, resp, errorMessages, idParam);
         System.out.println(idParam);
@@ -155,18 +156,18 @@ public class EditComputerServlet {
                 System.out.println("Un pc va etre modifié");
                 System.out.println("Nom : " + computerName);
                 CompanyDTO comp = getCompanyDTO(companyIdParam);
-
+    
                 ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(idParam, computerName)
                         .setDateIntroduction(introducedParam).setDateDiscontinuation(discontinuedParam)
                         .setEntreprise(comp).build();
-
+    
                 Computer com = null;
                 try {
                     com = ComputerMapper.fromDTO(dtoComputer);
                 } catch (MapperException mape) {
                     errorMessages.addAll(mape.getErrorList());
                 }
-
+    
                 if (errorMessages.isEmpty()) {
                     try {
                         computerService.updateComputer(com);
@@ -200,6 +201,6 @@ public class EditComputerServlet {
         } else {
             doGet(req, resp);
         }
-
+    
     }*/
 }
