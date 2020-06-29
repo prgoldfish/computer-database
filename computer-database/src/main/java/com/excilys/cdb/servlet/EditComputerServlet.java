@@ -59,12 +59,11 @@ public class EditComputerServlet {
         }).orElse(null));
     }
 
-    @GetMapping
-    public String redirectToDashboard() {
+    private String redirectToDashboard() {
         return "redirect:ListComputers";
     }
 
-    @PostMapping(params = { "id" })
+    @GetMapping
     public String getComputerInfo(ModelMap model, @RequestParam long id) {
         System.out.println("Au secours");
         if (id <= 0) {
@@ -87,7 +86,7 @@ public class EditComputerServlet {
         return "editComputer";
     }
 
-    @PostMapping(params = { "id", "computerName", "introduced", "discontinued", "companyId" })
+    @PostMapping
     public String editComputer(ModelMap model, @Valid ComputerBuilderDTO builder,
             @RequestParam(name = "companyId") long companyId, BindingResult br) {
 
@@ -139,68 +138,4 @@ public class EditComputerServlet {
         model.addAttribute("companyId", c.getEntreprise() != null ? c.getEntreprise().getId() : 0);
         model.addAttribute("id", id);
     }
-
-    /*public String doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<String> errorMessages = new ArrayList<>();
-        String computerName = req.getParameter("computerName");
-        String introducedParam = req.getParameter("introduced");
-        String discontinuedParam = req.getParameter("discontinued");
-        String companyIdParam = req.getParameter("companyId");
-    
-        String idParam = req.getParameter("id");
-        int id = parseId(req, resp, errorMessages, idParam);
-        System.out.println(idParam);
-        if (id > 0) {
-            req.setAttribute("id", id);
-            if (computerName != null) {
-                System.out.println("Un pc va etre modifié");
-                System.out.println("Nom : " + computerName);
-                CompanyDTO comp = getCompanyDTO(companyIdParam);
-    
-                ComputerDTO dtoComputer = new ComputerDTO.ComputerBuilderDTO(idParam, computerName)
-                        .setDateIntroduction(introducedParam).setDateDiscontinuation(discontinuedParam)
-                        .setEntreprise(comp).build();
-    
-                Computer com = null;
-                try {
-                    com = ComputerMapper.fromDTO(dtoComputer);
-                } catch (MapperException mape) {
-                    errorMessages.addAll(mape.getErrorList());
-                }
-    
-                if (errorMessages.isEmpty()) {
-                    try {
-                        computerService.updateComputer(com);
-                        req.setAttribute("headerMessage", "The computer has successfully been edited");
-                    } catch (ComputerServiceException cse) {
-                        errorMessages.add(cse.getMessage());
-                    }
-                }
-            } else {
-                Optional<Computer> optComp = computerService.getComputerById(id);
-                if (optComp.isEmpty()) {
-                    return redirectToDashboard();
-                } else {
-                    ComputerDTO c;
-                    try {
-                        c = ComputerMapper.toDTO(optComp.get());
-                    } catch (MapperException e) {
-                        logger.error(e.getMessage());
-                        doGet(req, resp);
-                        return;
-                    }
-                    req.setAttribute("computerName", c.getNom());
-                    req.setAttribute("dateIntro", c.getDateIntroduction());
-                    req.setAttribute("dateDiscont", c.getDateDiscontinuation());
-                    req.setAttribute("companyId", c.getEntreprise() != null ? c.getEntreprise().getId() : 0);
-                }
-            }
-            List<Company> companyList = companyService.getCompaniesList();
-            req.setAttribute("companies", companyList);
-            req.getRequestDispatcher("WEB-INF/views/editComputer.jsp").forward(req, resp);
-        } else {
-            doGet(req, resp);
-        }
-    
-    }*/
 }

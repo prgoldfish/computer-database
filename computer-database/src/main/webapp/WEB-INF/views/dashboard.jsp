@@ -111,7 +111,7 @@
 	                            <input type="checkbox" name="cb" class="cb" value="${ i.id }">
 	                        </td>
 	                        <td>
-	                           <form id="editForm${ i.id }" action="EditComputer" method="POST">
+	                           <form id="editForm${ i.id }" action="EditComputer" method="GET">
 	                               <input type="hidden" name="id" value="${ i.id }">
 	                               <a href="#" onclick="$(&quot;#editForm${ i.id }&quot;).submit()"><c:out value="${ i.nom }"></c:out></a>
 	                           </form>

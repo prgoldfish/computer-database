@@ -105,7 +105,7 @@ public class ComputerDTOValidator implements Validator {
                 try {
                     String message = messageSources.getMessage(msgCode, null, Locale.ROOT);
                     errorList.add(message);
-                    System.out.println("Message found : " + message);
+                    //System.out.println("Message found : " + message);
                     break;
                 } catch (NoSuchMessageException nsme) {
                 }
