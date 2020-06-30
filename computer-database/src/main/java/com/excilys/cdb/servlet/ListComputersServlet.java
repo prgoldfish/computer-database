@@ -48,13 +48,8 @@ public class ListComputersServlet {
          @RequestParam(required = false) String ascendent,
          @RequestParam(required = false, name = "selection") String deleteString) {*/
 
-        model.addAttribute("params", params);
         OrderByColumn orderColumn = OrderByColumn.getEnum(params.getOrder());
         boolean ascendentOrder = params.getAscendent() == null || !params.getAscendent().equals("desc");
-
-        if (params.getHeaderMessage() != null) {
-            model.addAttribute("headerMessage", params.getHeaderMessage());
-        }
 
         if (params.getSelection() != null) {
             int deletedCount = 0;
@@ -67,7 +62,7 @@ public class ListComputersServlet {
                     logger.error(exc.getMessage());
                 }
             }
-            model.addAttribute("headerMessage", deletedCount + " computer(s) deleted");
+            params.setHeaderMessage(deletedCount + " computer(s) deleted");
         }
         int intPage = 1;
         int intLength = 10;
@@ -112,15 +107,17 @@ public class ListComputersServlet {
         long lastPageNum = Math.min(pages.getCurrentPage() + 2, pages.getMaxPage());
         intPage = pages.getCurrentPage();
 
+        model.addAttribute("params", params);
+
         model.addAttribute("dtolist", dtoList);
         model.addAttribute("dtosize", computerCount);
-        model.addAttribute("search", search);
-        model.addAttribute("length", length);
-        model.addAttribute("page", page);
+        //model.addAttribute("search", params.getSearch());
+        //model.addAttribute("length", params.getLength());
+        //model.addAttribute("page", params.getPage());
         model.addAttribute("firstPageNum", firstPageNum);
         model.addAttribute("lastPageNum", lastPageNum);
-        model.addAttribute("order", order);
-        model.addAttribute("ascendent", ascendent);
+        //model.addAttribute("order", params.getOrder());
+        //model.addAttribute("ascendent", params.getAscendent());
 
         return "dashboard";
     }

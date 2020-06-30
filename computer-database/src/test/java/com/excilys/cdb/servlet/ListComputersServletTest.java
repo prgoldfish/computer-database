@@ -23,6 +23,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.ui.ModelMap;
 
 import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.dto.DashboardDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.OrderByColumn;
@@ -43,20 +44,23 @@ public class ListComputersServletTest {
     ModelMap attributeList;
     static Map<String, Class<?>> expectedTypesAttributes = initExpectedTypes();
 
+    DashboardDTO params;
+
     @Before
     public void setUp() throws Exception {
         expectedAttributes = new HashMap<String, Object>();
         attributeList = new ModelMap();
+        params = new DashboardDTO();
     }
 
     @Test
     public void ListComputersDefaultParametersTest() throws ComputerServiceException {
-        assertEquals(servlet.dashboard(attributeList, 1, 10, null, null, null, null, null), "dashboard");
+        DashboardDTO expected = new DashboardDTO();
+        assertEquals(servlet.dashboard(attributeList, params), "dashboard");
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
-        expectedAttributes.put("length", 10);
-        expectedAttributes.put("page", 1);
+        expectedAttributes.put("params", expected);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 1L);
         assertAttributeList();
@@ -69,21 +73,21 @@ public class ListComputersServletTest {
 
         for (String orderBy : orderBys) {
             for (String ascendent : ascendentOrders) {
+                DashboardDTO expected = new DashboardDTO();
+                params.setOrder(orderBy);
+                params.setAscendent(ascendent);
                 attributeList.clear();
-                servlet.dashboard(attributeList, 1, 10, null, null, orderBy, ascendent, null);
+                servlet.dashboard(attributeList, params);
                 verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.getEnum(orderBy),
                         !ascendent.equals("desc"));
                 expectedAttributes.clear();
                 expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
                 expectedAttributes.put("dtosize", 0);
-                expectedAttributes.put("length", 10);
-                expectedAttributes.put("page", 1);
                 expectedAttributes.put("firstPageNum", 1L);
                 expectedAttributes.put("lastPageNum", 1L);
-                expectedAttributes.put("order", orderBy);
-                if (ascendent.equals("desc")) {
-                    expectedAttributes.put("ascendent", ascendent);
-                }
+                expected.setOrder(orderBy);
+                expected.setAscendent(ascendent);
+                expectedAttributes.put("params", expected);
                 assertAttributeList();
             }
         }
@@ -91,34 +95,40 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersUnknownOrderByParameterTest() throws ServletException, IOException, ComputerServiceException {
-        servlet.dashboard(attributeList, 1, 10, null, null, "unknown", null, null);
+        params.setOrder("unknown");
+        DashboardDTO expected = new DashboardDTO();
+        expected.setOrder("unknown");
+        servlet.dashboard(attributeList, params);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
-        expectedAttributes.put("length", 10);
-        expectedAttributes.put("page", 1);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 1L);
-        expectedAttributes.put("order", "unknown");
+        expectedAttributes.put("params", expected);
         assertAttributeList();
     }
 
     @Test
     public void ListComputersUnknownAscendentParameterTest() throws ServletException, IOException, ComputerServiceException {
-        servlet.dashboard(attributeList, 1, 10, null, null, null, "unknown", null);
+        params.setAscendent("unknown");
+        DashboardDTO expected = new DashboardDTO();
+        expected.setAscendent("unknown");
+        servlet.dashboard(attributeList, params);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
-        expectedAttributes.put("length", 10);
-        expectedAttributes.put("page", 1);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 1L);
-        expectedAttributes.put("ascendent", "unknown");
+        expectedAttributes.put("params", expected);
         assertAttributeList();
     }
 
     @Test
     public void ListComputersPageLengthParameterTest() throws ServletException, IOException, ComputerServiceException {
+        params.setLength("50");
+        DashboardDTO expected = new DashboardDTO();
+        expected.setLength("50");
+
         List<Computer> answerList = new ArrayList<>();
         List<ComputerDTO> expectedList = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
@@ -127,18 +137,21 @@ public class ListComputersServletTest {
         }
         when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
-        servlet.dashboard(attributeList, 1, 50, null, null, null, null, null);
+        servlet.dashboard(attributeList, params);
         expectedAttributes.put("dtolist", expectedList.subList(0, 50));
         expectedAttributes.put("dtosize", 1000);
-        expectedAttributes.put("length", 50);
-        expectedAttributes.put("page", 1);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 3L);
+        expectedAttributes.put("params", expected);
         assertAttributeList();
     }
 
     @Test
     public void ListComputersPageParameterTest() throws ServletException, IOException, ComputerServiceException {
+        params.setPage("3");
+        DashboardDTO expected = new DashboardDTO();
+        expected.setPage("3");
+
         List<Computer> answerList = new ArrayList<>();
         List<ComputerDTO> expectedList = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
@@ -147,11 +160,10 @@ public class ListComputersServletTest {
         }
         when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
-        servlet.dashboard(attributeList, 3, 10, null, null, null, null, null);
+        servlet.dashboard(attributeList, params);
         expectedAttributes.put("dtolist", expectedList.subList(20, 30));
         expectedAttributes.put("dtosize", 1000);
-        expectedAttributes.put("length", 10);
-        expectedAttributes.put("page", 3);
+        expectedAttributes.put("params", expected);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 5L);
         assertAttributeList();
@@ -159,13 +171,15 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersSearchParameterTest() throws ServletException, IOException, ComputerServiceException {
-        servlet.dashboard(attributeList, 1, 10, "Nin", null, null, null, null);
+        params.setSearch("Nin");
+        DashboardDTO expected = new DashboardDTO();
+        expected.setSearch("Nin");
+
+        servlet.dashboard(attributeList, params);
         verify(mockService).searchComputersByName("Nin", OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
-        expectedAttributes.put("length", 10);
-        expectedAttributes.put("page", 1);
-        expectedAttributes.put("search", "Nin");
+        expectedAttributes.put("params", expected);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 1L);
         assertAttributeList();
@@ -173,29 +187,34 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersHeaderMessageParameterTest() throws ServletException, IOException, ComputerServiceException {
-        servlet.dashboard(attributeList, 1, 10, null, "test", null, null, null);
+        params.setHeaderMessage("Test");
+        DashboardDTO expected = new DashboardDTO();
+        expected.setHeaderMessage("Test");
+
+        servlet.dashboard(attributeList, params);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
-        expectedAttributes.put("length", 10);
-        expectedAttributes.put("page", 1);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 1L);
-        expectedAttributes.put("headerMessage", "test");
+        expectedAttributes.put("params", expected);
         assertAttributeList();
     }
 
     @Test
     public void ListComputersDeleteTest() throws ComputerServiceException, ServletException, IOException {
-        servlet.dashboard(attributeList, 1, 10, null, null, null, null, "1,2,3");
+        params.setSelection("1,2,3");
+        DashboardDTO expected = new DashboardDTO();
+        expected.setSelection("1,2,3");
+
+        servlet.dashboard(attributeList, params);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         verify(mockService).deleteComputer(1);
         verify(mockService).deleteComputer(2);
         verify(mockService).deleteComputer(3);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
-        expectedAttributes.put("length", 10);
-        expectedAttributes.put("page", 1);
+        expectedAttributes.put("params", expected);
         expectedAttributes.put("firstPageNum", 1L);
         expectedAttributes.put("lastPageNum", 1L);
 
@@ -214,16 +233,10 @@ public class ListComputersServletTest {
         HashMap<String, Class<?>> types = new HashMap<String, Class<?>>();
         types.put("dtolist", ArrayList.class);
         types.put("dtosize", Integer.class);
-        types.put("search", String.class);
-        types.put("length", Integer.class);
-        types.put("page", Integer.class);
         types.put("firstPageNum", Long.class);
         types.put("lastPageNum", Long.class);
-        types.put("order", String.class);
-        types.put("ascendent", String.class);
-        types.put("headerMessage", String.class);
+        types.put("params", DashboardDTO.class);
         return types;
 
     }
-
 }

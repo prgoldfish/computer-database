@@ -1,6 +1,7 @@
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>  
+<%@ taglib prefix = "fn" uri = "http://java.sun.com/jsp/jstl/functions" %>  
+<%@ taglib prefix = "form" uri = "http://www.springframework.org/tags/form" %>
 
 <!DOCTYPE html>
 <html>
@@ -27,7 +28,7 @@
         <div class="container">
         <c:if test="${ fn:length(headerMessage) > 0 }">
            <div class="alert alert-danger">
-              <c:out value="${ headerMessage }"></c:out> <br/>
+              <c:out value="${ params.headerMessage }"></c:out> <br/>
           </div>
         </c:if>
             <h1 id="homeTitle">
@@ -35,12 +36,12 @@
             </h1>
             <div id="actions" class="form-horizontal">
                 <div class="pull-left">
-                    <form id="searchForm" action="#" method="GET" class="form-inline">
+                    <form:form modelAttribute="params" id="searchForm" action="#" method="GET" class="form-inline">
 
-                        <input type="search" id="searchbox" name="search" class="form-control" placeholder="Search name" value="${ search }" />
+                        <form:input type="search" path="search" id="searchbox" name="search" class="form-control" placeholder="Search name" value="${ params.search }" />
                         <input type="submit" id="searchsubmit" value="Filter by name" class="btn btn-primary" />
-                        <input type="hidden" name="length" value="${ length }">
-                    </form>
+                        <form:input type="hidden" path="length" name="length" value="${ params.length }"/>
+                    </form:form>
                 </div>
                 <div class="pull-right">
                     <a class="btn btn-success" id="addComputer" href="AddComputer">Add Computer</a> 
@@ -49,27 +50,27 @@
             </div>
         </div>
 
-        <form id="deleteForm" action="#" method="POST">
-            <input type="hidden" name="selection" value="">
-            <input type="hidden" name="order" value="${ order }">
-            <input type="hidden" name="ascendent" value="${ ascendent }">
-        </form>
+        <form:form modelAttribute="params" id="deleteForm" action="#" method="POST">
+            <form:input type="hidden" path="selection" name="selection" value=""/>
+            <form:input type="hidden" path="order" name="order" value="${ params.order }"/>
+            <form:input type="hidden" path="ascendent" name="ascendent" value="${ params.ascendent }"/>
+        </form:form>
         
 
-        <form id="pageForm" action="#" method="GET">
-            <input type="hidden" name="page" value="">
-            <input type="hidden" name="length" value="${ length }">
-            <input type="hidden" name="search" value="${ search }">
-            <input type="hidden" id="orderParameter" name="order" value="${ order }">
-            <input type="hidden" id="ascendentParameter" name="ascendent" value="${ ascendent }">
-        </form>
+        <form:form modelAttribute="params" id="pageForm" action="#" method="GET">
+            <form:input type="hidden" path="page" name="page" value=""/>
+            <form:input type="hidden" path="length" name="length" value="${ params.length }"/>
+            <form:input type="hidden" path="search" name="search" value="${ params.search }"/>
+            <form:input type="hidden" path="order" id="orderParameter" name="order" value="${ params.order }"/>
+            <form:input type="hidden" path="ascendent" id="ascendentParameter" name="ascendent" value="${ params.ascendent }"/>
+        </form:form>
         
-        <form id="orderForm" action="#" method="GET">
-            <input type="hidden" name="length" value="${ length }">
-            <input type="hidden" name="search" value="${ search }">
-            <input type="hidden" name="order" value="">
-            <input type="hidden" name="ascendent" value="">
-        </form>
+        <form:form modelAttribute="params" id="orderForm" action="#" method="GET">
+            <form:input type="hidden" path="length" name="length" value="${ params.length }"/>
+            <form:input type="hidden" path="search" name="search" value="${ params.search }"/>
+            <form:input type="hidden" path="order" name="order" value=""/>
+            <form:input type="hidden" path="" name="ascendent" value=""/>
+        </form:form>
 
         <div class="container" style="margin-top: 10px;">
             <table class="table table-striped table-bordered">
@@ -130,7 +131,7 @@
     <footer class="navbar-fixed-bottom">
         <div class="container text-center">
             <ul class="pagination">
-                <c:if test="${ page != firstPageNum }">
+                <c:if test="${ params.page != firstPageNum }">
                     <li>
 	                    <a href="#" aria-label="Previous" onclick="$.fn.goToPage(${ 1 });">
 	                      <span aria-hidden="true">&laquo;</span>
@@ -139,28 +140,28 @@
                 </c:if>
 				<c:forEach begin="${ firstPageNum }" end="${ lastPageNum }" var="i">
 				    
-				    <li><a href="#" <c:if test="${ page == i }"><c:out value="class=currentPage"></c:out></c:if>
+				    <li><a href="#" <c:if test="${ params.page == i }"><c:out value="class=currentPage"></c:out></c:if>
 				            onclick="$.fn.goToPage(${ i });">
 				        <c:out value="${ i }"></c:out>
 				    </a></li>
 				</c:forEach>
-				<c:if test="${ page != lastPageNum }">
+				<c:if test="${ params.page != lastPageNum }">
 					<li>
-		                <a href="#" aria-label="Next" onclick="$.fn.goToPage(${ Math.floor((dtosize - 1) / length) + 1 });">
+		                <a href="#" aria-label="Next" onclick="$.fn.goToPage(${ Math.floor((dtosize - 1) / params.length) + 1 });">
 		                    <span aria-hidden="true">&raquo;</span>
 		                </a>
 		            </li>
                 </c:if>
 	        </ul>
 	        <div class="btn-group btn-group-sm pull-right" role="group" >
-				<form action="#" method="get">
-					<button type="submit" class="btn btn-default" value="10" name="length">10</button>
-					<button type="submit" class="btn btn-default" value="50" name="length">50</button>
-					<button type="submit" class="btn btn-default" value="100" name="length">100</button>
-					<input type="hidden" name="search" value="${ search }">
-		            <input type="hidden" name="order" value="${ order }">
-		            <input type="hidden" name="ascendent" value="${ ascendent }">
-				</form>
+				<form:form modelAttribute="params" action="#" method="get">
+					<form:input type="submit" class="btn btn-default" value="10" path="length" name="length"/>
+					<form:input type="submit" class="btn btn-default" value="50" path="length" name="length"/>
+					<form:input type="submit" class="btn btn-default" value="100" path="length" name="length"/>
+					<form:input type="hidden" path="search" name="search" value="${ params.search }"/>
+		            <form:input type="hidden" path="order" name="order" value="${ params.order }"/>
+		            <form:input type="hidden" path="ascendent" name="ascendent" value="${ params.ascendent }"/>
+				</form:form>
 	        </div>
         </div>
     </footer>
