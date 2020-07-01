@@ -2,6 +2,7 @@ package com.excilys.cdb.servlet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -9,6 +10,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -43,6 +45,9 @@ public class EditComputerServlet {
     private CompanyService companyService;
     @Autowired
     ComputerDTOValidator computerValidator;
+
+    @Autowired
+    MessageSource messageSource;
 
     @ModelAttribute
     public void getCompanyDTO(ModelMap model, @RequestParam(required = false) Long companyId) {
@@ -88,7 +93,7 @@ public class EditComputerServlet {
 
     @PostMapping
     public String editComputer(ModelMap model, @Valid ComputerBuilderDTO builder,
-            @RequestParam(name = "companyId") long companyId, BindingResult br) {
+            @RequestParam(name = "companyId") long companyId, BindingResult br, Locale loc) {
 
         List<String> errorMessages = new ArrayList<>();
         if (Long.valueOf(builder.getId()) <= 0) {
@@ -119,7 +124,9 @@ public class EditComputerServlet {
         if (errorMessages.isEmpty()) {
             try {
                 computerService.updateComputer(com);
-                model.addAttribute("headerMessage", "The computer has successfully been edited");
+                String message = messageSource.getMessage("header.message.edited", null,
+                        "The computer has successfully been edited", loc);
+                model.addAttribute("headerMessage", message);
             } catch (ComputerServiceException cse) {
                 errorMessages.add(cse.getMessage());
             }

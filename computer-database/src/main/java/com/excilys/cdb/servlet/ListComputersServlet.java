@@ -1,6 +1,7 @@
 package com.excilys.cdb.servlet;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -8,6 +9,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +35,9 @@ public class ListComputersServlet {
     @Autowired
     private ComputerService computerService;
 
+    @Autowired
+    MessageSource messageSource;
+
     @ModelAttribute
     public void defaultParams(ModelMap model) {
         if (model.getAttribute("params") == null) {
@@ -41,7 +46,7 @@ public class ListComputersServlet {
     }
 
     @RequestMapping(method = { RequestMethod.POST, RequestMethod.GET })
-    public String dashboard(ModelMap model, @Valid DashboardDTO params) {
+    public String dashboard(ModelMap model, @Valid DashboardDTO params, Locale loc) {
         /*@RequestParam(defaultValue = "1") int page,
          @RequestParam(defaultValue = "10") int length, @RequestParam(required = false) String search,
          @RequestParam(required = false) String headerMessage, @RequestParam(required = false) String order,
@@ -62,7 +67,9 @@ public class ListComputersServlet {
                     logger.error(exc.getMessage());
                 }
             }
-            params.setHeaderMessage(deletedCount + " computer(s) deleted");
+
+            String message = messageSource.getMessage("header.message.deleted", null, "computer(s) deleted", loc);
+            params.setHeaderMessage(deletedCount + " " + message);
         }
         int intPage = 1;
         int intLength = 10;

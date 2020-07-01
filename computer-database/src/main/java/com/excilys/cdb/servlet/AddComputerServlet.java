@@ -2,11 +2,13 @@ package com.excilys.cdb.servlet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -40,6 +42,9 @@ public class AddComputerServlet {
     CompanyService companyService;
 
     @Autowired
+    MessageSource messageSource;
+
+    @Autowired
     ComputerDTOValidator computerValidator;
 
     @ModelAttribute
@@ -70,7 +75,7 @@ public class AddComputerServlet {
 
     @RequestMapping(method = RequestMethod.POST)
     public String addComputer(ModelMap model, @Valid ComputerBuilderDTO builder, @RequestParam String companyId,
-            BindingResult br) {
+            BindingResult br, Locale loc) {
 
         String jspRet = getCompaniesList(model);
         List<String> errorMessages = new ArrayList<>();
@@ -100,7 +105,9 @@ public class AddComputerServlet {
         if (errorMessages.isEmpty()) {
             try {
                 computerService.addNewComputer(com);
-                model.addAttribute("headerMessage", "The computer has successfully been added to the database");
+                String message = messageSource.getMessage("header.message.added", null,
+                        "The computer has successfully been added to the database", loc);
+                model.addAttribute("headerMessage", message);
             } catch (ComputerServiceException cse) {
                 errorMessages.add(cse.getMessage());
             }

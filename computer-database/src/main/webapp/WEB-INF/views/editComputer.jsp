@@ -1,6 +1,7 @@
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>  
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,13 +13,30 @@
 	<link href="./css/main.css" rel="stylesheet" media="screen">
 	<script type="text/javascript" src="./js/jquery.min.js"></script>
 	<script type="text/javascript" src="./js/addComputer.js"></script>
+    <script src="./js/common.js"></script>
 </head>
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
+        <form id="langForm" action="#" method="GET">
+            <input type="hidden" name="id" value="${ id }"/>
+            <input type="hidden" name="lang" value=""/>
+        </form>
         <div class="container">
-            <a class="navbar-brand" href="ListComputers"> Application - Computer Database </a>
+            <a class="navbar-brand" href="ListComputers"><spring:message code="header.name"/> </a>
+            <div class="rightContainer">
+                <a href="#" onclick="setLang(&quot;fr&quot;)"><img alt="French/Français" src="./images/french.png" height="32"></a>
+                <a href="#" onclick="setLang(&quot;en&quot;)"><img alt="English/Anglais" src="./images/english.png" height="32"></a>
+            </div>
         </div>
     </header>
+    
+    <script type="text/javascript">
+        let strings = new Array();
+        strings['js.computer.name.empty'] = "<spring:message code='js.computer.name.empty' javaScriptEscape='true' />";
+        strings['js.date.discont.without.intro'] = "<spring:message code='js.date.discont.without.intro' javaScriptEscape='true' />";
+        strings['js.date.discont.before.intro'] = "<spring:message code='js.date.discont.before.intro' javaScriptEscape='true' />";
+        strings['js.fields.invalid'] = "<spring:message code='js.date.discont.before.intro' javaScriptEscape='true' />";
+    </script>
     
     <c:if test="${ fn:length(headerMessage) > 0 }">
         <form id="editedForm" action="ListComputers" method="POST">
@@ -36,13 +54,13 @@
                     <div class="label label-default pull-right">
                         id: <c:out value="${ id }"></c:out>
                     </div>
-                    <h1>Edit Computer</h1>
+                    <h1><spring:message code="editComputer.title"/></h1>
 
                     <form:form modelAttribute="computerDto" id="editComputer" action="EditComputer" method="POST">
                         <form:input type="hidden" path="id" value="${ id }" name="id" id="id"/>
                         <fieldset>
                             <div class="form-group">
-                                <form:label path="nom" for="computerName">Computer name</form:label>
+                                <form:label path="nom" for="computerName"><spring:message code="computerName"/></form:label>
                                 <div id="errGroup">
                                     <form:input type="text" class="form-control" id="computerName" path="nom" name="computerName" value="${ computerName }" placeholder="Computer name"/>
                                     <div class="addErrText" id="cnErr"></div>
@@ -50,21 +68,21 @@
                                 
                             </div>
                             <div class="form-group">
-                                <form:label path="dateIntroduction"  for="introduced">Introduced date</form:label>
+                                <form:label path="dateIntroduction"  for="introduced"><spring:message code="date.introduced"/></form:label>
                                 <div id="errGroup">
                                     <form:input type="date" class="form-control" id="introduced" path="dateIntroduction" nam="introduced" value="${ dateIntro }" placeholder="Introduced date"/>
                                     <div class="addErrText" id="introErr"></div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <form:label path="dateDiscontinuation" for="discontinued">Discontinued date</form:label>
+                                <form:label path="dateDiscontinuation" for="discontinued"><spring:message code="date.discontinued"/></form:label>
                                 <div id="errGroup">
                                     <form:input type="date" class="form-control" id="discontinued" path="dateDiscontinuation" name="discontinued" value="${ dateDiscont }" placeholder="Discontinued date"/>
                                     <div class="addErrText" id="discontErr"></div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="companyId">Company</label>
+                                <label for="companyId"><spring:message code="company"/></label>
                                 <select class="form-control" id="companyId" name="companyId" >
                                     <option value="0">--</option>
                                     <c:forEach var="company" items="${ companies }">
@@ -74,9 +92,9 @@
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
-                            <button type="button" onclick="checkInputs(&quot;editComputer&quot;)" class="btn btn-primary">Edit</button>
-                            or
-                            <a href="ListComputers" class="btn btn-default">Cancel</a>
+                            <button type="button" onclick="checkInputs(&quot;editComputer&quot;)" class="btn btn-primary"><spring:message code="edit"/></button>
+                            <spring:message code="or"/>
+                            <a href="ListComputers" class="btn btn-default"><spring:message code="cancel"/></a>
                         </div> 
                     </form:form>
                 </div>

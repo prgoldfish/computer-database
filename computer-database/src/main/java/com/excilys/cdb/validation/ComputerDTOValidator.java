@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
@@ -25,7 +25,7 @@ public class ComputerDTOValidator implements Validator {
     CompanyDTOValidator companyDtoValidator;
 
     @Autowired
-    ReloadableResourceBundleMessageSource messageSources;
+    MessageSource messageSources;
 
     private List<String> errorList = new ArrayList<>();
 

@@ -9,9 +9,8 @@ $(function() {
 		if($(this).val() == "")
 		{
 			this.style.borderColor = "red";
-			errMsg.text("The computer's name cannot be empty");
+			errMsg.text(strings['js.computer.name.empty']);
 			errMsg.slideDown();
-			console.log("Hey");
 		}
 		else
 		{
@@ -24,7 +23,6 @@ $(function() {
 		if($(this).val() > 0)
 		{
 			this.style.borderColor = "green";
-			console.log("Hey");
 		}
 		else
 		{
@@ -55,8 +53,8 @@ let checkDates = function() {
 	{
 		introduced.style.borderColor = "red";
 		discontinued.style.borderColor = "red";
-		introErr.text("An introduction date is needed if a discontinuation date is set");
-		discontErr.text("An introduction date is needed if a discontinuation date is set");
+		introErr.text(strings['js.date.discont.without.intro']);
+		discontErr.text(strings['js.date.discont.without.intro']);
 		errText.slideDown();
 		console.log("Hey");
 	}
@@ -64,8 +62,8 @@ let checkDates = function() {
 	{
 		introduced.style.borderColor = "red";
 		discontinued.style.borderColor = "red";
-		introErr.text("The discontinuation date is before the introduction date");
-		discontErr.text("The discontinuation date is before the introduction date");
+		introErr.text(strings['js.date.discont.before.intro']);
+		discontErr.text(strings['js.date.discont.before.intro']);
 		errText.slideDown();
 	}
 	else

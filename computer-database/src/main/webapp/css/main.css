@@ -49,6 +49,15 @@ input[type='checkbox'] {
     border-radius: 4px;
 }
 
+.rightContainer
+{
+	float: right;
+	height: 50px;
+	padding-top: 1%;
+	padding-bottom:1%;
+	line-height: 20px;
+}
+
 
 
 

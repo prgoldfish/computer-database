@@ -59,7 +59,6 @@ $(function() {
     	$("#orderForm input[name=order]").val(orderParameter);
     	$("#orderForm input[name=ascendent]").val(ascendent);
     	$("#orderForm").submit();
-    	console.log("Coucou");
     	
     });
 
@@ -88,11 +87,11 @@ $(function() {
     $.fn.toggleEditMode = function() {
         if($(".editMode").is(":visible")) {
             $(".editMode").hide();
-            $("#editComputer").text("Edit");
+            $("#editComputer").text(strings['js.computer.edit']);
         }
         else {
             $(".editMode").show();
-            $("#editComputer").text("View");
+            $("#editComputer").text(strings['js.computer.view']);
         }
         return this;
     };
@@ -103,7 +102,7 @@ $(function() {
 //Function delete selected: Asks for confirmation to delete selected computers, then submits it to the deleteForm
 (function ( $ ) {
  $.fn.deleteSelected = function() {
-     if (confirm("Are you sure you want to delete the selected computers?")) { 
+     if (confirm(strings['js.computer.delete.confirmation'])) { 
          $('#deleteForm input[name=selection]').setCheckboxValues('selection','cb');
          $('#deleteForm').submit();
      }

@@ -8,18 +8,18 @@
     <link href=<spring:url value="/css/bootstrap.min.css"/> rel="stylesheet" media="screen">
     <link href=<spring:url value="/css/font-awesome.css"/> rel="stylesheet" media="screen">
     <link href=<spring:url value="/css/main.css"/> rel="stylesheet" media="screen">
-</head>
+</head> 
 <body>
-	<header class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
-			<a class="navbar-brand" href=<spring:url value="/ListComputers"/>> Application - Computer Database </a>
-		</div>
-	</header>
+    <header class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href=<spring:url value="/ListComputers"/>> <spring:message code="header.name"/></a>
+        </div>
+    </header>
 
 	<section id="main">
 		<div class="container">
 			<div class="alert alert-danger">
-				Error 403: Access denied!
+			     <spring:message code="403.message"/>
 				<br/>
 				<!-- stacktrace -->
 			</div>

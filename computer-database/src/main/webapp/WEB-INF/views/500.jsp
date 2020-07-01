@@ -12,14 +12,14 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href=<spring:url value="/ListComputers"/>> Application - Computer Database </a>
+			<a class="navbar-brand" href=<spring:url value="/ListComputers"/>> <spring:message code="header.name"/></a>
 		</div>
 	</header>
 
 	<section id="main">
 		<div class="container">	
 			<div class="alert alert-danger">
-				Error 500: An error has occured!
+                 <spring:message code="500.message"/>
 				<br/>
 				<!-- stacktrace -->
 			</div>

@@ -81,7 +81,7 @@ public class AddComputerServletTest {
         driver.findElement(By.id("computerName")).sendKeys("Nothing");
         driver.findElement(By.id("computerName")).clear();
         assert (driver.findElement(By.id("cnErr")).isDisplayed());
-        assertEquals("The computer's name cannot be empty", driver.findElement(By.id("cnErr")).getText());
+        assertEquals("Le nom de l'ordinateur doit être renseigné", driver.findElement(By.id("cnErr")).getText());
     }
 
     @Test
@@ -92,13 +92,13 @@ public class AddComputerServletTest {
         driver.findElement(By.id("introduced")).click();
         driver.findElement(By.id("introduced")).sendKeys("2020-06-20");
         assert (driver.findElement(By.id("introErr")).isDisplayed());
-        assertEquals("The discontinuation date is before the introduction date",
+        assertEquals("La date de discontinuation est avant la date d'introduction",
                 driver.findElement(By.id("introErr")).getText());
 
         driver.findElement(By.id("introduced")).click();
         driver.findElement(By.id("introduced")).clear();
         assert (driver.findElement(By.id("introErr")).isDisplayed());
-        assertEquals("An introduction date is needed if a discontinuation date is set",
+        assertEquals("Une date d'introduction est requise si une date de discontinuation est présente",
                 driver.findElement(By.id("introErr")).getText());
 
         driver.findElement(By.id("introduced")).click();
@@ -114,7 +114,7 @@ public class AddComputerServletTest {
         driver.findElement(By.id("discontinued")).click();
         driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
         assert (driver.findElement(By.id("discontErr")).isDisplayed());
-        assertEquals("An introduction date is needed if a discontinuation date is set",
+        assertEquals("Une date d'introduction est requise si une date de discontinuation est présente",
                 driver.findElement(By.id("discontErr")).getText());
 
         driver.findElement(By.id("discontinued")).clear();
@@ -125,7 +125,7 @@ public class AddComputerServletTest {
         new WebDriverWait(driver, Duration.ofSeconds(2))
                 .until(driver -> driver.findElement(By.id("discontErr")).isDisplayed());
         assert (driver.findElement(By.id("discontErr")).isDisplayed());
-        assertEquals("The discontinuation date is before the introduction date",
+        assertEquals("La date de discontinuation est avant la date d'introduction",
                 driver.findElement(By.id("discontErr")).getText());
 
         driver.findElement(By.id("introduced")).click();

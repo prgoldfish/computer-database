@@ -1,6 +1,9 @@
 package com.excilys.cdb.servlet;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -20,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.context.MessageSource;
 import org.springframework.ui.ModelMap;
 
 import com.excilys.cdb.dto.ComputerDTO;
@@ -37,6 +42,9 @@ public class ListComputersServletTest {
     @Mock
     ComputerService mockService;
 
+    @Mock
+    MessageSource messageSource;
+
     @InjectMocks
     ListComputersServlet servlet;
 
@@ -46,17 +54,20 @@ public class ListComputersServletTest {
 
     DashboardDTO params;
 
+    Locale loc;
+
     @Before
     public void setUp() throws Exception {
         expectedAttributes = new HashMap<String, Object>();
         attributeList = new ModelMap();
         params = new DashboardDTO();
+        loc = Locale.ROOT;
     }
 
     @Test
     public void ListComputersDefaultParametersTest() throws ComputerServiceException {
         DashboardDTO expected = new DashboardDTO();
-        assertEquals(servlet.dashboard(attributeList, params), "dashboard");
+        assertEquals(servlet.dashboard(attributeList, params, loc), "dashboard");
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -77,7 +88,7 @@ public class ListComputersServletTest {
                 params.setOrder(orderBy);
                 params.setAscendent(ascendent);
                 attributeList.clear();
-                servlet.dashboard(attributeList, params);
+                servlet.dashboard(attributeList, params, loc);
                 verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.getEnum(orderBy),
                         !ascendent.equals("desc"));
                 expectedAttributes.clear();
@@ -98,7 +109,7 @@ public class ListComputersServletTest {
         params.setOrder("unknown");
         DashboardDTO expected = new DashboardDTO();
         expected.setOrder("unknown");
-        servlet.dashboard(attributeList, params);
+        servlet.dashboard(attributeList, params, loc);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -113,7 +124,7 @@ public class ListComputersServletTest {
         params.setAscendent("unknown");
         DashboardDTO expected = new DashboardDTO();
         expected.setAscendent("unknown");
-        servlet.dashboard(attributeList, params);
+        servlet.dashboard(attributeList, params, loc);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -137,7 +148,7 @@ public class ListComputersServletTest {
         }
         when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
-        servlet.dashboard(attributeList, params);
+        servlet.dashboard(attributeList, params, loc);
         expectedAttributes.put("dtolist", expectedList.subList(0, 50));
         expectedAttributes.put("dtosize", 1000);
         expectedAttributes.put("firstPageNum", 1L);
@@ -160,7 +171,7 @@ public class ListComputersServletTest {
         }
         when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
-        servlet.dashboard(attributeList, params);
+        servlet.dashboard(attributeList, params, loc);
         expectedAttributes.put("dtolist", expectedList.subList(20, 30));
         expectedAttributes.put("dtosize", 1000);
         expectedAttributes.put("params", expected);
@@ -175,7 +186,7 @@ public class ListComputersServletTest {
         DashboardDTO expected = new DashboardDTO();
         expected.setSearch("Nin");
 
-        servlet.dashboard(attributeList, params);
+        servlet.dashboard(attributeList, params, loc);
         verify(mockService).searchComputersByName("Nin", OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -191,7 +202,7 @@ public class ListComputersServletTest {
         DashboardDTO expected = new DashboardDTO();
         expected.setHeaderMessage("Test");
 
-        servlet.dashboard(attributeList, params);
+        servlet.dashboard(attributeList, params, loc);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
@@ -203,11 +214,14 @@ public class ListComputersServletTest {
 
     @Test
     public void ListComputersDeleteTest() throws ComputerServiceException, ServletException, IOException {
+        when(messageSource.getMessage(anyString(), isNull(), anyString(), any(Locale.class)))
+                .thenReturn("ordinateur(s) supprimés");
         params.setSelection("1,2,3");
         DashboardDTO expected = new DashboardDTO();
         expected.setSelection("1,2,3");
+        expected.setHeaderMessage("3 ordinateur(s) supprimés");
 
-        servlet.dashboard(attributeList, params);
+        servlet.dashboard(attributeList, params, loc);
         verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         verify(mockService).deleteComputer(1);
         verify(mockService).deleteComputer(2);
