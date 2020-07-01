@@ -135,8 +135,8 @@ public class ComputerServiceTest {
             long comp2 = c2.getEntreprise() == null ? 0 : c2.getEntreprise().getId();
             retValue = (int) (comp1 - comp2);
         case COMPANYNAME:
-            String compName1 = c1.getEntreprise() == null ? "" : c1.getEntreprise().getNom();
-            String compName2 = c2.getEntreprise() == null ? "" : c2.getEntreprise().getNom();
+            String compName1 = c1.getEntreprise() == null ? "" : c1.getEntreprise().getName();
+            String compName2 = c2.getEntreprise() == null ? "" : c2.getEntreprise().getName();
             retValue = compName1.compareTo(compName2);
         case COMPUTERDISCONT:
             LocalDateTime dateDiscont1 = c1.getDateDiscontinuation() == null ? LocalDateTime.MIN

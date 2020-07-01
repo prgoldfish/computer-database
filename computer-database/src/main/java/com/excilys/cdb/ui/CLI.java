@@ -66,7 +66,7 @@ public class CLI {
         Company entreprise = c.getEntreprise();
         String introString = intro == null ? "Indefini" : intro.toString();
         String discontString = discont == null ? "Indéfini" : discont.toString();
-        String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getNom();
+        String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getName();
         outString.append("| ").append(c.getId());
         outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
         outString.append("| ").append(String.format("%1$-20s", introString));

@@ -6,7 +6,7 @@
 
   <groupId>com.excilys</groupId>
   <artifactId>computer-database</artifactId>
-  <version>5.0</version>
+  <version>5.1-SNAPSHOT1</version>
   <packaging>war</packaging>
 
   <name>computer-database Maven Webapp</name>
@@ -25,6 +25,8 @@
     <selenium.version>4.0.0-alpha-6</selenium.version>
     <spring.version>5.2.7.RELEASE</spring.version>
     <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
+    <hibernate-core.version>5.4.18.Final</hibernate-core.version>
+    <openjpa.version>3.1.1</openjpa.version>
   </properties>
 
   <dependencies>
@@ -105,7 +107,12 @@
 	    <groupId>org.hibernate.validator</groupId>  
 	    <artifactId>hibernate-validator</artifactId>  
 	    <version>${hibernate-validator.version}</version>  
-	</dependency>  
+	</dependency>
+	<dependency>
+        <groupId>org.apache.openjpa</groupId>
+        <artifactId>openjpa</artifactId>
+        <version>${openjpa.version}</version>
+    </dependency>
 </dependencies>
 
   <build>
@@ -148,6 +155,25 @@
           <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.openjpa</groupId>
+            <artifactId>openjpa-maven-plugin</artifactId>
+            <version>${openjpa.version}</version>
+            <configuration>
+                <includes>**/entities/*.class</includes>
+                <excludes>**/entities/XML*.class</excludes>
+                <addDefaultConstructor>true</addDefaultConstructor>               
+                <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
+            </configuration>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.openjpa</groupId>
+                    <artifactId>openjpa</artifactId>
+                    <!-- set the version to be the same as the level in your runtime -->
+                    <version>${openjpa.version}</version>
+                </dependency>
+            </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>

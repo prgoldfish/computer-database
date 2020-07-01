@@ -10,7 +10,7 @@ public class CompanyMapper {
         if (c == null) {
             throw new MapperException("Company object is null");
         }
-        return new CompanyDTO(Long.toString(c.getId()), c.getNom());
+        return new CompanyDTO(Long.toString(c.getId()), c.getName());
     }
 
     public static Company fromDTO(CompanyDTO c) throws MapperException {

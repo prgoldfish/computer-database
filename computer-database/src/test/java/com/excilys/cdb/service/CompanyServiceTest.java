@@ -37,7 +37,7 @@ public class CompanyServiceTest {
     private void refreshMockGetCompanyByName() {
         when(dao.getCompanyByName(anyString())).thenReturn(Optional.empty());
         compList.stream()
-                .forEach(company -> when(dao.getCompanyByName(company.getNom())).thenReturn(Optional.of(company)));
+                .forEach(company -> when(dao.getCompanyByName(company.getName())).thenReturn(Optional.of(company)));
     }
 
     private void refreshMockGetCompanyList() {

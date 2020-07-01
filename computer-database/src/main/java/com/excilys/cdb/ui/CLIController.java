@@ -162,7 +162,7 @@ public class CLIController {
         outString.append("|\n");
         for (Company c : compList) {
             outString.append("| ").append(c.getId());
-            outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
+            outString.append("\t| ").append(String.format("%1$-70s", c.getName()));
             outString.append("|\n");
         }
         CLI.printString(outString.toString());

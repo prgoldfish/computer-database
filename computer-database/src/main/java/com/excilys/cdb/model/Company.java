@@ -2,21 +2,37 @@ package com.excilys.cdb.model;
 
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "Company")
 public class Company {
 
-    String nom;
-    long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    @Column(name = "name")
+    private String name;
+
+    public Company() {
+    }
 
     public Company(long id, String name) {
-        this.nom = name;
+        this.name = name;
         this.id = id;
     }
 
     /**
      * @return Renvoie le nom de l'entreprise
      */
-    public String getNom() {
-        return nom;
+    public String getName() {
+        return name;
     }
 
     /**
@@ -28,12 +44,12 @@ public class Company {
 
     @Override
     public String toString() {
-        return nom + "(" + id + ")";
+        return name + "(" + id + ")";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nom);
+        return Objects.hash(id, name);
     }
 
     @Override
@@ -45,7 +61,7 @@ public class Company {
             return false;
         }
         Company other = (Company) obj;
-        return id == other.id && Objects.equals(nom, other.nom);
+        return id == other.id && Objects.equals(name, other.name);
     }
 
 }

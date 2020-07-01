@@ -74,7 +74,7 @@ public class ComputerService {
         addIntroDate(com.getDateIntroduction());
         addEndDate(com.getDateDiscontinuation());
         if (com.getEntreprise() != null) {
-            addCompany(com.getEntreprise().getNom());
+            addCompany(com.getEntreprise().getName());
         }
         addComputerToDB();
     }
