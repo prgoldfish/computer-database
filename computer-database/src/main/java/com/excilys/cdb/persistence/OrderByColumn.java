@@ -2,8 +2,8 @@ package com.excilys.cdb.persistence;
 
 public enum OrderByColumn {
 
-    COMPUTERID("computer.id"), COMPUTERNAME("computer.name"), COMPUTERINTRO("computer.introduced"),
-    COMPUTERDISCONT("computer.discontinued"), COMPANYID("company.id"), COMPANYNAME("company.name");
+    COMPUTERID("id"), COMPUTERNAME("name"), COMPUTERINTRO("introduced"), COMPUTERDISCONT("discontinued"),
+    COMPANYID("company_id"), COMPANYNAME("company.name");
 
     private String columnName;
 

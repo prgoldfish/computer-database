@@ -18,12 +18,12 @@ public class ComputerMapper {
         if (c == null) {
             throw new MapperException("Computer object is null");
         }
-        ComputerBuilderDTO dto = new ComputerDTO.ComputerBuilderDTO(Long.toString(c.getId()), c.getNom());
-        if (c.getDateIntroduction() != null) {
-            dto.setDateIntroduction(c.getDateIntroduction().format(DateTimeFormatter.ISO_DATE));
+        ComputerBuilderDTO dto = new ComputerDTO.ComputerBuilderDTO(Long.toString(c.getId()), c.getName());
+        if (c.getIntroduced() != null) {
+            dto.setDateIntroduction(c.getIntroduced().format(DateTimeFormatter.ISO_DATE));
         }
-        if (c.getDateDiscontinuation() != null) {
-            dto.setDateDiscontinuation(c.getDateDiscontinuation().format(DateTimeFormatter.ISO_DATE));
+        if (c.getDiscontinued() != null) {
+            dto.setDateDiscontinuation(c.getDiscontinued().format(DateTimeFormatter.ISO_DATE));
         }
         if (c.getEntreprise() != null) {
             dto.setEntreprise(CompanyMapper.toDTO(c.getEntreprise()));
@@ -68,7 +68,7 @@ public class ComputerMapper {
         boolean bothSet = introSet && discontSet;
         if (introSet) {
             try {
-                result.setDateIntroduction(
+                result.setIntroduced(
                         LocalDate.parse(c.getDateIntroduction(), DateTimeFormatter.ISO_DATE).atStartOfDay());
             } catch (DateTimeParseException dtpe) {
                 bothSet = false;
@@ -81,7 +81,7 @@ public class ComputerMapper {
                 errors.add("The discontinued date is set but the introduced date is not");
             } else {
                 try {
-                    result.setDateDiscontinuation(
+                    result.setDiscontinued(
                             LocalDate.parse(c.getDateDiscontinuation(), DateTimeFormatter.ISO_DATE).atStartOfDay());
                 } catch (DateTimeParseException dtpe) {
                     bothSet = false;
@@ -89,7 +89,7 @@ public class ComputerMapper {
                 }
             }
         }
-        if (bothSet && result.getDateIntroduction().isAfter(result.getDateDiscontinuation())) {
+        if (bothSet && result.getIntroduced().isAfter(result.getDiscontinued())) {
             errors.add("The introduction date is after the discontinuation date");
         }
     }

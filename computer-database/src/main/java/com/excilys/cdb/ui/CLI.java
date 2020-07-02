@@ -61,14 +61,14 @@ public class CLI {
 
     private static String computerDetailsString(Computer c) {
         StringBuilder outString = new StringBuilder();
-        LocalDateTime intro = c.getDateIntroduction();
-        LocalDateTime discont = c.getDateDiscontinuation();
+        LocalDateTime intro = c.getIntroduced();
+        LocalDateTime discont = c.getDiscontinued();
         Company entreprise = c.getEntreprise();
         String introString = intro == null ? "Indefini" : intro.toString();
         String discontString = discont == null ? "Indéfini" : discont.toString();
         String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getName();
         outString.append("| ").append(c.getId());
-        outString.append("\t| ").append(String.format("%1$-70s", c.getNom()));
+        outString.append("\t| ").append(String.format("%1$-70s", c.getName()));
         outString.append("| ").append(String.format("%1$-20s", introString));
         outString.append("| ").append(String.format("%1$-24s", discontString));
         outString.append("| ").append(String.format("%1$-45s", nomEntreprise));

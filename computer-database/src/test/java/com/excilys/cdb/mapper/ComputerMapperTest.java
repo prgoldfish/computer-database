@@ -1,6 +1,6 @@
 package com.excilys.cdb.mapper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
 
@@ -24,9 +24,8 @@ public class ComputerMapperTest {
 
     @Test
     public void testToDTO() throws MapperException {
-        ComputerBuilder cb = new Computer.ComputerBuilder(123, "PC")
-                .setDateIntroduction(LocalDateTime.of(2002, 1, 1, 0, 0));
-        cb.setDateDiscontinuation(LocalDateTime.of(2003, 1, 1, 0, 0));
+        ComputerBuilder cb = new Computer.ComputerBuilder(123, "PC").setIntroduced(LocalDateTime.of(2002, 1, 1, 0, 0));
+        cb.setDiscontinued(LocalDateTime.of(2003, 1, 1, 0, 0));
         cb.setEntreprise(new Company(1, "Company"));
         Computer c = cb.build();
         ComputerBuilderDTO resBuilder = new ComputerDTO.ComputerBuilderDTO("123", "PC")
@@ -51,8 +50,8 @@ public class ComputerMapperTest {
     @Test
     public void testFromDTO() throws MapperException {
         ComputerBuilder resBuilder = new Computer.ComputerBuilder(123, "PC")
-                .setDateIntroduction(LocalDateTime.of(2002, 1, 1, 0, 0));
-        resBuilder.setDateDiscontinuation(LocalDateTime.of(2003, 1, 1, 0, 0));
+                .setIntroduced(LocalDateTime.of(2002, 1, 1, 0, 0));
+        resBuilder.setDiscontinued(LocalDateTime.of(2003, 1, 1, 0, 0));
         resBuilder.setEntreprise(new Company(1, "Company"));
         Computer res = resBuilder.build();
         ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2002-01-01")
@@ -104,7 +103,7 @@ public class ComputerMapperTest {
     @Test
     public void testFromDTOIntroductionOnly() throws MapperException {
         ComputerBuilder resBuilder = new Computer.ComputerBuilder(123, "PC")
-                .setDateIntroduction(LocalDateTime.of(2002, 1, 1, 0, 0));
+                .setIntroduced(LocalDateTime.of(2002, 1, 1, 0, 0));
         Computer res = resBuilder.build();
         ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2002-01-01");
         ComputerDTO c = cb.build();

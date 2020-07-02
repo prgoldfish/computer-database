@@ -56,15 +56,13 @@ public class EditComputerServletTest {
         driver.get("http://localhost:8080/computer-database/ListComputers");
         firstEdit(); //Edite le premier ordinateur de la dernière page
         Computer expected = new Computer.ComputerBuilder(1, "Test Selenium")
-                .setDateIntroduction(LocalDateTime.of(2020, 6, 1, 0, 0))
-                .setDateDiscontinuation(LocalDateTime.of(2020, 6, 7, 0, 0))
+                .setIntroduced(LocalDateTime.of(2020, 6, 1, 0, 0)).setDiscontinued(LocalDateTime.of(2020, 6, 7, 0, 0))
                 .setEntreprise(companyService.getCompanyByName("Cray").get()).build();
         assertEquals(expected, computerService.getComputerById(1).get());
 
         editback(); //Ré-édite le même ordinateur pour remettre ses valeurs d'avant
         expected = new Computer.ComputerBuilder(1, "MacBook Pro 15.4 inch")
-                .setDateIntroduction(LocalDateTime.of(2020, 6, 2, 0, 0))
-                .setDateDiscontinuation(LocalDateTime.of(2020, 6, 3, 0, 0))
+                .setIntroduced(LocalDateTime.of(2020, 6, 2, 0, 0)).setDiscontinued(LocalDateTime.of(2020, 6, 3, 0, 0))
                 .setEntreprise(companyService.getCompanyByName("Apple Inc.").get()).build();
         assertEquals(expected, computerService.getComputerById(1).get());
     }

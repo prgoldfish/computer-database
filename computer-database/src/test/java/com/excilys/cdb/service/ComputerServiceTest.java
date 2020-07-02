@@ -78,7 +78,7 @@ public class ComputerServiceTest {
     private void refreshMockGetComputerByName() {
         when(dao.getComputerByName(anyString())).thenReturn(Optional.empty());
         compList.stream()
-                .forEach(computer -> when(dao.getComputerByName(computer.getNom())).thenReturn(Optional.of(computer)));
+                .forEach(computer -> when(dao.getComputerByName(computer.getName())).thenReturn(Optional.of(computer)));
     }
 
     private void refreshMockGetComputerById() {
@@ -110,7 +110,7 @@ public class ComputerServiceTest {
             String searchString = invoc.getArgument(0, String.class);
             OrderByColumn order = invoc.getArgument(1, OrderByColumn.class);
             boolean ascendent = invoc.getArgument(2, Boolean.class);
-            return orderCompList(compList, order, ascendent).stream().filter(c -> c.getNom().contains(searchString))
+            return orderCompList(compList, order, ascendent).stream().filter(c -> c.getName().contains(searchString))
                     .collect(Collectors.toList());
         });
     }
@@ -139,17 +139,15 @@ public class ComputerServiceTest {
             String compName2 = c2.getEntreprise() == null ? "" : c2.getEntreprise().getName();
             retValue = compName1.compareTo(compName2);
         case COMPUTERDISCONT:
-            LocalDateTime dateDiscont1 = c1.getDateDiscontinuation() == null ? LocalDateTime.MIN
-                    : c1.getDateDiscontinuation();
-            LocalDateTime dateDiscont2 = c2.getDateDiscontinuation() == null ? LocalDateTime.MIN
-                    : c2.getDateDiscontinuation();
+            LocalDateTime dateDiscont1 = c1.getDiscontinued() == null ? LocalDateTime.MIN : c1.getDiscontinued();
+            LocalDateTime dateDiscont2 = c2.getDiscontinued() == null ? LocalDateTime.MIN : c2.getDiscontinued();
             retValue = dateDiscont1.compareTo(dateDiscont2);
         case COMPUTERINTRO:
-            LocalDateTime dateIntro1 = c1.getDateIntroduction() == null ? LocalDateTime.MIN : c1.getDateIntroduction();
-            LocalDateTime dateIntro2 = c2.getDateIntroduction() == null ? LocalDateTime.MIN : c2.getDateIntroduction();
+            LocalDateTime dateIntro1 = c1.getIntroduced() == null ? LocalDateTime.MIN : c1.getIntroduced();
+            LocalDateTime dateIntro2 = c2.getIntroduced() == null ? LocalDateTime.MIN : c2.getIntroduced();
             retValue = dateIntro1.compareTo(dateIntro2);
         case COMPUTERNAME:
-            retValue = c1.getNom().compareTo(c2.getNom());
+            retValue = c1.getName().compareTo(c2.getName());
         default:
             retValue = Long.compare(c1.getId(), c2.getId());
         }
@@ -162,8 +160,8 @@ public class ComputerServiceTest {
     @Before
     public void setUp() throws Exception {
         compList = new ArrayList<>();
-        compList.add(new Computer.ComputerBuilder(1, "PC 1").setDateIntroduction(LocalDateTime.now()).build());
-        compList.add(new Computer.ComputerBuilder(2, "PC 2").setDateIntroduction(LocalDateTime.now()).build());
+        compList.add(new Computer.ComputerBuilder(1, "PC 1").setIntroduced(LocalDateTime.now()).build());
+        compList.add(new Computer.ComputerBuilder(2, "PC 2").setIntroduced(LocalDateTime.now()).build());
         refreshMock();
     }
 
@@ -282,7 +280,7 @@ public class ComputerServiceTest {
         computerService.updateComputerToDB();
         refreshMock();
         Computer toCompareWithIntro = new Computer.ComputerBuilder(dao.getMaxId(), "PC de Test")
-                .setDateIntroduction(LocalDateTime.of(2020, 1, 1, 0, 0)).build();
+                .setIntroduced(LocalDateTime.of(2020, 1, 1, 0, 0)).build();
         assertEquals(toCompareWithIntro, computerService.getComputerByName("PC de Test").get());
     }
 

@@ -35,11 +35,11 @@ public class ComputerService {
     }
 
     public boolean canAddEndDate() {
-        return builder != null && builder.isPresent() && builder.get().getDateIntroduction() != null;
+        return builder != null && builder.isPresent() && builder.get().getIntroduced() != null;
     }
 
     public Optional<LocalDateTime> getBeginDate() {
-        return builder.map((build) -> build.getDateIntroduction());
+        return builder.map((build) -> build.getIntroduced());
     }
 
     public void buildNewComputer(String name) throws ComputerServiceException {
@@ -57,10 +57,10 @@ public class ComputerService {
             logger.error("Aucun ordinateur en entrée");
             throw new ComputerServiceException("L'ordinateur en entrée est null");
         }
-        System.out.println("Nom 2 : " + com.getNom());
-        builder = Optional.of(new ComputerBuilder(com.getId(), com.getNom()));
-        builder.get().setDateIntroduction(com.getDateIntroduction());
-        builder.get().setDateDiscontinuation(com.getDateDiscontinuation());
+        System.out.println("Nom 2 : " + com.getName());
+        builder = Optional.of(new ComputerBuilder(com.getId(), com.getName()));
+        builder.get().setIntroduced(com.getIntroduced());
+        builder.get().setDiscontinued(com.getDiscontinued());
         builder.get().setEntreprise(com.getEntreprise());
         fromScratch = false;
     }
@@ -70,9 +70,9 @@ public class ComputerService {
             logger.error("Aucun ordinateur en entrée");
             throw new ComputerServiceException("L'ordinateur en entrée est null");
         }
-        buildNewComputer(com.getNom());
-        addIntroDate(com.getDateIntroduction());
-        addEndDate(com.getDateDiscontinuation());
+        buildNewComputer(com.getName());
+        addIntroDate(com.getIntroduced());
+        addEndDate(com.getDiscontinued());
         if (com.getEntreprise() != null) {
             addCompany(com.getEntreprise().getName());
         }
@@ -86,20 +86,20 @@ public class ComputerService {
 
     public void addIntroDate(LocalDateTime time) throws ComputerServiceException {
         isBuildStarted();
-        builder.get().setDateIntroduction(time);
+        builder.get().setIntroduced(time);
     }
 
     public void addEndDate(LocalDateTime time) throws ComputerServiceException {
         isBuildStarted();
-        if (builder.get().getDateIntroduction() == null && time != null) {
+        if (builder.get().getIntroduced() == null && time != null) {
             logger.error("Tentative de réglage de la date de fin alors que la date de début n'est pas réglée");
             throw new ComputerServiceException(
                     "Impossible de régler la date de fin si la date de début n'est pas réglée.");
-        } else if (time != null && builder.get().getDateIntroduction().isAfter(time)) {
+        } else if (time != null && builder.get().getIntroduced().isAfter(time)) {
             logger.error("Date de fin avant la date de début");
             throw new ComputerServiceException("La date de fin est est avant la date de début.");
         }
-        builder.get().setDateDiscontinuation(time);
+        builder.get().setDiscontinued(time);
     }
 
     public void addCompany(String companyName) throws ComputerServiceException {
@@ -152,7 +152,8 @@ public class ComputerService {
         dao.deleteComputer(computerId);
     }
 
-    public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy, boolean ascendentOrder) throws ComputerServiceException {
+    public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy,
+            boolean ascendentOrder) throws ComputerServiceException {
         if (startIndex < 0 || startIndex > dao.getMaxId()) {
             logger.error("Index de départ invalide. Index = {}", startIndex);
             throw new ComputerServiceException("L'index de départ est invalide");

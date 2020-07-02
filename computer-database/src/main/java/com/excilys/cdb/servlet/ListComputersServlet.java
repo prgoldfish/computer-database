@@ -91,7 +91,7 @@ public class ListComputersServlet {
                         computerService.searchComputersByName(params.getSearch(), orderColumn, ascendentOrder),
                         intLength);
             } else {
-                pages = new Page<>(computerService.getComputerList(0, Long.MAX_VALUE, orderColumn, ascendentOrder),
+                pages = new Page<>(computerService.getComputerList(0, Integer.MAX_VALUE, orderColumn, ascendentOrder),
                         intLength);
             }
         } catch (ComputerServiceException cse) {
