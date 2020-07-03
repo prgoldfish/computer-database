@@ -3,7 +3,7 @@ package com.excilys.cdb.persistence;
 public enum OrderByColumn {
 
     COMPUTERID("id"), COMPUTERNAME("name"), COMPUTERINTRO("introduced"), COMPUTERDISCONT("discontinued"),
-    COMPANYID("company_id"), COMPANYNAME("company.name");
+    COMPANYID("id"), COMPANYNAME("name");
 
     private String columnName;
 

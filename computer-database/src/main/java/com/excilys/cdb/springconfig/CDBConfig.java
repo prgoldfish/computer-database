@@ -2,7 +2,7 @@ package com.excilys.cdb.springconfig;
 
 import java.util.Locale;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.MessageSource;
@@ -13,7 +13,6 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -33,8 +32,6 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @ComponentScan(basePackages = "com.excilys.cdb")
 public class CDBConfig implements WebMvcConfigurer {
-
-    private static AnnotationConfigWebApplicationContext context;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -83,7 +80,7 @@ public class CDBConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public EntityManagerFactory entityManagerFactory() {
+    public EntityManager entityManager() {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(hikariDataSource());
         factoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
@@ -91,7 +88,7 @@ public class CDBConfig implements WebMvcConfigurer {
         //factoryBean.setPersistenceUnitName("CDBPU");
         factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         factoryBean.afterPropertiesSet();
-        return factoryBean.getNativeEntityManagerFactory();
+        return factoryBean.getNativeEntityManagerFactory().createEntityManager();
     }
 
     @Override
@@ -112,15 +109,6 @@ public class CDBConfig implements WebMvcConfigurer {
         registry.addRedirectViewController("/WEB-INF/views/403.jsp", "403");
         registry.addRedirectViewController("/WEB-INF/views/404.jsp", "404");
         registry.addRedirectViewController("/WEB-INF/views/500.jsp", "500");
-    }
-
-    public static AnnotationConfigWebApplicationContext getContext() {
-        if (context == null) {
-            context = new AnnotationConfigWebApplicationContext();
-            context.register(CDBConfig.class);
-            context.refresh();
-        }
-        return context;
     }
 
 }

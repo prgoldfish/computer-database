@@ -3,16 +3,16 @@ package com.excilys.cdb.persistence;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Root;
 
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 
 @Repository
@@ -28,13 +29,11 @@ public class ComputerDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
-    private EntityManagerFactory emFactory;
     private EntityManager em;
 
     @Autowired
-    public ComputerDAO(EntityManagerFactory emf) {
-        emFactory = emf;
-        em = emFactory.createEntityManager();
+    public ComputerDAO(EntityManager em) {
+        this.em = em;
 
     }
 
@@ -43,12 +42,28 @@ public class ComputerDAO {
         if (orderBy == null) {
             return new Order[] { cb.asc(root.get(OrderByColumn.COMPUTERID.getColumnName())) };
         }
-        Function<String, Order> mkOrder = s -> ascendentOrder ? cb.asc(root.get(s)) : cb.desc(root.get(s));
+        Join<Computer, Company> join = root.join(
+                em.getMetamodel().entity(Computer.class).getDeclaredSingularAttribute("company", Company.class),
+                JoinType.LEFT);
         List<Order> res = new ArrayList<>();
-        if (orderBy != OrderByColumn.COMPUTERID) {
-            res.add(mkOrder.apply(orderBy.getColumnName()));
+        switch (orderBy) {
+        case COMPUTERNAME:
+        case COMPUTERINTRO:
+        case COMPUTERDISCONT:
+        case COMPUTERID:
+            res.add(ascendentOrder ? cb.asc(root.get(orderBy.getColumnName()))
+                    : cb.desc(root.get(orderBy.getColumnName())));
+            break;
+        case COMPANYID:
+        case COMPANYNAME:
+            res.add(ascendentOrder ? cb.asc(join.get(orderBy.getColumnName()))
+                    : cb.desc(join.get(orderBy.getColumnName())));
+            break;
         }
-        res.add(cb.asc(root.get(OrderByColumn.COMPUTERID.getColumnName())));
+
+        if (orderBy != OrderByColumn.COMPUTERID) {
+            res.add(cb.asc(root.get(OrderByColumn.COMPUTERID.getColumnName())));
+        }
         return res.toArray(new Order[0]);
 
     }
@@ -63,6 +78,7 @@ public class ComputerDAO {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Computer> cq = cb.createQuery(Computer.class);
         Root<Computer> root = cq.from(Computer.class);
+
         cq.select(root).orderBy(getCriteriaOrders(cb, root, orderBy, ascendentOrder));
         TypedQuery<Computer> query = em.createQuery(cq).setFirstResult((int) startIndex).setMaxResults((int) limit);
         return query.getResultList();
@@ -78,7 +94,10 @@ public class ComputerDAO {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Computer> root = cq.from(Computer.class);
-        cq.select(root.get("computer.id")).where(cb.equal(root.get("company.id"), companyId));
+        Join<Computer, Company> join = root.join(
+                em.getMetamodel().entity(Computer.class).getDeclaredSingularAttribute("company", Company.class),
+                JoinType.LEFT);
+        cq.select(root.get("id")).where(cb.equal(join.get("id"), companyId));
         TypedQuery<Long> query = em.createQuery(cq);
         return query.getResultList();
         /*
@@ -107,8 +126,8 @@ public class ComputerDAO {
         Root<Computer> root = cq.from(Computer.class);
         cq.select(root).where(cb.equal(root.get("id"), id));
         try {
-            return Optional.of(em.createQuery(cq).getSingleResult());
-        } catch (NoResultException nre) {
+            return Optional.of(em.createQuery(cq).getResultList().get(0));
+        } catch (IndexOutOfBoundsException ioobe) {
             return Optional.empty();
         }
         /*
@@ -149,6 +168,7 @@ public class ComputerDAO {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Computer> cq = cb.createQuery(Computer.class);
         Root<Computer> root = cq.from(Computer.class);
+
         cq.select(root).where(cb.like(root.get("name"), name))
                 .orderBy(getCriteriaOrders(cb, root, orderBy, ascendentOrder));
         TypedQuery<Computer> query = em.createQuery(cq);
@@ -162,7 +182,10 @@ public class ComputerDAO {
     }
 
     public void addComputer(Computer c) {
+        EntityTransaction tr = em.getTransaction();
+        tr.begin();
         em.persist(c);
+        tr.commit();
 
         /*
         LocalDateTime intro = c.getDateIntroduction();
@@ -175,15 +198,29 @@ public class ComputerDAO {
     }
 
     public void updateComputer(Computer c) {
+        Optional<Computer> optOld = getComputerById(c.getId());
+        if (optOld.isEmpty()) {
+            throw new RuntimeException("The old computer cannot be found");
+        }
+        Computer old = optOld.get();
+        old.setName(c.getName());
+        old.setIntroduced(c.getIntroduced());
+        old.setDiscontinued(c.getDiscontinued());
+        old.setCompany(c.getCompany());
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<Computer> cu = cb.createCriteriaUpdate(Computer.class);
         Root<Computer> root = cu.from(Computer.class);
-        cu.set("name", c.getName());
-        cu.set("introduced", c.getIntroduced());
-        cu.set("discontinued", c.getDiscontinued());
-        cu.set("company_id", c.getEntreprise() == null ? null : c.getEntreprise().getId());
-        cu.where(cb.equal(root.get("id"), c.getId()));
+        cu.set("name", old.getName());
+        cu.set("introduced", old.getIntroduced());
+        cu.set("discontinued", old.getDiscontinued());
+        cu.set("company", old.getCompany());
+        cu.where(cb.equal(root.get("id"), old.getId()));
+
+        EntityTransaction tr = em.getTransaction();
+        tr.begin();
         em.createQuery(cu).executeUpdate();
+        em.flush();
+        tr.commit();
 
         /*
         LocalDateTime intro = c.getDateIntroduction();
@@ -194,7 +231,7 @@ public class ComputerDAO {
         executeUpdateComputerQuery(c, entreprise, introTimestamp, discontTimestamp);*/
     }
 
-    public void deleteComputer(long id) {
+    public void deleteComputer(long id, EntityTransaction t) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Computer> cd = cb.createCriteriaDelete(Computer.class);
         Root<Computer> root = cd.from(Computer.class);

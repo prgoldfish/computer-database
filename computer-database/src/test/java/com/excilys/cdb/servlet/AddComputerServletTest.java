@@ -69,7 +69,7 @@ public class AddComputerServletTest {
         driver.findElement(By.cssSelector(".btn-primary")).click();
         Computer expected = new Computer.ComputerBuilder(computerService.getMaxId(), "Test encore et encore")
                 .setIntroduced(LocalDateTime.of(2020, 6, 1, 0, 0)).setDiscontinued(LocalDateTime.of(2020, 6, 4, 0, 0))
-                .setEntreprise(companyService.getCompanyByName("MOS Technology").get()).build();
+                .setCompany(companyService.getCompanyByName("MOS Technology").get()).build();
         assertEquals(expected, computerService.getComputerById(computerService.getMaxId()).get());
     }
 

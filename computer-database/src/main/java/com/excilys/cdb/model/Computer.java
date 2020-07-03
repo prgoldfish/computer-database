@@ -6,8 +6,6 @@ import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -23,7 +21,6 @@ public class Computer implements Serializable {
     private static final long serialVersionUID = -7047630403351541471L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column(name = "name", nullable = false)
@@ -37,7 +34,7 @@ public class Computer implements Serializable {
 
     @ManyToOne(targetEntity = Company.class)
     @JoinColumn(name = "company_id")
-    private Company entreprise;
+    private Company company;
 
     public Computer() {
     }
@@ -47,7 +44,7 @@ public class Computer implements Serializable {
         this.name = builder.name;
         this.introduced = builder.introduced;
         this.discontinued = builder.discontinued;
-        this.entreprise = builder.entreprise;
+        this.company = builder.company;
     }
 
     /**
@@ -81,8 +78,24 @@ public class Computer implements Serializable {
     /**
      * @return Renvoie l'identifiant de l'entreprise associée à l'ordinateur
      */
-    public Company getEntreprise() {
-        return entreprise;
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setIntroduced(LocalDateTime introduced) {
+        this.introduced = introduced;
+    }
+
+    public void setDiscontinued(LocalDateTime discontinued) {
+        this.discontinued = discontinued;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     @Override
@@ -93,13 +106,13 @@ public class Computer implements Serializable {
         res.append("\nNom de l'ordinateur : ").append(name == null ? indefini : name);
         res.append("\nDate d'introduction : ").append(introduced == null ? indefini : introduced);
         res.append("\nDate de fin : ").append(discontinued == null ? indefini : discontinued);
-        res.append("\nEntreprise : ").append(entreprise == null ? indefini : entreprise);
+        res.append("\nEntreprise : ").append(company == null ? indefini : company);
         return res.toString();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(discontinued, introduced, entreprise, id, name);
+        return Objects.hash(discontinued, introduced, company, id, name);
     }
 
     @Override
@@ -112,7 +125,7 @@ public class Computer implements Serializable {
         }
         Computer other = (Computer) obj;
         return Objects.equals(discontinued, other.discontinued) && Objects.equals(introduced, other.introduced)
-                && Objects.equals(entreprise, other.entreprise) && id == other.id && Objects.equals(name, other.name);
+                && Objects.equals(company, other.company) && id == other.id && Objects.equals(name, other.name);
     }
 
     public static class ComputerBuilder {
@@ -123,7 +136,7 @@ public class Computer implements Serializable {
         // Optionnels
         private LocalDateTime introduced;
         private LocalDateTime discontinued;
-        private Company entreprise;
+        private Company company;
 
         public ComputerBuilder(long id, String name) {
             this.id = id;
@@ -140,8 +153,8 @@ public class Computer implements Serializable {
             return this;
         }
 
-        public ComputerBuilder setEntreprise(Company entreprise) {
-            this.entreprise = entreprise;
+        public ComputerBuilder setCompany(Company company) {
+            this.company = company;
             return this;
         }
 
@@ -159,7 +172,7 @@ public class Computer implements Serializable {
 
         @Override
         public int hashCode() {
-            return Objects.hash(discontinued, introduced, entreprise, id, name);
+            return Objects.hash(discontinued, introduced, company, id, name);
         }
 
         @Override
@@ -172,8 +185,7 @@ public class Computer implements Serializable {
             }
             ComputerBuilder other = (ComputerBuilder) obj;
             return Objects.equals(discontinued, other.discontinued) && Objects.equals(introduced, other.introduced)
-                    && Objects.equals(entreprise, other.entreprise) && id == other.id
-                    && Objects.equals(name, other.name);
+                    && Objects.equals(company, other.company) && id == other.id && Objects.equals(name, other.name);
         }
     }
 

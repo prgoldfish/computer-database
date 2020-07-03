@@ -26,7 +26,7 @@ public class ComputerMapperTest {
     public void testToDTO() throws MapperException {
         ComputerBuilder cb = new Computer.ComputerBuilder(123, "PC").setIntroduced(LocalDateTime.of(2002, 1, 1, 0, 0));
         cb.setDiscontinued(LocalDateTime.of(2003, 1, 1, 0, 0));
-        cb.setEntreprise(new Company(1, "Company"));
+        cb.setCompany(new Company(1, "Company"));
         Computer c = cb.build();
         ComputerBuilderDTO resBuilder = new ComputerDTO.ComputerBuilderDTO("123", "PC")
                 .setDateIntroduction("2002-01-01").setDateDiscontinuation("2003-01-01");
@@ -52,7 +52,7 @@ public class ComputerMapperTest {
         ComputerBuilder resBuilder = new Computer.ComputerBuilder(123, "PC")
                 .setIntroduced(LocalDateTime.of(2002, 1, 1, 0, 0));
         resBuilder.setDiscontinued(LocalDateTime.of(2003, 1, 1, 0, 0));
-        resBuilder.setEntreprise(new Company(1, "Company"));
+        resBuilder.setCompany(new Company(1, "Company"));
         Computer res = resBuilder.build();
         ComputerBuilderDTO cb = new ComputerDTO.ComputerBuilderDTO("123", "PC").setDateIntroduction("2002-01-01")
                 .setDateDiscontinuation("2003-01-01");

@@ -68,7 +68,7 @@ public class ListComputersServletTest {
     public void ListComputersDefaultParametersTest() throws ComputerServiceException {
         DashboardDTO expected = new DashboardDTO();
         assertEquals(servlet.dashboard(attributeList, params, loc), "dashboard");
-        verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
+        verify(mockService).getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
         expectedAttributes.put("params", expected);
@@ -89,7 +89,7 @@ public class ListComputersServletTest {
                 params.setAscendent(ascendent);
                 attributeList.clear();
                 servlet.dashboard(attributeList, params, loc);
-                verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.getEnum(orderBy),
+                verify(mockService).getComputerList(0, Integer.MAX_VALUE, OrderByColumn.getEnum(orderBy),
                         !ascendent.equals("desc"));
                 expectedAttributes.clear();
                 expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
@@ -110,7 +110,7 @@ public class ListComputersServletTest {
         DashboardDTO expected = new DashboardDTO();
         expected.setOrder("unknown");
         servlet.dashboard(attributeList, params, loc);
-        verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
+        verify(mockService).getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
         expectedAttributes.put("firstPageNum", 1L);
@@ -125,7 +125,7 @@ public class ListComputersServletTest {
         DashboardDTO expected = new DashboardDTO();
         expected.setAscendent("unknown");
         servlet.dashboard(attributeList, params, loc);
-        verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
+        verify(mockService).getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
         expectedAttributes.put("firstPageNum", 1L);
@@ -146,7 +146,7 @@ public class ListComputersServletTest {
             answerList.add(new Computer.ComputerBuilder(i, "NoName " + i).build());
             expectedList.add(new ComputerDTO.ComputerBuilderDTO("" + i, "NoName " + i).build());
         }
-        when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
+        when(mockService.getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
         servlet.dashboard(attributeList, params, loc);
         expectedAttributes.put("dtolist", expectedList.subList(0, 50));
@@ -169,7 +169,7 @@ public class ListComputersServletTest {
             answerList.add(new Computer.ComputerBuilder(i, "NoName " + i).build());
             expectedList.add(new ComputerDTO.ComputerBuilderDTO("" + i, "NoName " + i).build());
         }
-        when(mockService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
+        when(mockService.getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true)).thenReturn(answerList);
 
         servlet.dashboard(attributeList, params, loc);
         expectedAttributes.put("dtolist", expectedList.subList(20, 30));
@@ -203,7 +203,7 @@ public class ListComputersServletTest {
         expected.setHeaderMessage("Test");
 
         servlet.dashboard(attributeList, params, loc);
-        verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
+        verify(mockService).getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         expectedAttributes.put("dtolist", new ArrayList<ComputerDTO>());
         expectedAttributes.put("dtosize", 0);
         expectedAttributes.put("firstPageNum", 1L);
@@ -222,7 +222,7 @@ public class ListComputersServletTest {
         expected.setHeaderMessage("3 ordinateur(s) supprimés");
 
         servlet.dashboard(attributeList, params, loc);
-        verify(mockService).getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true);
+        verify(mockService).getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true);
         verify(mockService).deleteComputer(1);
         verify(mockService).deleteComputer(2);
         verify(mockService).deleteComputer(3);

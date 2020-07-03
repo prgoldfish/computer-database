@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -24,15 +24,11 @@ public class CompanyDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(CompanyDAO.class);
 
-    //@Autowired
-    private EntityManagerFactory emFactory;
-
-    private EntityManager em; // = emFactory.createEntityManager();
+    private EntityManager em;
 
     @Autowired
-    public CompanyDAO(EntityManagerFactory emFactory) {
-        this.emFactory = emFactory;
-        em = this.emFactory.createEntityManager();
+    public CompanyDAO(EntityManager em) {
+        this.em = em;
     }
 
     /**
@@ -94,12 +90,13 @@ public class CompanyDAO {
         */
     }
 
-    public void deleteCompany(long id) {
+    public void deleteCompany(long id, EntityTransaction t) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Company> cd = cb.createCriteriaDelete(Company.class);
         Root<Company> root = cd.from(Company.class);
         cd.where(cb.equal(root.get("id"), id));
         em.createQuery(cd).executeUpdate();
+        logger.info("Deleted company with id : {}", id);
     }
 
     public static void main(String[] args) {

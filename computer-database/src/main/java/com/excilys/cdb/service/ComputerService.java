@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,9 @@ public class ComputerService {
 
     @Autowired
     private CompanyService companyService;
+
+    @Autowired
+    private EntityManager em;
 
     private ComputerService() {
         builder = Optional.empty();
@@ -61,7 +67,7 @@ public class ComputerService {
         builder = Optional.of(new ComputerBuilder(com.getId(), com.getName()));
         builder.get().setIntroduced(com.getIntroduced());
         builder.get().setDiscontinued(com.getDiscontinued());
-        builder.get().setEntreprise(com.getEntreprise());
+        builder.get().setCompany(com.getCompany());
         fromScratch = false;
     }
 
@@ -73,8 +79,8 @@ public class ComputerService {
         buildNewComputer(com.getName());
         addIntroDate(com.getIntroduced());
         addEndDate(com.getDiscontinued());
-        if (com.getEntreprise() != null) {
-            addCompany(com.getEntreprise().getName());
+        if (com.getCompany() != null) {
+            addCompany(com.getCompany().getName());
         }
         addComputerToDB();
     }
@@ -110,7 +116,7 @@ public class ComputerService {
                 logger.error("Nom de l'entreprise {} inconnu", companyName);
                 throw new ComputerServiceException("Le nom de l'entreprise est inconnu.");
             } else {
-                builder.get().setEntreprise(comp.get());
+                builder.get().setCompany(comp.get());
             }
         }
     }
@@ -149,7 +155,10 @@ public class ComputerService {
             logger.error("Tentative de suppression d'un ordinateur qui n'existe pas. Id = {}", computerId);
             throw new ComputerServiceException("L'ordinateur ne peut être supprimé car il n'existe pas");
         }
-        dao.deleteComputer(computerId);
+        EntityTransaction t = em.getTransaction();
+        t.begin();
+        dao.deleteComputer(computerId, t);
+        t.commit();
     }
 
     public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy,

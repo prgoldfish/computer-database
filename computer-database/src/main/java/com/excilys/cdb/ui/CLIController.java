@@ -14,7 +14,7 @@ import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.Page;
-import com.excilys.cdb.springconfig.CDBConfig;
+import com.excilys.cdb.springconfig.CDBConfigNoWeb;
 
 @Controller
 public class CLIController {
@@ -174,7 +174,7 @@ public class CLIController {
     private void showComputerList() {
         try {
             Page<Computer> page = new Page<>(
-                    computerService.getComputerList(0, Long.MAX_VALUE, OrderByColumn.COMPUTERID, true), 20);
+                    computerService.getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true), 20);
             CLI.printPage(page.getPageContent(), page.getCurrentPage(), page.getMaxPage());
             CLI.pageCommand(page);
         } catch (ComputerServiceException cse) {
@@ -236,7 +236,7 @@ public class CLIController {
     }
 
     public static void main(String[] args) {
-        CDBConfig.getContext().getBean(CLIController.class).menu();
+        CDBConfigNoWeb.getContext().getBean(CLIController.class).menu();
 
     }
 

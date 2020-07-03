@@ -25,8 +25,8 @@ public class ComputerMapper {
         if (c.getDiscontinued() != null) {
             dto.setDateDiscontinuation(c.getDiscontinued().format(DateTimeFormatter.ISO_DATE));
         }
-        if (c.getEntreprise() != null) {
-            dto.setEntreprise(CompanyMapper.toDTO(c.getEntreprise()));
+        if (c.getCompany() != null) {
+            dto.setEntreprise(CompanyMapper.toDTO(c.getCompany()));
         }
         return dto.build();
     }
@@ -49,7 +49,7 @@ public class ComputerMapper {
         parseDates(c, errors, result);
         if (c.getEntreprise() != null) {
             try {
-                result.setEntreprise(CompanyMapper.fromDTO(c.getEntreprise()));
+                result.setCompany(CompanyMapper.fromDTO(c.getEntreprise()));
             } catch (MapperException mape) {
                 errors.add(mape.getMessage());
             }

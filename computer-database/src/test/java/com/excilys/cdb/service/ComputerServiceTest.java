@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +37,12 @@ public class ComputerServiceTest {
     @Mock
     private ComputerDAO dao;
 
+    @Mock
+    private EntityTransaction tr;
+
+    @Mock
+    private EntityManager em;
+
     @InjectMocks
     private ComputerService computerService;
 
@@ -48,6 +57,7 @@ public class ComputerServiceTest {
         refreshMockUpdateComputer();
         refreshMockDeleteComputer();
         refreshSearchComputerByName();
+        when(em.getTransaction()).thenReturn(tr);
     }
 
     private void refreshMockGetMaxId() {
@@ -59,7 +69,7 @@ public class ComputerServiceTest {
             long id = invoc.getArgument(0, Long.class);
             compList = compList.stream().filter(c -> c.getId() != id).collect(Collectors.toList());
             return "Done";
-        }).when(dao).deleteComputer(anyLong());
+        }).when(dao).deleteComputer(anyLong(), any());
     }
 
     private void refreshMockUpdateComputer() {
@@ -131,12 +141,12 @@ public class ComputerServiceTest {
         int retValue = 0;
         switch (order) {
         case COMPANYID:
-            long comp1 = c1.getEntreprise() == null ? 0 : c1.getEntreprise().getId();
-            long comp2 = c2.getEntreprise() == null ? 0 : c2.getEntreprise().getId();
+            long comp1 = c1.getCompany() == null ? 0 : c1.getCompany().getId();
+            long comp2 = c2.getCompany() == null ? 0 : c2.getCompany().getId();
             retValue = (int) (comp1 - comp2);
         case COMPANYNAME:
-            String compName1 = c1.getEntreprise() == null ? "" : c1.getEntreprise().getName();
-            String compName2 = c2.getEntreprise() == null ? "" : c2.getEntreprise().getName();
+            String compName1 = c1.getCompany() == null ? "" : c1.getCompany().getName();
+            String compName2 = c2.getCompany() == null ? "" : c2.getCompany().getName();
             retValue = compName1.compareTo(compName2);
         case COMPUTERDISCONT:
             LocalDateTime dateDiscont1 = c1.getDiscontinued() == null ? LocalDateTime.MIN : c1.getDiscontinued();

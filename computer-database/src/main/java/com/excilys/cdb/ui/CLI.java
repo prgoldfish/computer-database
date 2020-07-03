@@ -63,7 +63,7 @@ public class CLI {
         StringBuilder outString = new StringBuilder();
         LocalDateTime intro = c.getIntroduced();
         LocalDateTime discont = c.getDiscontinued();
-        Company entreprise = c.getEntreprise();
+        Company entreprise = c.getCompany();
         String introString = intro == null ? "Indefini" : intro.toString();
         String discontString = discont == null ? "Indéfini" : discont.toString();
         String nomEntreprise = entreprise == null ? "Indéfini" : entreprise.getName();
