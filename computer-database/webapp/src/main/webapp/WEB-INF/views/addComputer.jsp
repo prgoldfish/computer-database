@@ -14,21 +14,13 @@
 	<link href="./css/main.css" rel="stylesheet" media="screen">
 	<script type="text/javascript" src="./js/jquery.min.js"></script>
 	<script type="text/javascript" src="./js/addComputer.js"></script>
-    <script src="./js/common.js"></script>
 </head>
 <body>
-    <header class="navbar navbar-inverse navbar-fixed-top">
-        <form id="langForm" action="#" method="GET">
-            <input type="hidden" name="lang" value=""/>
-        </form>
-        <div class="container">
-            <a class="navbar-brand" href="ListComputers"><spring:message code="header.name"/> </a>
-            <div class="rightContainer">
-                <a href="#" onclick="setLang(&quot;fr&quot;)"><img alt="French/Français" src="./images/french.png" height="32"></a>
-                <a href="#" onclick="setLang(&quot;en&quot;)"><img alt="English/Anglais" src="./images/english.png" height="32"></a>
-            </div>
-        </div>
-    </header>
+    <form id="langForm" action="#" method="GET">
+        <input type="hidden" name="lang" value=""/>
+    </form>    
+    
+    <jsp:include page="header.jsp"/>
     
     <script type="text/javascript">
         let strings = new Array();
@@ -39,9 +31,9 @@
     </script>
     
     <c:if test="${ fn:length(headerMessage) > 0 }">
-        <form id="addedForm" action="ListComputers" method="POST">
-            <input type="hidden" value="${ headerMessage }" name="headerMessage"/>
-        </form>
+        <form:form modelAttribute="dashboardDTO" id="addedForm" action="ListComputers" method="POST">
+            <form:input path="headerMessage" type="hidden" value="${ headerMessage }" name="headerMessage"/>
+        </form:form>
         <script type="text/javascript">
             document.getElementById("addedForm").submit()
         </script>

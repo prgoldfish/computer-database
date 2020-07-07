@@ -1,4 +1,4 @@
-package com.excilys.cdb.servlet;
+package com.excilys.cdb.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.dto.ComputerDTO.ComputerBuilderDTO;
+import com.excilys.cdb.dto.DashboardDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.MapperException;
 import com.excilys.cdb.mapper.CompanyMapper;
@@ -32,7 +33,7 @@ import com.excilys.cdb.validation.ComputerDTOValidator;
 
 @Controller
 @RequestMapping("/AddComputer")
-public class AddComputerServlet {
+public class AddComputerController {
 
     //private static final Logger logger = LoggerFactory.getLogger(AddComputerServlet.class);
 
@@ -108,6 +109,7 @@ public class AddComputerServlet {
                 String message = messageSource.getMessage("header.message.added", null,
                         "The computer has successfully been added to the database", loc);
                 model.addAttribute("headerMessage", message);
+                model.addAttribute("dashboardDTO", new DashboardDTO());
             } catch (ComputerServiceException cse) {
                 errorMessages.add(cse.getMessage());
             }

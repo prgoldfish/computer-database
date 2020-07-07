@@ -20,23 +20,16 @@
     <script src="./js/common.js"></script>
 </head>
 <body>
-    <header class="navbar navbar-inverse navbar-fixed-top">
-        <form:form modelAttribute="params" id="langForm" action="#" method="GET">
-            <form:input type="hidden" path="page" name="page" value="${ params.page }"/>
-            <form:input type="hidden" path="length" name="length" value="${ params.length }"/>
-            <form:input type="hidden" path="search" name="search" value="${ params.search }"/>
-            <form:input type="hidden" path="order" id="orderParameter" name="order" value="${ params.order }"/>
-            <form:input type="hidden" path="ascendent" id="ascendentParameter" name="ascendent" value="${ params.ascendent }"/>
-            <input type="hidden" name="lang" value=""/>
-        </form:form>
-        <div class="container">
-            <a class="navbar-brand" href="ListComputers"><spring:message code="header.name"/> </a>
-            <div class="rightContainer">
-	            <a href="#" onclick="setLang(&quot;fr&quot;)"><img alt="French/Français" src="./images/french.png" height="32"></a>
-	            <a href="#" onclick="setLang(&quot;en&quot;)"><img alt="English/Anglais" src="./images/english.png" height="32"></a>
-	        </div>
-        </div>
-    </header>
+    <form:form modelAttribute="params" id="langForm" action="#" method="GET">
+        <form:input type="hidden" path="page" name="page" value="${ params.page }"/>
+        <form:input type="hidden" path="length" name="length" value="${ params.length }"/>
+        <form:input type="hidden" path="search" name="search" value="${ params.search }"/>
+        <form:input type="hidden" path="order" id="orderParameter" name="order" value="${ params.order }"/>
+        <form:input type="hidden" path="ascendent" id="ascendentParameter" name="ascendent" value="${ params.ascendent }"/>
+        <input type="hidden" name="lang" value=""/>
+    </form:form>
+    
+    <jsp:include page="header.jsp"/>
     
     <script type="text/javascript">
 	    let strings = new Array();
@@ -50,7 +43,7 @@
     <section id="main">
         <div class="container">
         <c:if test="${ fn:length(params.headerMessage) > 0 }">
-           <div class="alert alert-danger">
+           <div class="alert alert-success">
               <c:out value="${ params.headerMessage }"></c:out> <br/>
           </div>
         </c:if>

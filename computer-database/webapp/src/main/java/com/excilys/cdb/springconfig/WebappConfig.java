@@ -5,6 +5,12 @@ import java.util.Locale;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -18,9 +24,10 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
 @EnableWebMvc
+@EnableWebSecurity
 @Configuration
-@ComponentScan(basePackages = { "com.excilys.cdb.servlet", "com.excilys.cdb.springconfig" })
-public class CDBConfig implements WebMvcConfigurer {
+@ComponentScan(basePackages = { "com.excilys.cdb.controller", "com.excilys.cdb.springconfig" })
+public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     @Bean
     public ViewResolver viewResolver() {
@@ -43,6 +50,20 @@ public class CDBConfig implements WebMvcConfigurer {
         LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
         lci.setParamName("lang");
         return lci;
+    }
+
+    @Bean
+    public UserDetailsService UserDetailsService() {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(
+                User.withDefaultPasswordEncoder().username("cdbAdmin").password("azerty").roles("ADMIN").build());
+        return manager;
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().anyRequest().hasRole("ADMIN").and().formLogin().and().httpBasic().and().logout()
+                .logoutUrl("logout").logoutSuccessUrl("/");
     }
 
     @Override

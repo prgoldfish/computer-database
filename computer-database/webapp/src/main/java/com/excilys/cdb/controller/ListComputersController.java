@@ -1,4 +1,4 @@
-package com.excilys.cdb.servlet;
+package com.excilys.cdb.controller;
 
 import java.util.List;
 import java.util.Locale;
@@ -28,9 +28,9 @@ import com.excilys.cdb.service.Page;
 
 @Controller
 @RequestMapping("/ListComputers")
-public class ListComputersServlet {
+public class ListComputersController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ListComputersServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(ListComputersController.class);
 
     @Autowired
     private ComputerService computerService;
@@ -47,11 +47,6 @@ public class ListComputersServlet {
 
     @RequestMapping(method = { RequestMethod.POST, RequestMethod.GET })
     public String dashboard(ModelMap model, @Valid DashboardDTO params, Locale loc) {
-        /*@RequestParam(defaultValue = "1") int page,
-         @RequestParam(defaultValue = "10") int length, @RequestParam(required = false) String search,
-         @RequestParam(required = false) String headerMessage, @RequestParam(required = false) String order,
-         @RequestParam(required = false) String ascendent,
-         @RequestParam(required = false, name = "selection") String deleteString) {*/
 
         OrderByColumn orderColumn = OrderByColumn.getEnum(params.getOrder());
         boolean ascendentOrder = params.getAscendent() == null || !params.getAscendent().equals("desc");
@@ -118,13 +113,8 @@ public class ListComputersServlet {
 
         model.addAttribute("dtolist", dtoList);
         model.addAttribute("dtosize", computerCount);
-        //model.addAttribute("search", params.getSearch());
-        //model.addAttribute("length", params.getLength());
-        //model.addAttribute("page", params.getPage());
         model.addAttribute("firstPageNum", firstPageNum);
         model.addAttribute("lastPageNum", lastPageNum);
-        //model.addAttribute("order", params.getOrder());
-        //model.addAttribute("ascendent", params.getAscendent());
 
         return "dashboard";
     }

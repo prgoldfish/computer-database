@@ -6,7 +6,7 @@ public class WebServletConfiguration extends AbstractAnnotationConfigDispatcherS
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[] { CDBConfig.class };
+        return new Class[] { WebappConfig.class };
     }
 
     @Override

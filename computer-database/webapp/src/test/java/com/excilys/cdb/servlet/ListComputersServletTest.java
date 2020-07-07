@@ -27,6 +27,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.context.MessageSource;
 import org.springframework.ui.ModelMap;
 
+import com.excilys.cdb.controller.ListComputersController;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.dto.DashboardDTO;
 import com.excilys.cdb.exception.ComputerServiceException;
@@ -46,7 +47,7 @@ public class ListComputersServletTest {
     MessageSource messageSource;
 
     @InjectMocks
-    ListComputersServlet servlet;
+    ListComputersController servlet;
 
     Map<String, Object> expectedAttributes;
     ModelMap attributeList;

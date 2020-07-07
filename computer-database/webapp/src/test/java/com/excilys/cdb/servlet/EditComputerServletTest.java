@@ -23,11 +23,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.springconfig.CDBConfig;
+import com.excilys.cdb.springconfig.WebappConfig;
 
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CDBConfig.class)
+@ContextConfiguration(classes = WebappConfig.class)
 public class EditComputerServletTest {
 
     private WebDriver driver;

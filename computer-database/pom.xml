@@ -22,6 +22,7 @@
 		<hikaricp.version>3.4.5</hikaricp.version>
 		<selenium.version>4.0.0-alpha-6</selenium.version>
 		<spring.version>5.2.7.RELEASE</spring.version>
+		<spring-security.version>5.3.3.RELEASE</spring-security.version>
 		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
 		<hibernate-core.version>5.1.17.Final</hibernate-core.version>
 		<jaxb.version>2.3.2</jaxb.version>
