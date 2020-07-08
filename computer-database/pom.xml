@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.excilys</groupId>
     <artifactId>computer-database</artifactId>
-    <version>5.2</version>
+    <version>5.2-SNAPSHOT1</version>
     <packaging>pom</packaging>
     <name>computer-database</name>
 
@@ -61,6 +61,11 @@
 	        <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
 	        <scope>test</scope>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.springframework.security</groupId>
+	        <artifactId>spring-security-core</artifactId>
+	        <version>${spring-security.version}</version>
 	    </dependency>
     </dependencies>
 

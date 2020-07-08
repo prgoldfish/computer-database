@@ -9,11 +9,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -33,7 +36,10 @@ import org.springframework.web.servlet.view.JstlView;
 public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     @Autowired
-    PasswordEncoder passEncoder;
+    DigestAuthenticationFilter digestAuthenticationFilter;
+
+    @Autowired
+    DigestAuthenticationEntryPoint entryPoint;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -64,17 +70,40 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
     }
 
     @Bean
-    public UserDetailsService UserDetailsService() {
+    public UserDetailsService UserDetailsService(PasswordEncoder passEncoder) {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.builder().passwordEncoder(passEncoder::encode).username("cdbAdmin").password("azerty")
-                .roles("ADMIN").build());
+        manager.createUser(
+                User.builder().passwordEncoder(s -> s).username("cdbAdmin").password("azerty").roles("ADMIN").build());
         return manager;
+    }
+
+    @Bean
+    public DigestAuthenticationEntryPoint digestAuthenticationEntryPoint() {
+        DigestAuthenticationEntryPoint entryPoint = new DigestAuthenticationEntryPoint();
+        entryPoint.setRealmName("CDBRealm");
+        entryPoint.setKey("random key");
+        entryPoint.afterPropertiesSet();
+        return entryPoint;
+    }
+
+    @Bean
+    public DigestAuthenticationFilter digestAuthenticationFilter(UserDetailsService uds,
+            DigestAuthenticationEntryPoint digestAuthenticationEntryPoint) {
+        DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
+        filter.setUserDetailsService(uds);
+        filter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint);
+        filter.setPasswordAlreadyEncoded(false);
+        filter.afterPropertiesSet();
+        return filter;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/AddComputer", "/EditComputer").hasRole("ADMIN").and().formLogin().and()
-                .httpBasic().and().logout().logoutUrl("logout").logoutSuccessUrl("/");
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+                .antMatchers("/AddComputer", "/EditComputer").hasRole("ADMIN").and().formLogin().and()
+                .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint))
+                .addFilterBefore(digestAuthenticationFilter, DigestAuthenticationFilter.class).logout()
+                .logoutUrl("logout").logoutSuccessUrl("/");
     }
 
     @Override

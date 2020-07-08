@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,12 +34,6 @@ public class ComputerServiceTest {
     @Mock
     private ComputerDAO dao;
 
-    @Mock
-    private EntityTransaction tr;
-
-    @Mock
-    private EntityManager em;
-
     @InjectMocks
     private ComputerService computerService;
 
@@ -57,7 +48,6 @@ public class ComputerServiceTest {
         refreshMockUpdateComputer();
         refreshMockDeleteComputer();
         refreshSearchComputerByName();
-        when(em.getTransaction()).thenReturn(tr);
     }
 
     private void refreshMockGetMaxId() {
@@ -69,7 +59,7 @@ public class ComputerServiceTest {
             long id = invoc.getArgument(0, Long.class);
             compList = compList.stream().filter(c -> c.getId() != id).collect(Collectors.toList());
             return "Done";
-        }).when(dao).deleteComputer(anyLong(), any());
+        }).when(dao).deleteComputer(anyLong());
     }
 
     private void refreshMockUpdateComputer() {

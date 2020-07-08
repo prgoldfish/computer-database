@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -20,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
@@ -32,8 +35,8 @@ public class ComputerDAO {
     private EntityManager em;
 
     @Autowired
-    public ComputerDAO(EntityManager em) {
-        this.em = em;
+    public ComputerDAO(EntityManagerFactory emf) {
+        this.em = emf.createEntityManager();
 
     }
 
@@ -82,12 +85,6 @@ public class ComputerDAO {
         cq.select(root).orderBy(getCriteriaOrders(cb, root, orderBy, ascendentOrder));
         TypedQuery<Computer> query = em.createQuery(cq).setFirstResult((int) startIndex).setMaxResults((int) limit);
         return query.getResultList();
-        /*
-        String orderByColumns = processOrderBy(orderBy, ascendentOrder);
-        String request = SELECT_COMPUTER_LIST_QUERY + orderByColumns + LIMIT_OFFSET;
-        
-        logger.info("Exécution de la requête \"{}\"", request);
-        return jdbcTemplateObject.query(request, computerMapper, limit, startIndex);*/
     }
 
     public List<Long> getComputersIdsByCompanyId(long companyId) {
@@ -100,10 +97,6 @@ public class ComputerDAO {
         cq.select(root.get("id")).where(cb.equal(join.get("id"), companyId));
         TypedQuery<Long> query = em.createQuery(cq);
         return query.getResultList();
-        /*
-        logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_COMPANY_ID_QUERY);
-        return jdbcTemplateObject.query(SELECT_COMPUTER_BY_COMPANY_ID_QUERY,
-                (resultSet, numRow) -> resultSet.getLong("id"), companyId);*/
     }
 
     public long getMaxId() {
@@ -113,11 +106,6 @@ public class ComputerDAO {
         cq.select(cb.max(root.get("id")));
         TypedQuery<Long> query = em.createQuery(cq);
         return query.getSingleResult();
-
-        /*
-        logger.info("Exécution de la requête \"{}\"", GET_MAX_ID_QUERY);
-        return jdbcTemplateObject.queryForObject(GET_MAX_ID_QUERY, Long.class);
-        */
     }
 
     public Optional<Computer> getComputerById(long id) {
@@ -130,14 +118,6 @@ public class ComputerDAO {
         } catch (IndexOutOfBoundsException ioobe) {
             return Optional.empty();
         }
-        /*
-        logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_ID_QUERY);
-        try {
-            Computer c = jdbcTemplateObject.queryForObject(SELECT_COMPUTER_BY_ID_QUERY, computerMapper, id);
-            return Optional.of(c);
-        } catch (EmptyResultDataAccessException dae) {
-            return Optional.empty();
-        }*/
     }
 
     public Optional<Computer> getComputerByName(String name) {
@@ -151,16 +131,6 @@ public class ComputerDAO {
         } catch (IndexOutOfBoundsException ioobe) {
             return Optional.empty();
         }
-        /*
-        logger.info("Exécution de la requête \"{}\"", SELECT_COMPUTER_BY_NAME_QUERY);
-        name = name.replace("%", "\\%");
-        try {
-            Computer c = jdbcTemplateObject.queryForObject(SELECT_COMPUTER_BY_NAME_QUERY, computerMapper, name);
-            return Optional.of(c);
-        } catch (EmptyResultDataAccessException dae) {
-            return Optional.empty();
-        }
-        */
     }
 
     public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
@@ -173,73 +143,38 @@ public class ComputerDAO {
                 .orderBy(getCriteriaOrders(cb, root, orderBy, ascendentOrder));
         TypedQuery<Computer> query = em.createQuery(cq);
         return query.getResultList();
-
-        /*
-        String request = SEARCH_COMPUTERS_BY_NAME_OR_COMPANY_QUERY + processOrderBy(orderBy, ascendentOrder);
-        name = "%" + name.replace("%", "\\%") + "%";
-        logger.info("Exécution de la requête \"{}\"", request);
-        return jdbcTemplateObject.query(request, computerMapper, name, name);*/
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void addComputer(Computer c) {
-        EntityTransaction tr = em.getTransaction();
-        tr.begin();
         em.persist(c);
-        tr.commit();
-
-        /*
-        LocalDateTime intro = c.getDateIntroduction();
-        LocalDateTime discont = c.getDateDiscontinuation();
-        Company entreprise = c.getEntreprise();
-        Timestamp introTimestamp = intro == null ? null : Timestamp.valueOf(intro);
-        Timestamp discontTimestamp = discont == null ? null : Timestamp.valueOf(discont);
-        executeAddComputerQuery(c, entreprise, introTimestamp, discontTimestamp);
-        */
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void updateComputer(Computer c) {
-        Optional<Computer> optOld = getComputerById(c.getId());
-        if (optOld.isEmpty()) {
-            throw new RuntimeException("The old computer cannot be found");
-        }
-        Computer old = optOld.get();
-        old.setName(c.getName());
-        old.setIntroduced(c.getIntroduced());
-        old.setDiscontinued(c.getDiscontinued());
-        old.setCompany(c.getCompany());
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<Computer> cu = cb.createCriteriaUpdate(Computer.class);
         Root<Computer> root = cu.from(Computer.class);
-        cu.set("name", old.getName());
-        cu.set("introduced", old.getIntroduced());
-        cu.set("discontinued", old.getDiscontinued());
-        cu.set("company", old.getCompany());
-        cu.where(cb.equal(root.get("id"), old.getId()));
+        cu.set("name", c.getName());
+        cu.set("introduced", c.getIntroduced());
+        cu.set("discontinued", c.getDiscontinued());
+        cu.set("company", c.getCompany());
+        cu.where(cb.equal(root.get("id"), c.getId()));
 
-        EntityTransaction tr = em.getTransaction();
-        tr.begin();
         em.createQuery(cu).executeUpdate();
         em.flush();
-        tr.commit();
-
-        /*
-        LocalDateTime intro = c.getDateIntroduction();
-        LocalDateTime discont = c.getDateDiscontinuation();
-        Company entreprise = c.getEntreprise();
-        Timestamp introTimestamp = intro == null ? null : Timestamp.valueOf(intro);
-        Timestamp discontTimestamp = discont == null ? null : Timestamp.valueOf(discont);
-        executeUpdateComputerQuery(c, entreprise, introTimestamp, discontTimestamp);*/
     }
 
-    public void deleteComputer(long id, EntityTransaction t) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteComputer(long id) {
+        if (!em.isJoinedToTransaction()) {
+            throw new TransactionRequiredException();
+        }
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Computer> cd = cb.createCriteriaDelete(Computer.class);
         Root<Computer> root = cd.from(Computer.class);
         cd.where(cb.equal(root.get("id"), id));
         em.createQuery(cd).executeUpdate();
-        /*
-        logger.info("Exécution de la requête \"{}\"", DELETE_COMPUTER_QUERY);
-        jdbcTemplateObject.update(DELETE_COMPUTER_QUERY, id);*/
         logger.info("Deleted computer with id : {}", id);
     }
 }

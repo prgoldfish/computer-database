@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +28,6 @@ public class ComputerService {
 
     @Autowired
     private CompanyService companyService;
-
-    @Autowired
-    private EntityManager em;
 
     private ComputerService() {
         builder = Optional.empty();
@@ -154,10 +148,7 @@ public class ComputerService {
             logger.error("Tentative de suppression d'un ordinateur qui n'existe pas. Id = {}", computerId);
             throw new ComputerServiceException("L'ordinateur ne peut être supprimé car il n'existe pas");
         }
-        EntityTransaction t = em.getTransaction();
-        t.begin();
-        dao.deleteComputer(computerId, t);
-        t.commit();
+        dao.deleteComputer(computerId);
     }
 
     public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy,

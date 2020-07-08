@@ -13,7 +13,14 @@
       <pattern>[%p] %c{2}.%t - %m%n</pattern>
     </encoder>
   </appender>
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>log.log</file>
+    <encoder>
+      <pattern>[%p] %c{2}.%t - %m%n</pattern>
+    </encoder>
+  </appender>
   <root level="DEBUG">
     <appender-ref ref="Console"/>
+    <appender-ref ref="FILE"/>
   </root>
 </configuration>

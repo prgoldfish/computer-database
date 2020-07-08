@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.model.Company;
 
@@ -27,8 +30,8 @@ public class CompanyDAO {
     private EntityManager em;
 
     @Autowired
-    public CompanyDAO(EntityManager em) {
-        this.em = em;
+    public CompanyDAO(EntityManagerFactory emf) {
+        this.em = emf.createEntityManager();
     }
 
     /**
@@ -44,9 +47,6 @@ public class CompanyDAO {
         cq.select(root);
         TypedQuery<Company> query = em.createQuery(cq);
         return query.getResultList();
-        /*
-        logger.info("Exécution de la requête \"{}\"", SELECT_COMPANY_LIST_QUERY);
-        return jdbcTemplateObject.query(SELECT_COMPANY_LIST_QUERY, companyMapper);*/
     }
 
     public Optional<Company> getCompanyByName(String name) {
@@ -59,14 +59,6 @@ public class CompanyDAO {
         } catch (NoResultException nre) {
             return Optional.empty();
         }
-        /*
-        logger.info("Exécution de la requête \"{}\"", SELECT_COMPANY_BY_NAME_QUERY);
-        try {
-            Company c = jdbcTemplateObject.queryForObject(SELECT_COMPANY_BY_NAME_QUERY, companyMapper, name);
-            return Optional.of(c);
-        } catch (EmptyResultDataAccessException dae) {
-            return Optional.empty();
-        }*/
     }
 
     public Optional<Company> getCompanyById(long id) {
@@ -79,18 +71,13 @@ public class CompanyDAO {
         } catch (NoResultException nre) {
             return Optional.empty();
         }
-        /*
-        logger.info("Exécution de la requête \"{}\"", SELECT_COMPANY_BY_ID_QUERY);
-        try {
-            Company c = jdbcTemplateObject.queryForObject(SELECT_COMPANY_BY_ID_QUERY, companyMapper, id);
-            return Optional.of(c);
-        } catch (EmptyResultDataAccessException dae) {
-            return Optional.empty();
-        }
-        */
     }
 
-    public void deleteCompany(long id, EntityTransaction t) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteCompany(long id) {
+        if (!em.isJoinedToTransaction()) {
+            throw new TransactionRequiredException();
+        }
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Company> cd = cb.createCriteriaDelete(Company.class);
         Root<Company> root = cd.from(Company.class);
