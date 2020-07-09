@@ -6,13 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
@@ -66,44 +67,46 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Override
+    @Bean
+    public UserDetailsService userDetailsServiceBean() {
+        InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
+        inMemoryUserDetailsManager
+                .createUser(User.withUsername("cdbAdmin").password("password").roles("ADMIN").build());
+        inMemoryUserDetailsManager.createUser(User.withUsername("cdbUser").password("password").roles("USER").build());
+        return inMemoryUserDetailsManager;
     }
 
     @Bean
-    public UserDetailsService UserDetailsService(PasswordEncoder passEncoder) {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(
-                User.builder().passwordEncoder(s -> s).username("cdbAdmin").password("azerty").roles("ADMIN").build());
-        return manager;
+    DigestAuthenticationEntryPoint digestEntryPoint() {
+        DigestAuthenticationEntryPoint bauth = new DigestAuthenticationEntryPoint();
+        bauth.setRealmName("Digest WF Realm");
+        bauth.setKey("MySecureKey");
+        return bauth;
     }
 
     @Bean
-    public DigestAuthenticationEntryPoint digestAuthenticationEntryPoint() {
-        DigestAuthenticationEntryPoint entryPoint = new DigestAuthenticationEntryPoint();
-        entryPoint.setRealmName("CDBRealm");
-        entryPoint.setKey("random key");
-        entryPoint.afterPropertiesSet();
-        return entryPoint;
-    }
-
-    @Bean
-    public DigestAuthenticationFilter digestAuthenticationFilter(UserDetailsService uds,
-            DigestAuthenticationEntryPoint digestAuthenticationEntryPoint) {
-        DigestAuthenticationFilter filter = new DigestAuthenticationFilter();
-        filter.setUserDetailsService(uds);
-        filter.setAuthenticationEntryPoint(digestAuthenticationEntryPoint);
-        filter.setPasswordAlreadyEncoded(false);
-        filter.afterPropertiesSet();
-        return filter;
+    DigestAuthenticationFilter digestAuthenticationFilter() throws Exception {
+        DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
+        digestAuthenticationFilter.setUserDetailsService(userDetailsServiceBean());
+        digestAuthenticationFilter.setAuthenticationEntryPoint(digestEntryPoint());
+        return digestAuthenticationFilter;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-                .antMatchers("/AddComputer", "/EditComputer").hasRole("ADMIN").and().formLogin().and()
-                .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint))
-                .addFilterBefore(digestAuthenticationFilter, DigestAuthenticationFilter.class).logout()
-                .logoutUrl("logout").logoutSuccessUrl("/");
+                .antMatchers("/AddComputer", "/EditComputer").hasRole("ADMIN").and()
+                .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint)).addFilter(digestAuthenticationFilter)
+                .logout().logoutUrl("logout").logoutSuccessUrl("/");
+    }
+
+    @Bean
+    public AuthenticationManager customAuthenticationManager() throws Exception {
+        return authenticationManager();
     }
 
     @Override
