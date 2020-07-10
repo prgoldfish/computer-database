@@ -19,16 +19,16 @@
         
         
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-        <dependent-module archiveName="core-5.2-SNAPSHOT3.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/core/core">
+        <dependent-module archiveName="core-6.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/core/core">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="binding-5.2-SNAPSHOT3.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/binding/binding">
+        <dependent-module archiveName="binding-6.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/binding/binding">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="service-5.2-SNAPSHOT3.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/service/service">
+        <dependent-module archiveName="service-6.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/service/service">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="persistence-5.2-SNAPSHOT3.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/persistence/persistence">
+        <dependent-module archiveName="persistence-6.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/persistence/persistence">
             <dependency-type>uses</dependency-type>
         </dependent-module>
                                         

@@ -67,6 +67,21 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
     @Bean
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
+        //return new BCryptPasswordEncoder();
+        /*return new PasswordEncoder() {
+
+            private String salt = BCrypt.gensalt();
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return BCrypt.checkpw(rawPassword.toString(), encodedPassword);
+            }
+
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return BCrypt.hashpw(rawPassword.toString(), salt);
+            }
+        };*/
     }
 
     /*    @Override
@@ -83,7 +98,7 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
     DigestAuthenticationEntryPoint digestEntryPoint() {
         DigestAuthenticationEntryPoint bauth = new DigestAuthenticationEntryPoint();
         bauth.setRealmName("Digest WF Realm");
-        bauth.setKey("MySecureKey");
+        bauth.setKey("CDBKey");
         return bauth;
     }
 

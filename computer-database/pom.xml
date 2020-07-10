@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.excilys</groupId>
     <artifactId>computer-database</artifactId>
-    <version>5.2-SNAPSHOT3</version>
+    <version>6.0</version>
     <packaging>pom</packaging>
     <name>computer-database</name>
 
