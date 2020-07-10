@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -167,9 +166,6 @@ public class ComputerDAO {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteComputer(long id) {
-        if (!em.isJoinedToTransaction()) {
-            throw new TransactionRequiredException();
-        }
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Computer> cd = cb.createCriteriaDelete(Computer.class);
         Root<Computer> root = cd.from(Computer.class);

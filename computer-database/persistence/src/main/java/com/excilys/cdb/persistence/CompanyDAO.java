@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
-import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -75,9 +74,6 @@ public class CompanyDAO {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteCompany(long id) {
-        if (!em.isJoinedToTransaction()) {
-            throw new TransactionRequiredException();
-        }
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Company> cd = cb.createCriteriaDelete(Company.class);
         Root<Company> root = cd.from(Company.class);

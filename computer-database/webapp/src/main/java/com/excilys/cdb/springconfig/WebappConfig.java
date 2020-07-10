@@ -11,11 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 import org.springframework.web.servlet.LocaleResolver;
@@ -29,6 +26,8 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+
+import com.excilys.cdb.persistence.UserDAO;
 
 @EnableWebMvc
 @EnableWebSecurity
@@ -70,7 +69,7 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
         return NoOpPasswordEncoder.getInstance();
     }
 
-    @Override
+    /*    @Override
     @Bean
     public UserDetailsService userDetailsServiceBean() {
         InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
@@ -79,7 +78,7 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
         inMemoryUserDetailsManager.createUser(User.withUsername("cdbUser").password("password").roles("USER").build());
         return inMemoryUserDetailsManager;
     }
-
+    */
     @Bean
     DigestAuthenticationEntryPoint digestEntryPoint() {
         DigestAuthenticationEntryPoint bauth = new DigestAuthenticationEntryPoint();
@@ -89,9 +88,9 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
     }
 
     @Bean
-    DigestAuthenticationFilter digestAuthenticationFilter() throws Exception {
+    DigestAuthenticationFilter digestAuthenticationFilter(UserDAO userDetailsService) throws Exception {
         DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
-        digestAuthenticationFilter.setUserDetailsService(userDetailsServiceBean());
+        digestAuthenticationFilter.setUserDetailsService(userDetailsService);
         digestAuthenticationFilter.setAuthenticationEntryPoint(digestEntryPoint());
         return digestAuthenticationFilter;
     }

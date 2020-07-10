@@ -15,6 +15,7 @@
   </appender>
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>log.log</file>
+    <append>false</append>
     <encoder>
       <pattern>[%p] %c{2}.%t - %m%n</pattern>
     </encoder>

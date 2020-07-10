@@ -4,7 +4,7 @@
   <parent>
     <artifactId>computer-database</artifactId>
     <groupId>com.excilys</groupId>
-    <version>5.2-SNAPSHOT2</version>
+    <version>5.2-SNAPSHOT3</version>
   </parent>
 
   <artifactId>webapp</artifactId>
