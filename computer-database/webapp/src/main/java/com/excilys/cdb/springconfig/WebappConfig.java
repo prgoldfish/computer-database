@@ -69,14 +69,14 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
         return NoOpPasswordEncoder.getInstance();
         //return new BCryptPasswordEncoder();
         /*return new PasswordEncoder() {
-
+        
             private String salt = BCrypt.gensalt();
-
+        
             @Override
             public boolean matches(CharSequence rawPassword, String encodedPassword) {
                 return BCrypt.checkpw(rawPassword.toString(), encodedPassword);
             }
-
+        
             @Override
             public String encode(CharSequence rawPassword) {
                 return BCrypt.hashpw(rawPassword.toString(), salt);
@@ -112,7 +112,7 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and().authorizeRequests()
                 .antMatchers("/AddComputer", "/EditComputer").hasRole("ADMIN").and()
                 .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint)).addFilter(digestAuthenticationFilter)
                 .logout().logoutUrl("logout").logoutSuccessUrl("/");

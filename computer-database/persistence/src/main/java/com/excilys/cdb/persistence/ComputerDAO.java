@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -18,7 +18,6 @@ import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,13 +30,8 @@ public class ComputerDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(ComputerDAO.class);
 
+    @PersistenceContext
     private EntityManager em;
-
-    @Autowired
-    public ComputerDAO(EntityManagerFactory emf) {
-        this.em = emf.createEntityManager();
-
-    }
 
     private Order[] getCriteriaOrders(CriteriaBuilder cb, Root<Computer> root, OrderByColumn orderBy,
             boolean ascendentOrder) {

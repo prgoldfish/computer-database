@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
@@ -39,8 +40,14 @@ public class AddComputerServletTest {
     @Autowired
     CompanyService companyService;
 
+    private String url;
+
     @Before
     public void setUp() throws Exception {
+        Properties prop = new Properties();
+        prop.load(getClass().getClassLoader().getResourceAsStream("credentials.properties"));
+        url = "http://" + prop.getProperty("username") + ":" + prop.getProperty("password")
+                + "@localhost:8080/computer-database/AddComputer";
         System.setProperty("webdriver.gecko.driver", "/opt/WebDriver/bin/geckodriver");
         driver = new FirefoxDriver();
         js = (JavascriptExecutor) driver;
@@ -53,7 +60,8 @@ public class AddComputerServletTest {
 
     @Test
     public void addCompleteTest() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
+        driver.get(url);
+
         driver.findElement(By.id("computerName")).click();
         driver.findElement(By.id("computerName")).sendKeys("Test encore et encore");
         driver.findElement(By.id("introduced")).click();
@@ -75,7 +83,7 @@ public class AddComputerServletTest {
 
     @Test
     public void addEmptyName() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
+        driver.get(url);
         driver.findElement(By.id("computerName")).click();
         driver.findElement(By.id("computerName")).sendKeys("Nothing");
         driver.findElement(By.id("computerName")).clear();
@@ -85,7 +93,7 @@ public class AddComputerServletTest {
 
     @Test
     public void addIntroInputBoxTest() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
+        driver.get(url);
         driver.findElement(By.id("discontinued")).click();
         driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
         driver.findElement(By.id("introduced")).click();
@@ -109,7 +117,7 @@ public class AddComputerServletTest {
 
     @Test
     public void addDiscontInputBoxTest() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
+        driver.get(url);
         driver.findElement(By.id("discontinued")).click();
         driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
         assert (driver.findElement(By.id("discontErr")).isDisplayed());

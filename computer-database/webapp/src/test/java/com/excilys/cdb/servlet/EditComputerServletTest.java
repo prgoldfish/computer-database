@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
@@ -39,8 +40,14 @@ public class EditComputerServletTest {
     @Autowired
     CompanyService companyService;
 
+    private String url;
+
     @Before
     public void setUp() throws Exception {
+        Properties prop = new Properties();
+        prop.load(getClass().getClassLoader().getResourceAsStream("credentials.properties"));
+        url = "http://" + prop.getProperty("username") + ":" + prop.getProperty("password")
+                + "@localhost:8080/computer-database/ListComputers";
         System.setProperty("webdriver.gecko.driver", "/opt/WebDriver/bin/geckodriver");
         driver = new FirefoxDriver();
         js = (JavascriptExecutor) driver;
@@ -53,7 +60,7 @@ public class EditComputerServletTest {
 
     @Test
     public void editComputerFullAndBackTest() {
-        driver.get("http://localhost:8080/computer-database/ListComputers");
+        driver.get(url);
         firstEdit(); //Edite le premier ordinateur de la dernière page
         Computer expected = new Computer.ComputerBuilder(1, "Test Selenium")
                 .setIntroduced(LocalDateTime.of(2020, 6, 1, 0, 0)).setDiscontinued(LocalDateTime.of(2020, 6, 7, 0, 0))
@@ -104,65 +111,6 @@ public class EditComputerServletTest {
         }
         driver.findElement(By.cssSelector("option:nth-child(31)")).click();
         driver.findElement(By.cssSelector(".btn-primary")).click();
-    }
-
-    @Test
-    public void editEmptyName() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
-        driver.findElement(By.id("computerName")).click();
-        driver.findElement(By.id("computerName")).sendKeys("Nothing");
-        driver.findElement(By.id("computerName")).clear();
-        assert (driver.findElement(By.id("cnErr")).isDisplayed());
-        assertEquals("Le nom de l'ordinateur doit être renseigné", driver.findElement(By.id("cnErr")).getText());
-    }
-
-    @Test
-    public void editIntroInputBoxTest() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
-        driver.findElement(By.id("discontinued")).click();
-        driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
-        driver.findElement(By.id("introduced")).click();
-        driver.findElement(By.id("introduced")).sendKeys("2020-06-20");
-        assert (driver.findElement(By.id("introErr")).isDisplayed());
-        assertEquals("La date de discontinuation est avant la date d'introduction",
-                driver.findElement(By.id("introErr")).getText());
-
-        driver.findElement(By.id("introduced")).click();
-        driver.findElement(By.id("introduced")).clear();
-        assert (driver.findElement(By.id("introErr")).isDisplayed());
-        assertEquals("Une date d'introduction est requise si une date de discontinuation est présente",
-                driver.findElement(By.id("introErr")).getText());
-
-        driver.findElement(By.id("introduced")).click();
-        driver.findElement(By.id("introduced")).sendKeys("2020-06-01");
-        new WebDriverWait(driver, Duration.ofSeconds(2))
-                .until(driver -> !driver.findElement(By.id("introErr")).isDisplayed());
-        assert (!driver.findElement(By.id("introErr")).isDisplayed());
-    }
-
-    @Test
-    public void editDiscontInputBoxTest() {
-        driver.get("http://localhost:8080/computer-database/AddComputer");
-        driver.findElement(By.id("discontinued")).click();
-        driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
-        assert (driver.findElement(By.id("discontErr")).isDisplayed());
-        assertEquals("Une date d'introduction est requise si une date de discontinuation est présente",
-                driver.findElement(By.id("discontErr")).getText());
-
-        driver.findElement(By.id("discontinued")).clear();
-        driver.findElement(By.id("introduced")).click();
-        driver.findElement(By.id("introduced")).sendKeys("2020-06-20");
-        driver.findElement(By.id("discontinued")).click();
-        driver.findElement(By.id("discontinued")).sendKeys("2020-06-04");
-        assert (driver.findElement(By.id("discontErr")).isDisplayed());
-        assertEquals("La date de discontinuation est avant la date d'introduction",
-                driver.findElement(By.id("discontErr")).getText());
-
-        driver.findElement(By.id("introduced")).click();
-        driver.findElement(By.id("introduced")).sendKeys("2020-06-01");
-        new WebDriverWait(driver, Duration.ofSeconds(2))
-                .until(driver -> !driver.findElement(By.id("discontErr")).isDisplayed());
-        assert (!driver.findElement(By.id("discontErr")).isDisplayed());
     }
 
 }
