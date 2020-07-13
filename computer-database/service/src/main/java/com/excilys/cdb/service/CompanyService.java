@@ -32,6 +32,10 @@ public class CompanyService {
         return companyDao.getCompanyById(id);
     }
 
+    public int getNumOfElementsForLastRequest() {
+        return companyDao.getNumOfElementsForLastRequest();
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteCompany(long id) {
         Optional<Company> optCompany = companyDao.getCompanyById(id);

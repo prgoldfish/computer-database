@@ -1,11 +1,13 @@
 package com.excilys.cdb.springconfig;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
@@ -67,33 +70,9 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
     @Bean
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
-        //return new BCryptPasswordEncoder();
-        /*return new PasswordEncoder() {
-        
-            private String salt = BCrypt.gensalt();
-        
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return BCrypt.checkpw(rawPassword.toString(), encodedPassword);
-            }
-        
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return BCrypt.hashpw(rawPassword.toString(), salt);
-            }
-        };*/
+
     }
 
-    /*    @Override
-    @Bean
-    public UserDetailsService userDetailsServiceBean() {
-        InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
-        inMemoryUserDetailsManager
-                .createUser(User.withUsername("cdbAdmin").password("password").roles("ADMIN").build());
-        inMemoryUserDetailsManager.createUser(User.withUsername("cdbUser").password("password").roles("USER").build());
-        return inMemoryUserDetailsManager;
-    }
-    */
     @Bean
     DigestAuthenticationEntryPoint digestEntryPoint() {
         DigestAuthenticationEntryPoint bauth = new DigestAuthenticationEntryPoint();
@@ -112,7 +91,7 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and().authorizeRequests()
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
                 .antMatchers("/AddComputer", "/EditComputer").hasRole("ADMIN").and()
                 .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint)).addFilter(digestAuthenticationFilter)
                 .logout().logoutUrl("logout").logoutSuccessUrl("/");
@@ -121,6 +100,19 @@ public class WebappConfig extends WebSecurityConfigurerAdapter implements WebMvc
     @Bean
     public AuthenticationManager customAuthenticationManager() throws Exception {
         return authenticationManager();
+    }
+
+    @Bean
+    public MappingJackson2HttpMessageConverter jsonMessageConverter() {
+        return new MappingJackson2HttpMessageConverter();
+    }
+
+    @Bean
+    public RequestMappingHandlerAdapter requestMappingHandlerAdapter(
+            MappingJackson2HttpMessageConverter jsonConverter) {
+        RequestMappingHandlerAdapter adapter = new RequestMappingHandlerAdapter();
+        adapter.setMessageConverters(Arrays.asList(jsonConverter));
+        return adapter;
     }
 
     @Override

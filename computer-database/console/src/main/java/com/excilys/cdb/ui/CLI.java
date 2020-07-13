@@ -12,7 +12,7 @@ import com.excilys.cdb.exception.ComputerServiceException;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.service.Page;
+import com.excilys.cdb.service.PageManager;
 
 public class CLI {
 
@@ -26,7 +26,7 @@ public class CLI {
      *
      * @param p L'objet page contenant les informations de pagination
      */
-    private static void askPage(Page<Computer> p) {
+    private static void askPage(PageManager p) {
         System.out.println("Entrez un numéro de page entre 1 et " + p.getMaxPage());
         int pageNum = getIntBetween(1, p.getMaxPage());
         p.gotoPage(pageNum);
@@ -96,43 +96,32 @@ public class CLI {
         return computerName;
     }
 
-    protected static void pageCommand(Page<Computer> page) throws ComputerServiceException {
-        boolean quit = false;
-        while (!quit) {
-            System.out.println(
-                    "Entrez \"prec\" pour voir la page précédente, \"suiv\" pour la page suivante, \"page\" pour aller à une page et \"menu\" pour retourner au menu principal.");
-            try {
-                quit = pageCommandSwitch(page, quit);
-            } catch (PageException pae) {
-                printSingleError(pae.getMessage());
-            }
-        }
-    }
-
-    private static boolean pageCommandSwitch(Page<Computer> page, boolean quit) throws ComputerServiceException, PageException {
-        switch (sc.nextLine()) {
+    protected static String askCommand(PageManager page) throws ComputerServiceException, PageException {
+        System.out.println(
+                "Entrez \"prec\" pour voir la page précédente, \"suiv\" pour la page suivante, \"page\" pour aller à une page et \"menu\" pour retourner au menu principal.");
+        String input = sc.nextLine();
+        switch (input) {
+        case "page":
+            askPage(page);
         case "prec":
-            printPage(page.getPreviousPageContents(), page.getCurrentPage(), page.getMaxPage());
-            break;
-
+        case "suiv":
+        case "menu":
+            return input;
+        //printPage(page.getPreviousPageContents(), page.getCurrentPage(), page.getMaxPage());
+        /*
         case "suiv":
             printPage(page.getNextPageContents(), page.getCurrentPage(), page.getMaxPage());
             break;
-
+        
         case "page":
             askPage(page);
             printPage(page.getPageContent(), page.getCurrentPage(), page.getMaxPage());
             break;
-
-        case "menu":
-            quit = true;
-            break;
-
+        */
         default:
             System.out.println("Entrée invalide");
-            break;
+            return askCommand(page);
         }
-        return quit;
     }
 
     /**

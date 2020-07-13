@@ -4,7 +4,7 @@
   <parent>
     <artifactId>computer-database</artifactId>
     <groupId>com.excilys</groupId>
-    <version>6.0.1</version>
+    <version>6.1-alpha1</version>
   </parent>
 
   <artifactId>webapp</artifactId>
@@ -81,6 +81,11 @@
         <version>${spring-security.version}</version>
         <scope>test</scope>
     </dependency>
+    <dependency>
+	  <groupId>com.fasterxml.jackson.core</groupId>
+	  <artifactId>jackson-databind</artifactId>
+	  <version>${jackson.version}</version>
+	</dependency>
     
   </dependencies>
 

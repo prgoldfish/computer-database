@@ -1,5 +1,6 @@
 package com.excilys.cdb.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.service.Page;
+import com.excilys.cdb.service.PageManager;
 
 @Controller
 @RequestMapping("/ListComputers")
@@ -78,25 +79,26 @@ public class ListComputersController {
         params.setPage(Integer.toString(intPage));
 
         int computerCount = 0;
-        Page<Computer> pages = null;
+        PageManager pages = new PageManager(intPage, intLength);
+
+        List<Computer> compList = new ArrayList<>();
 
         try {
             if (params.getSearch() != null) {
-                pages = new Page<>(
-                        computerService.searchComputersByName(params.getSearch(), orderColumn, ascendentOrder),
-                        intLength);
+                compList = pages.getSubList(
+                        computerService.searchComputersByName(params.getSearch(), orderColumn, ascendentOrder));
             } else {
-                pages = new Page<>(computerService.getComputerList(0, Integer.MAX_VALUE, orderColumn, ascendentOrder),
-                        intLength);
+                compList = computerService.getComputerList(pages.getOffset(), pages.getLength(), orderColumn,
+                        ascendentOrder);
             }
         } catch (ComputerServiceException cse) {
             logger.error(cse.getMessage());
         }
 
         pages.gotoPage(intPage);
-        computerCount = pages.getElementCount();
+        computerCount = computerService.getNumOfElementsForLastRequest();
 
-        List<ComputerDTO> dtoList = pages.getPageContent().stream().map(c -> {
+        List<ComputerDTO> dtoList = compList.stream().map(c -> {
             try {
                 return ComputerMapper.toDTO(c);
             } catch (MapperException e) {

@@ -33,6 +33,12 @@ public class ComputerDAO {
     @PersistenceContext
     private EntityManager em;
 
+    private int numOfElementsForLastRequest = 0;
+
+    public int getNumOfElementsForLastRequest() {
+        return numOfElementsForLastRequest;
+    }
+
     private Order[] getCriteriaOrders(CriteriaBuilder cb, Root<Computer> root, OrderByColumn orderBy,
             boolean ascendentOrder) {
         if (orderBy == null) {
@@ -71,16 +77,24 @@ public class ComputerDAO {
      * @return Les ordinateurs dans une List
      */
     public List<Computer> getComputerList(long startIndex, long limit, OrderByColumn orderBy, boolean ascendentOrder) {
+        numOfElementsForLastRequest = 0;
         CriteriaBuilder cb = em.getCriteriaBuilder();
+
+        //Get number of elements in the table
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        countQuery.select(cb.count(countQuery.from(Computer.class)));
+        numOfElementsForLastRequest = em.createQuery(countQuery).getSingleResult().intValue();
+
+        //Do the request with the offset and limit
         CriteriaQuery<Computer> cq = cb.createQuery(Computer.class);
         Root<Computer> root = cq.from(Computer.class);
-
         cq.select(root).orderBy(getCriteriaOrders(cb, root, orderBy, ascendentOrder));
         TypedQuery<Computer> query = em.createQuery(cq).setFirstResult((int) startIndex).setMaxResults((int) limit);
         return query.getResultList();
     }
 
     public List<Long> getComputersIdsByCompanyId(long companyId) {
+        numOfElementsForLastRequest = 0;
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Computer> root = cq.from(Computer.class);
@@ -88,45 +102,55 @@ public class ComputerDAO {
                 em.getMetamodel().entity(Computer.class).getDeclaredSingularAttribute("company", Company.class),
                 JoinType.LEFT);
         cq.select(root.get("id")).where(cb.equal(join.get("id"), companyId));
-        TypedQuery<Long> query = em.createQuery(cq);
-        return query.getResultList();
+        List<Long> res = em.createQuery(cq).getResultList();
+        numOfElementsForLastRequest = res.size();
+        return res;
     }
 
     public long getMaxId() {
+        numOfElementsForLastRequest = 0;
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Computer> root = cq.from(Computer.class);
         cq.select(cb.max(root.get("id")));
-        TypedQuery<Long> query = em.createQuery(cq);
-        return query.getSingleResult();
+        long res = em.createQuery(cq).getSingleResult();
+        numOfElementsForLastRequest = 1;
+        return res;
     }
 
     public Optional<Computer> getComputerById(long id) {
+        numOfElementsForLastRequest = 0;
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Computer> cq = cb.createQuery(Computer.class);
         Root<Computer> root = cq.from(Computer.class);
         cq.select(root).where(cb.equal(root.get("id"), id));
         try {
-            return Optional.of(em.createQuery(cq).getResultList().get(0));
+            Optional<Computer> res = Optional.of(em.createQuery(cq).getResultList().get(0));
+            numOfElementsForLastRequest = 1;
+            return res;
         } catch (IndexOutOfBoundsException ioobe) {
             return Optional.empty();
         }
     }
 
     public Optional<Computer> getComputerByName(String name) {
+        numOfElementsForLastRequest = 0;
         name = "%" + name.replace("%", "\\%") + "%";
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Computer> cq = cb.createQuery(Computer.class);
         Root<Computer> root = cq.from(Computer.class);
         cq.select(root).where(cb.like(root.get("name"), name));
         try {
-            return Optional.of(em.createQuery(cq).getResultList().get(0));
+            Optional<Computer> res = Optional.of(em.createQuery(cq).getResultList().get(0));
+            numOfElementsForLastRequest = 1;
+            return res;
         } catch (IndexOutOfBoundsException ioobe) {
             return Optional.empty();
         }
     }
 
     public List<Computer> searchComputersByName(String name, OrderByColumn orderBy, boolean ascendentOrder) {
+        numOfElementsForLastRequest = 0;
         name = "%" + name.replace("%", "\\%") + "%";
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Computer> cq = cb.createQuery(Computer.class);
@@ -134,17 +158,20 @@ public class ComputerDAO {
 
         cq.select(root).where(cb.like(root.get("name"), name))
                 .orderBy(getCriteriaOrders(cb, root, orderBy, ascendentOrder));
-        TypedQuery<Computer> query = em.createQuery(cq);
-        return query.getResultList();
+        List<Computer> res = em.createQuery(cq).getResultList();
+        numOfElementsForLastRequest = res.size();
+        return res;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void addComputer(Computer c) {
+        numOfElementsForLastRequest = 0;
         em.persist(c);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void updateComputer(Computer c) {
+        numOfElementsForLastRequest = 0;
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<Computer> cu = cb.createCriteriaUpdate(Computer.class);
         Root<Computer> root = cu.from(Computer.class);
@@ -160,6 +187,7 @@ public class ComputerDAO {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteComputer(long id) {
+        numOfElementsForLastRequest = 0;
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Computer> cd = cb.createCriteriaDelete(Computer.class);
         Root<Computer> root = cd.from(Computer.class);

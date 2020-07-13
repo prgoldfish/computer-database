@@ -8,12 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.excilys.cdb.exception.ComputerServiceException;
+import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.OrderByColumn;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.service.Page;
+import com.excilys.cdb.service.PageManager;
 import com.excilys.cdb.springconfig.ConsoleConfig;
 
 @Controller
@@ -172,13 +173,45 @@ public class CLIController {
      * Affiche la liste des ordinateurs avec un système de pagination
      */
     private void showComputerList() {
+        PageManager page = new PageManager(20);
         try {
-            Page<Computer> page = new Page<>(
-                    computerService.getComputerList(0, Integer.MAX_VALUE, OrderByColumn.COMPUTERID, true), 20);
-            CLI.printPage(page.getPageContent(), page.getCurrentPage(), page.getMaxPage());
-            CLI.pageCommand(page);
+            List<Computer> comList = computerService.getComputerList(page.getOffset(), page.getLength(),
+                    OrderByColumn.COMPUTERID, true);
+            CLI.printPage(comList, page.getCurrentPage(),
+                    page.getMaxPage(computerService.getNumOfElementsForLastRequest()));
+            pageLoop(page);
         } catch (ComputerServiceException cse) {
             CLI.printSingleError(cse.getMessage());
+        }
+    }
+
+    private void pageLoop(PageManager page) throws ComputerServiceException {
+        while (true) {
+            try {
+                String input = CLI.askCommand(page);
+                int offset = 0;
+                switch (input) {
+                case "page":
+                    offset = page.getOffset();
+                    break;
+                case "prec":
+                    offset = page.getPreviousPageOffset();
+                    break;
+                case "suiv":
+                    offset = page.getNextPageOffset();
+                    break;
+
+                case "menu":
+                default:
+                    return;
+                }
+                List<Computer> comList = computerService.getComputerList(offset, page.getLength(),
+                        OrderByColumn.COMPUTERID, true);
+                CLI.printPage(comList, page.getCurrentPage(),
+                        page.getMaxPage(computerService.getNumOfElementsForLastRequest()));
+            } catch (PageException pae) {
+                CLI.printSingleError(pae.getMessage());
+            }
         }
     }
 

@@ -34,6 +34,10 @@ public class ComputerService {
         fromScratch = false;
     }
 
+    public int getNumOfElementsForLastRequest() {
+        return dao.getNumOfElementsForLastRequest();
+    }
+
     public boolean canAddEndDate() {
         return builder != null && builder.isPresent() && builder.get().getIntroduced() != null;
     }
